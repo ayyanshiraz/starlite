@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import Link from 'next/link'; // --- ADDED THIS IMPORT ---
-import { allProducts } from '../lib/products'; // --- ADDED THIS IMPORT ---
+import Link from 'next/link';
+import { allProducts } from '../lib/products';
 
 // --- IMPORTS ---
 import { HeaderSection } from '../components/Header';
@@ -244,42 +244,42 @@ function ModernHeroSection() {
                   visible: { transition: { staggerChildren: 0.1 } }
                 }}
               >
-                  <div className="px-4">
-                    <motion.span
-                      // --- UPDATED: Added font-bold ---
-                      className="block text-gray-300 font-bold mb-4 text-base"
-                      variants={textChildVariants}
-                    >
-                      {slide.preTitle}
-                    </motion.span>
+                <div className="px-4">
+                  <motion.span
+                    // --- UPDATED: Added font-bold ---
+                    className="block text-gray-300 font-bold mb-4 text-base"
+                    variants={textChildVariants}
+                  >
+                    {slide.preTitle}
+                  </motion.span>
 
-                    <motion.h1
-                      // --- Title style (Kept) ---
-                      className="text-6xl lg:text-7xl font-extrabold text-white mb-6 leading-tight"
-                      variants={textChildVariants}
-                    >
-                      {slide.title}
-                    </motion.h1>
+                  <motion.h1
+                    // --- Title style (Kept) ---
+                    className="text-6xl lg:text-7xl font-extrabold text-white mb-6 leading-tight"
+                    variants={textChildVariants}
+                  >
+                    {slide.title}
+                  </motion.h1>
 
-                    <motion.p
-                      // --- UPDATED: Added font-bold ---
-                      className="text-base text-gray-300 font-bold mb-10 mx-auto max-w-xl"
-                      variants={textChildVariants}
-                    >
-                      {slide.description}
-                    </motion.p>
+                  <motion.p
+                    // --- UPDATED: Added font-bold ---
+                    className="text-base text-gray-300 font-bold mb-10 mx-auto max-w-xl"
+                    variants={textChildVariants}
+                  >
+                    {slide.description}
+                  </motion.p>
 
-                    {/* --- Button style (Kept) --- */}
-                    <motion.div variants={textChildVariants}>
-                      <Link
-                        href={slide.href}
-                        className="inline-flex items-center text-lg font-semibold py-3 px-8 border-2 border-white text-white rounded-md transition-all duration-300 hover:bg-white hover:text-blue-700 hover:shadow-[0_0_15px_5px_rgba(255,255,255,0.4)]"
-                      >
-                        Know more
-                        <ArrowRightIcon className="w-5 h-5 ml-2" />
-                      </Link>
-                    </motion.div>
-                  </div>
+                  {/* --- Button style (Kept) --- */}
+                  <motion.div variants={textChildVariants}>
+                    <Link
+                      href={slide.href}
+                      className="inline-flex items-center text-lg font-semibold py-3 px-8 border-2 border-white text-white rounded-md transition-all duration-300 hover:bg-white hover:text-blue-700 hover:shadow-[0_0_15px_5px_rgba(255,255,255,0.4)]"
+                    >
+                      Know more
+                      <ArrowRightIcon className="w-5 h-5 ml-2" />
+                    </Link>
+                  </motion.div>
+                </div>
               </motion.div>
 
             </div>
@@ -402,11 +402,6 @@ function DealsSection() {
 
 // --- START: NEW FEATURED PRODUCTS SECTION ---
 
-// ---
-// --- !!! ATTENTION !!!
-// --- THIS IS THE VARIABLE YOU NEED TO CHECK
-// --- MAKE SURE 'image:' HAS THE CORRECT PATH TO YOUR LAPTOP IMAGE
-// ---
 // --- Mock Data (Replace with your actual data) ---
 const specialOffer = {
   title: 'HP 14" EliteBook 640 G9 - 6C0Z3UT',
@@ -460,7 +455,8 @@ const TabButton = ({ title, isActive, onClick }: { title: string, isActive: bool
 function ProductCard({ product }: { product: any }) {
   return (
     <motion.div
-      className="group relative border border-gray-700 bg-[#00001E] rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg flex flex-col z-0"
+      // --- 1. CHANGED: border-gray-700 to border-gray-200 and bg-[#00001E] to bg-white ---
+      className="group relative border border-gray-200 bg-white rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg flex flex-col z-0"
       whileHover={{
         y: -8,
         scale: 1.03,
@@ -480,24 +476,29 @@ function ProductCard({ product }: { product: any }) {
       </Link>
 
       {/* Restructured card content to match BestDealsSection */}
-      <div className="p-4 bg-[#00001E] flex flex-col grow">
-        <span className="block text-xs text-gray-400 mb-1">{product.brand}</span>
+      {/* --- 2. CHANGED: bg-[#00001E] to bg-white --- */}
+      <div className="p-4 bg-white flex flex-col grow">
+        {/* --- 3. CHANGED: text-gray-400 to text-gray-500 --- */}
+        <span className="block text-xs text-gray-500 mb-1">{product.brand}</span>
         {/* --- CHANGE: Converted <a> to <Link> and used product.slug --- */}
         <Link href={`/product/${product.slug}`} className="flex-grow">
-          <h3 className="text-sm font-semibold text-white mb-3 h-10 line-clamp-2 group-hover:text-blue-400 transition-colors">
+          {/* --- 4. CHANGED: text-white to text-gray-900 and hover:text-blue-400 to hover:text-blue-600 --- */}
+          <h3 className="text-sm font-semibold text-gray-900 mb-3 h-10 line-clamp-2 group-hover:text-blue-600 transition-colors">
             {product.title}
           </h3>
         </Link>
 
         {/* NEW Action Area (replaces old text and button) */}
-        <div className="mt-auto pt-4 border-t border-gray-700"> {/* Border for separation */}
+        {/* --- 5. CHANGED: border-gray-700 to border-gray-200 --- */}
+        <div className="mt-auto pt-4 border-t border-gray-200"> {/* Border for separation */}
           <a
             href="#" // This should ideally be a quote link
             className="block w-full text-center bg-blue-600 text-white font-semibold py-2.5 rounded-md text-sm transition-all duration-300 hover:bg-blue-700 hover:shadow-md"
           >
             Get a Quote
           </a>
-          <button className="flex items-center gap-1.5 text-gray-400 hover:text-blue-400 transition-colors w-full justify-center mt-3">
+          {/* --- 6. CHANGED: text-gray-400 to text-gray-600 and hover:text-blue-400 to hover:text-blue-600 --- */}
+          <button className="flex items-center gap-1.5 text-gray-600 hover:text-blue-600 transition-colors w-full justify-center mt-3">
             <HeartIcon className="w-4 h-4" />
             <span className="text-sm font-medium">Add to Wishlist</span>
           </button>
@@ -659,7 +660,7 @@ function EverythingBannerSection() {
           }}
         >
           <p className="text-xl md:text-2xl font-semibold text-gray-100 leading-snug"> {/* --- UPDATED: text-3xl md:text-4xl to text-xl md:text-2xl --- */}
-            Starlite Linker empowers businesses by simplifying IT procurement with a wide range of cost-effective hardware, complemented by expert consultation and 24/7 support to craft tailored, complete technology solutions. They act as a trusted partner, guiding companies from product selection to comprehensive implementation.         </p>
+            Starlite Linker empowers businesses by simplifying IT procurement with a wide range of cost-effective hardware, complemented by expert consultation and 24/7 support to craft tailored, complete technology solutions. They act as a trusted partner, guiding companies from product selection to comprehensive implementation.          </p>
         </motion.div>
       </div>
     </section>
@@ -746,10 +747,46 @@ const bestDealsCategories = [
 function BestDealsSection() {
   const [activeCategory, setActiveCategory] = useState('all');
 
-  // Filter products based on activeCategory (simple example, would be more complex with real data)
-  const filteredProducts = activeCategory === 'all'
-    ? bestDealsProducts
-    : bestDealsProducts.filter(product => product.brand.toLowerCase().includes(activeCategory.replace('-', ' '))); // Basic filtering
+  // --- START: MODIFIED FILTER LOGIC ---
+  // Get all matching products first
+  const allFilteredProducts = (() => {
+    // "Best Deals" tab uses the curated 'bestDealsProducts' list
+    if (activeCategory === 'all') {
+      return bestDealsProducts;
+    }
+
+    // All other tabs filter from the master 'allProducts' list
+    const allProductsFormatted = allProducts.map(p => ({
+      id: p.id,
+      slug: p.slug,
+      image: p.image,
+      title: p.name,
+      brand: p.category,
+    }));
+
+    if (activeCategory === 'lenovo-laptop') {
+      // Special filter for Lenovo Laptops
+      return allProductsFormatted.filter(product => {
+        const searchableText = (product.brand.toLowerCase() + ' ' + product.title.toLowerCase());
+        return searchableText.includes('lenovo') && 
+               (searchableText.includes('laptop') || searchableText.includes('thinkpad'));
+      });
+    }
+
+    // Basic filtering for other categories
+    const searchTerm = activeCategory.replace('-', ' ');
+    return allProductsFormatted.filter(product => {
+      const searchableText = (product.title.toLowerCase() + ' ' + product.brand.toLowerCase());
+      return searchableText.includes(searchTerm);
+    });
+    
+  })();
+
+  // Now, limit the products if we are on the Lenovo tab
+  const productsToShow = activeCategory === 'lenovo-laptop'
+    ? allFilteredProducts.slice(0, 5)
+    : allFilteredProducts;
+  // --- END: MODIFIED FILTER LOGIC ---
 
   // Variant for the entire section "stomp"
   const sectionStompVariant = {
@@ -794,11 +831,13 @@ function BestDealsSection() {
         <div
           className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6"
         >
-          {filteredProducts.map((product) => (
+         {productsToShow.map((product) => (
+            // --- 1. CHANGED: bg-[#00001E] to bg-white, border-gray-700 to border-gray-200, hover:border-blue-700 to hover:border-blue-600 ---
             <div
               key={product.id}
-              className="group bg-[#00001E] rounded-lg border border-gray-700 hover:border-blue-700 transition-all duration-300 overflow-hidden flex flex-col shadow-sm hover:shadow-xl"
+              className="group bg-white rounded-lg border border-gray-200 hover:border-blue-600 transition-all duration-300 overflow-hidden flex flex-col shadow-sm hover:shadow-xl"
             >
+              
               {/* --- CHANGE: Converted <a> to <Link> and used product.slug --- */}
               <Link href={`/product/${product.slug}`} className="block relative w-full h-32 bg-white p-4 overflow-hidden">
                 <Image
@@ -810,27 +849,29 @@ function BestDealsSection() {
                 />
               </Link>
 
-              {/* --- Style Update: Content area is DARK, text is LIGHT --- */}
-              <div className="p-4 flex flex-col flex-grow bg-[#00001E]"> {/* Content background is DARK */}
-                {/* --- Style Update: Brand color is LIGHT BLUE --- */}
-                <span className="block text-xs font-medium text-blue-400 mb-1">{product.brand}</span>
+              {/* --- 2. CHANGED: bg-[#00001E] to bg-white --- */}
+              <div className="p-4 flex flex-col flex-grow bg-white"> {/* Content background is WHITE */}
+                {/* --- 3. CHANGED: text-blue-400 to text-gray-500 --- */}
+                <span className="block text-xs font-medium text-gray-500 mb-1">{product.brand}</span>
                 {/* --- CHANGE: Converted <a> to <Link> and used product.slug --- */}
                 <Link href={`/product/${product.slug}`} className="flex-grow">
-                  <h3 className="text-sm font-semibold text-white mb-3 h-10 line-clamp-2 group-hover:text-blue-400 transition-colors">
+                  {/* --- 4. CHANGED: text-white to text-gray-900, hover:text-blue-400 to hover:text-blue-600 --- */}
+                  <h3 className="text-sm font-semibold text-gray-900 mb-3 h-10 line-clamp-2 group-hover:text-blue-600 transition-colors">
                     {product.title}
                   </h3>
                 </Link>
 
                 {/* --- NEW Action Area --- */}
-                <div className="mt-auto pt-4 border-t border-gray-700"> {/* Border is DARK */}
+                {/* --- 5. CHANGED: border-gray-700 to border-gray-200 --- */}
+                <div className="mt-auto pt-4 border-t border-gray-200"> {/* Border is LIGHT */}
                   <a
                     href="#" // This should ideally be a quote link
                     className="block w-full text-center bg-blue-600 text-white font-semibold py-2.5 rounded-md text-sm transition-all duration-300 hover:bg-blue-700 hover:shadow-md"
                   >
                     Get a Quote
                   </a>
-                  {/* --- Style Update: Wishlist text is LIGHT GRAY --- */}
-                  <button className="flex items-center gap-1.5 text-gray-400 hover:text-blue-400 transition-colors w-full justify-center mt-3">
+                  {/* --- 6. CHANGED: text-gray-400 to text-gray-600, hover:text-blue-400 to hover:text-blue-600 --- */}
+                  <button className="flex items-center gap-1.5 text-gray-600 hover:text-blue-600 transition-colors w-full justify-center mt-3">
                     <HeartIcon className="w-4 h-4" />
                     <span className="text-sm font-medium">Add to Wishlist</span>
                   </button>
@@ -839,88 +880,24 @@ function BestDealsSection() {
             </div>
           ))}
         </div>
+        {/* --- START: PASTE THE NEW "VIEW ALL" BUTTON CODE HERE --- */}
+        {activeCategory === 'lenovo-laptop' && allFilteredProducts.length > 5 && (
+          <div className="flex justify-center mt-10">
+            <Link
+              href="/category/lenovo-laptop"
+              className="inline-flex items-center text-lg font-semibold py-3 px-8 border-2 border-blue-600 text-blue-600 rounded-md transition-all duration-300 hover:bg-blue-600 hover:text-white hover:shadow-lg group"
+            >
+              View All Lenovo Laptops
+              <ArrowRightIcon className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" />
+            </Link>
+          </div>
+        )}
+        {/* --- END: NEW "VIEW ALL" BUTTON --- */}
       </div>
     </motion.section>
   );
 }
 // --- END: NEW BEST DEALS SECTION ---
-// --- START: NEW LENOVO LAPTOP SECTION ---
-
-// 1. Filter the data from allProducts
-const lenovoLaptops = allProducts.filter(product => {
-  const searchableText = (product.name + ' ' + product.category).toLowerCase();
-  return searchableText.includes('lenovo') && (searchableText.includes('laptop') || searchableText.includes('laptops'));
-}).slice(0, 5); // Get the first 5 Lenovo Laptops
-
-// 2. Create the Section Component
-function LenovoLaptopSection() {
-  
-  // Re-using the animation from BestDealsSection
-  const sectionStompVariant = {
-    hidden: { opacity: 0, scale: 0.95 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      transition: {
-        duration: 0.4,
-        ease: "easeOut"
-      }
-    }
-  };
-
-  // Map data to the format ProductCard expects
-  const formattedLenovoProducts = lenovoLaptops.map(p => ({
-    id: p.id,
-    slug: p.slug,
-    image: p.image,
-    title: p.name, // ProductCard (line 603) expects 'title'
-    brand: p.category, // ProductCard (line 603) expects 'brand'
-  }));
-
-
-  return (
-    <motion.section
-      className="py-16 bg-white" // White background to match BestDeals
-      variants={sectionStompVariant}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: false, amount: 0.2 }}
-    >
-      <div className="container mx-auto px-24">
-        {/* Section Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div className="relative">
-            <h2 className="text-3xl font-bold text-gray-900">Lenovo Laptops</h2>
-            <div className="absolute -bottom-2 left-0 w-20 h-1 bg-blue-600 rounded-full"></div>
-          </div>
-          
-          <Link
-            href="/category/lenovo-laptop"
-            className="flex items-center text-blue-600 font-semibold group"
-          >
-            <span>View All</span>
-            <ArrowRightIcon className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" />
-          </Link>
-        </div>
-
-        {/* Products Grid */}
-        <div
-          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6"
-        >
-          {formattedLenovoProducts.map((product) => (
-            // Using the dark ProductCard component defined around line 603
-            <ProductCard
-              key={product.id}
-              product={product}
-            />
-          ))}
-        </div>
-      </div>
-    </motion.section>
-  );
-}
-// --- END: NEW LENOVO LAPTOP SECTION ---
-
 
 // --- START: MOCK DATA FOR BEST SELLERS ---
 // --- UPDATED: Added slug field to all products ---
@@ -1057,15 +1034,16 @@ function BestSellersSection() {
 
   if (numPages === 0) {
     return (
-      <section className="py-16 bg-[#00001E]">
-        <div className="container mx-auto px-24 text-center text-gray-400">
+      // --- 1. CHANGED: Background to white and text to dark ---
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-24 text-center text-gray-700">
           No products found for this category.
         </div>
       </section>
     );
   }
 
-  let displayProducts = [];
+  let displayProducts: (typeof allBestSellers[0] | null)[] = [];
   if (numPages === 1) {
     displayProducts = [null, activeProductList[0], null];
   } else {
@@ -1079,7 +1057,8 @@ function BestSellersSection() {
   }
 
   return (
-    <section className="py-16 bg-[#00001E]">
+    // --- 2. CHANGED: Background to white ---
+    <section className="py-16 bg-white">
       <div className="container mx-auto px-24">
         {/* Category Tabs */}
         <div className="flex justify-center flex-wrap gap-x-6 gap-y-2 mb-10">
@@ -1090,10 +1069,11 @@ function BestSellersSection() {
                 setActiveTab(tab.id);
                 setPage([0, 0]); // Reset slider on tab change
               }}
+              // --- 3. CHANGED: Inactive tab styles for white background ---
               className={`py-2 px-5 rounded-md text-lg font-semibold transition-colors duration-300
                 ${activeTab === tab.id
                   ? 'bg-blue-600 text-white'
-                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
             >
               {tab.title}
@@ -1130,19 +1110,20 @@ function BestSellersSection() {
           {/* Carousel Buttons */}
           {numPages > 1 && (
             <>
+              {/* --- 4. CHANGED: Arrow button styles for white background --- */}
               <button
                 onClick={() => paginate(-1)}
-                className="absolute top-1/2 left-[-3rem] -translate-y-1/2 z-30 bg-white/70 hover:bg-white backdrop-blur-sm p-2 rounded-full shadow-lg transition-all"
+                className="absolute top-1/2 left-[-3rem] -translate-y-1/2 z-30 bg-gray-100 hover:bg-blue-600 text-gray-900 hover:text-white p-2 rounded-full shadow-lg transition-all"
                 aria-label="Previous slide"
               >
-                <ChevronLeftIcon className="w-6 h-6 text-gray-900" />
+                <ChevronLeftIcon className="w-6 h-6" />
               </button>
               <button
                 onClick={() => paginate(1)}
-                className="absolute top-1/2 right-[-3rem] -translate-y-1/2 z-30 bg-white/70 hover:bg-white backdrop-blur-sm p-2 rounded-full shadow-lg transition-all"
+                className="absolute top-1/2 right-[-3rem] -translate-y-1/2 z-30 bg-gray-100 hover:bg-blue-600 text-gray-900 hover:text-white p-2 rounded-full shadow-lg transition-all"
                 aria-label="Next slide"
               >
-                <ChevronRightIcon className="w-6 h-6 text-gray-900" />
+                <ChevronRightIcon className="w-6 h-6" />
               </button>
             </>
           )}
@@ -1152,8 +1133,6 @@ function BestSellersSection() {
   );
 }
 // --- END: NEW BEST SELLERS SECTION ---
-
-
 // --- START: NEW BIG DEALS BANNER SECTION ---
 // This is a category/shop link, so it remains as-is.
 function BigDealsBannerSection() {
@@ -1396,7 +1375,6 @@ export default function HomePageClient() {
       <EverythingBannerSection />
       {/* NEW: BestDealsSection added here */}
       <BestDealsSection />
-      <LenovoLaptopSection />
       {/* NEW: BestSellersSection added after BestDeals */}
       <BestSellersSection />
       

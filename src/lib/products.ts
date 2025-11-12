@@ -1,7 +1,7 @@
 // src/lib/products.ts
 
-// 1. DEFINE THE DESCRIPTION TYPE
-export type ProductDescription = {
+// 1. DEFINE THE STANDARD DESCRIPTION TYPE (Original)
+export type StandardProductDescription = {
   overview: string;
   design: { title: string; formFactor: string };
   performance: { title: string; processor: string; memory: string; storage: string };
@@ -10,7 +10,17 @@ export type ProductDescription = {
   functionality: { title: string; versatility: string; connectivityOptions: string };
 };
 
-// 2. UPDATE THE MAIN PRODUCT TYPE
+// 2. DEFINE THE NEW KEY-FEATURE DESCRIPTION TYPE (For screenshot format)
+export type KeyFeatureProductDescription = {
+  keyFeatures: {
+    title: string;
+    items: string[];
+  }[];
+  benefits: string[];
+  summary: string;
+};
+
+// 3. UPDATE THE MAIN PRODUCT TYPE TO ACCEPT EITHER STRUCTURE
 export type Product = {
   id: string;
   name: string;
@@ -19,12 +29,11 @@ export type Product = {
   category: string; // The display category (e.g., "Laptops, HP")
   categorySlug: string; // The link (e.g., "computers-and-laptops")
   slug: string; // This is required
-  description: ProductDescription; // This is now required
+  description: StandardProductDescription | KeyFeatureProductDescription; // This allows both formats
 };
-
 // 3. CREATE THE DETAILED DELL DESCRIPTION
 // This is the one you provided
-const dellDescription: ProductDescription = {
+const dellDescription: StandardProductDescription = {
   overview: "Dell 14 inch Latitude 7420 2-in-1 Touchscreen Notebook Overview",
   design: {
     title: "Design",
@@ -60,7 +69,7 @@ const dellDescription: ProductDescription = {
   }
 };
 // 3. CREATE A GENERIC PLACEHOLDER DESCRIPTION
-const placeholderDescription: ProductDescription = {
+const placeholderDescription: StandardProductDescription = {
   overview: "Product overview is not yet available.",
   design: {
     title: "Design",
@@ -90,7 +99,7 @@ const placeholderDescription: ProductDescription = {
   
 };
 // --- NEW DESCRIPTION FOR HP M501dn ---
-const hpLaserJetM501dnDescription: ProductDescription = {
+const hpLaserJetM501dnDescription: StandardProductDescription = {
   overview: 'HP LaserJet Pro M501dn Mono Laser Printer',
   design: {
     title: 'Compact and Efficient Design',
@@ -1114,7 +1123,7 @@ export const allProducts: Product[] = [
     id: "59", 
     name: 'Dell – Latitude 5540 – 15.6″ – Intel Core i5 1345U – YRYYW', 
     price: "Get a Quote", 
-    image: '/computerandlaptops/dell/dell2.png', 
+    image: '/computerandlaptops/dell/dell3.jpg', 
     category: 'Laptops, Dell', 
     categorySlug: 'computers-and-laptops',
     slug: 'dell-latitude-5540-15-6-intel-core-i5-1345u-yryyw',
@@ -1131,7 +1140,7 @@ export const allProducts: Product[] = [
     id: "60", 
     name: 'Dell – Latitude 5540 – 15.6″ – Intel Core i7 1365U – TPJJ4', 
     price: "Get a Quote", 
-    image: '/computerandlaptops/dell/dell3.png', 
+    image: '/computerandlaptops/dell/dell3.jpg', 
     category: 'Laptops, Dell', 
     categorySlug: 'computers-and-laptops',
     slug: 'dell-latitude-5540-15-6-intel-core-i7-1365u-tpjj4',
@@ -1148,7 +1157,7 @@ export const allProducts: Product[] = [
     id: "61", 
     name: 'Dell 15.6″ Latitude 5540 Notebook – X3VH2', 
     price: "Get a Quote", 
-    image: '/computerandlaptops/dell/dell4.png', 
+    image: '/computerandlaptops/dell/dell4.jpg', 
     category: 'Laptops, Dell', 
     categorySlug: 'computers-and-laptops',
     slug: 'dell-15-6-latitude-5540-notebook-x3vh2',
@@ -2525,290 +2534,304 @@ export const allProducts: Product[] = [
   // --- End of Computers & Laptops ---
 
   // --- Accessories ---
-  { 
-    id: "143", 
-    name: 'Dell WD19S Docking station - USB-C', 
-    price: "Get a Quote", 
-    image: '/images/hero-printer.png', 
-    category: 'Accessories, Dell', 
-    categorySlug: 'accessories',
-    slug: 'dell-wd19s-docking-station-usb-c',
-    description: {
-      overview: "Dell WD19S Docking Station Overview",
-      design: { title: "Design", formFactor: "A powerful and modular USB-C docking station designed to declutter your workspace and provide extensive connectivity." },
-      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
-      display: { title: "Display and Graphics", screen: "Supports multiple high-resolution displays (e.g., dual 4K) for maximum productivity.", graphics: "N/A" },
-      connectivity: { title: "Connectivity", ports: ["USB-C 3.2 Gen 2", "USB-A 3.2 Gen 1", "DisplayPort 1.4", "HDMI 2.0", "RJ-45 Ethernet"], wireless: ["N/A"] },
-      functionality: { title: "Functionality", versatility: "Transform your laptop into a full desktop workstation with a single USB-C cable. Delivers power, data, and video.", connectivityOptions: "Modular design allows for easy upgrades and flexible setup." }
-    }
-  },
-    // --- NEW DELL DOCKING STATIONS ---
+  // --- UPDATED Dell WD19S Docking station (id: "143") ---
+{ 
+  id: "143", 
+  name: 'Dell WD19S Docking station - USB-C', 
+  price: "Get a Quote", 
+  image: '/dell-docking-station/5.jpg', 
+  category: 'Accessories, Dell', 
+  categorySlug: 'accessories',
+  slug: 'dell-wd19s-docking-station-usb-c',
+  description: {
+    keyFeatures: [
+      {
+        title: 'Ports',
+        items: [
+          'DisplayPort 1.4 (Dual): Provides connectivity for two modern displays.',
+          'HDMI 2.0b: A versatile port for connecting monitors or TVs.',
+          'USB-C Multifunction: Supports DisplayPort over USB-C.',
+          'USB-C 3.2 Gen 2: A port for fast data transfer devices.',
+          'USB-A 3.2 Gen 1 (Triple): Ample ports for your keyboard mouse and other accessories.',
+          'Gigabit Ethernet (RJ-45): Delivers a reliable high-speed wired network connection.'
+        ]
+      },
+      {
+        title: 'Display Support',
+        items: [
+          'Supports multiple high-resolution displays (e.g. dual 4K) for maximum productivity.'
+        ]
+      },
+      {
+        title: 'Power Delivery',
+        items: [
+          'Delivers power to your laptop through the USB-C cable (e.g. 90W or 130W depending on the adapter).'
+        ]
+      }
+    ],
+    benefits: [
+      'Single-Cable Solution: Transform your laptop into a full desktop workstation with a single USB-C cable that handles power data and video.',
+      'Modular Design: Features a modular design allowing for easy upgrades and flexible setup.',
+      'Streamlined Productivity: Connect all your peripherals—monitors keyboard mouse and network—through one single device.'
+    ],
+    summary: 'The Dell WD19S is a powerful and modular USB-C docking station designed to declutter your workspace and provide extensive connectivity. It transforms your laptop into a full desktop workstation with a single cable.'
+  }
+},
+// --- NEW DELL DOCKING STATIONS (AMENDED & CLEANED) ---
+// --- Replace the old objects in your src/lib/products.ts file with these ---
 {
   id: 'dell-da305u',
   slug: 'dell-6-in-1-multiport-adapter-da305u',
   name: 'Dell – 6-in-1 Multiport Adapter – DELL-DA305U',
-  image: '/computerandlaptops/dell/dell-da305u.png', // You may need to update this image path
+  image: '/dell-docking-station/2.jpg',
   category: 'Docking Station, Dell',
   categorySlug: 'accessories',
   price: 'Get a Quote',
   description: {
-    overview: 'Dell 6-in-1 USB-C Multiport Adapter - DA305U',
-    design: {
-      title: 'Compact 6-in-1 Design',
-      formFactor: 'A compact and portable multiport adapter with a patented, twist-to-retract design. Features an integrated USB-C cable that stores neatly within the adapter.',
-    },
-    performance: {
-      title: 'Versatile Performance',
-      processor: 'N/A',
-      memory: 'N/A',
-      storage: 'N/A',
-    },
-    display: {
-      title: 'Flexible Display Connectivity',
-      screen: 'Supports one 4K display at 60Hz via DisplayPort or HDMI 2.0. Also includes a VGA port for legacy display support.',
-      graphics: 'N/A',
-    },
-    connectivity: {
-      title: 'Comprehensive Port Selection',
-      ports: [
-        '1x HDMI 2.0 (4K @ 60Hz)',
-        '1x DisplayPort 1.4 (4K @ 60Hz)',
-        '1x VGA',
-        '1x USB-C 3.2 Gen 2 (10Gbps data & 90W Power Pass-through)',
-        '2x USB-A 3.2 Gen 2 (10Gbps)',
-        '1x RJ-45 Gigabit Ethernet',
-      ],
-      wireless: ['N/A'],
-    },
-    functionality: {
-      title: 'All-in-One Connectivity',
-      versatility: 'Ideal for mobile professionals, this adapter provides 90W Power Pass-through (requires a separate USB-C power adapter) and fast 10Gbps data transfer.',
-      connectivityOptions: 'The most comprehensive portable adapter, offering video, data, network, and power pass-through in a single device.',
-    },
+    keyFeatures: [
+      {
+        title: 'Ports',
+        items: [
+          'HDMI 2.0: Connect to a 4K display at 60Hz.',
+          'DisplayPort 1.4: Supports high-resolution 4K video output at 60Hz.',
+          'VGA: Provides connectivity for legacy display monitors.',
+          'USB-C 3.2 Gen 2: Supports 10Gbps data transfer and 90W Power Pass-through.',
+          'USB-A 3.2 Gen 2: Two ports for fast 10Gbps data transfer to peripherals.',
+          'Gigabit Ethernet (RJ-45): Ensures a fast and reliable wired network connection.'
+        ]
+      },
+      {
+        title: 'Power Delivery',
+        items: [
+          '90W Power Pass-through: Charge your laptop while using the adapter. This requires a separate USB-C power adapter.'
+        ]
+      },
+      {
+        title: 'Design',
+        items: [
+          'Compact and Portable: Features a patented twist-to-retract design with a neatly stored integrated USB-C cable.'
+        ]
+      }
+    ],
+    benefits: [
+      'All-in-One Connectivity: Offers a comprehensive selection of video data network and power pass-through in one single device.',
+      'High-Speed Data: Equipped with USB 3.2 Gen 2 ports for 10Gbps data transfer speeds.',
+      'Flexible Display Options: Connect to modern 4K displays or older VGA monitors with ease.'
+    ],
+    summary: 'The Dell 6-in-1 USB-C Multiport Adapter DA305U is an essential tool for mobile professionals. It improves your laptop connectivity by supporting multiple interfaces and fast data transfer in a highly compact design.'
   }
 },
 {
   id: 'dell-wd19s-performance',
   slug: 'dell-performance-docking-station-wd19s',
   name: 'Dell – Performance – docking station – DELL-WD19DCS',
-  image: '/computerandlaptops/dell/dell-wd19s-performance.png', // You may need to update this image path
+  image: '/dell-docking-station/5.jpg',
   category: 'Docking Station, Dell',
   categorySlug: 'accessories',
   price: 'Get a Quote',
   description: {
-    overview: 'Dell Performance Dock - WD19SP (WD19S with 180W/240W Adapter)',
-    design: {
-      title: 'High-Performance Modular Design',
-      formFactor: 'A modular docking station designed for power users. This is the WD19S base with a high-output power adapter (likely 180W or 240W) to deliver more power to your laptop.',
-    },
-    performance: {
-      title: 'Performance-Focused Power',
-      processor: 'N/A',
-      memory: 'N/A',
-      storage: 'N/A',
-    },
-    display: {
-      title: 'Multi-Display Support',
-      screen: 'Supports up to dual 4K displays at 60Hz or triple QHD displays. Performance depends on the host laptop (HBR2 vs HBR3).',
-      graphics: 'N/A',
-    },
-    connectivity: {
-      title: 'Extensive Pro-Level Ports',
-      ports: [
-        '1x USB-C 3.2 Gen 2',
-        '1x USB-C Multifunction (DisplayPort over USB-C)',
-        '3x USB-A 3.2 Gen 1 (5Gbps)',
-        '2x DisplayPort 1.4',
-        '1x HDMI 2.0b',
-        '1x RJ-45 Gigabit Ethernet',
-      ],
-      wireless: ['N/A'],
-    },
-    functionality: {
-      title: 'Future-Proof and Upgradable',
-      versatility: 'Delivers up to 130W of power (with 180W adapter) or 210W (with 240W adapter), ideal for workstations. The module is swappable for future upgrades.',
-      connectivityOptions: 'Features Dell ExpressCharge for rapid battery charging and a single USB-C cable for data, display, and power.',
-    },
+    keyFeatures: [
+      {
+        title: 'Ports',
+        items: [
+          'DisplayPort 1.4 (Dual): Connect multiple high-resolution displays.',
+          'HDMI 2.0b: An additional port for video and audio output.',
+          'USB-C Multifunction: Supports DisplayPort over USB-C for more display options.',
+          'USB-C 3.2 Gen 2: For high-speed data transfer.',
+          'USB-A 3.2 Gen 1 (Triple): Connect a wide range of standard peripherals.',
+          'Gigabit Ethernet (RJ-45): For stable and fast wired network access.'
+        ]
+      },
+      {
+        title: 'Display Support',
+        items: [
+          'Multi-Monitor Power: Supports up to dual 4K displays at 60Hz or triple QHD displays. Performance is host laptop dependent.'
+        ]
+      },
+      {
+        title: 'Power Delivery',
+        items: [
+          'High-Performance Power: Delivers up to 130W (with 180W adapter) or 210W (with 240W adapter) to power high-demand workstations.'
+        ]
+      }
+    ],
+    benefits: [
+      'Future-Proof Design: Features a modular design with swappable modules for easy future upgrades.',
+      'Workstation Ready: Built for power users who need extensive port selection and high power delivery for demanding tasks.',
+      'Rapid Charging: Includes Dell ExpressCharge technology for quickly charging your laptop battery.'
+    ],
+    summary: 'The Dell Performance Dock WD19S is a high-performance modular solution for power users. It simplifies your workspace with a single USB-C cable for data extensive multi-display support and powerful charging for workstations.'
   }
 },
 {
   id: 'dell-wd19s-150w',
   slug: 'dell-wd19s-docking-station-150w',
   name: 'Dell – WD19S – Docking station – DELL-WD19S130W',
-  image: '/computerandlaptops/dell/dell-wd19s-pair.png', // You may need to update this image path
+  image: '/dell-docking-station/6.jpg',
   category: 'Docking Station, Dell',
   categorySlug: 'accessories',
   price: 'Get a Quote',
   description: {
-    overview: 'Dell Docking Station - WD19S (with 150W/180W Adapter)',
-    design: {
-      title: 'Modern and Modular',
-      formFactor: 'The industry-standard USB-C docking station. This model (WD19S) connects via a single USB-C cable and features a modular design for easy upgrades.',
-    },
-    performance: {
-      title: 'Standard Business Performance',
-      processor: 'N/A',
-      memory: 'N/A',
-      storage: 'N/A',
-    },
-    display: {
-      title: 'Dual Display Capability',
-      screen: 'Supports up to dual Full HD (1080p) displays or a single 4K display, making it perfect for standard business productivity.',
-      graphics: 'N/A',
-    },
-    connectivity: {
-      title: 'Essential Business Ports',
-      ports: [
-        '1x USB-C 3.2 Gen 2',
-        '1x USB-C Multifunction (DisplayPort over USB-C)',
-        '3x USB-A 3.2 Gen 1 (5Gbps)',
-        '2x DisplayPort 1.4',
-        '1x HDMI 2.0b',
-        '1x RJ-45 Gigabit Ethernet',
-      ],
-      wireless: ['N/A'],
-    },
-    functionality: {
-      title: 'Streamlined Productivity',
-      versatility: 'Delivers up to 90W of power (with 130W adapter) or 130W (with 180W adapter), charging your laptop while you work.',
-      connectivityOptions: 'Connect all your peripherals—monitors, keyboard, mouse, and network—through a single cable.',
-    },
+    keyFeatures: [
+      {
+        title: 'Ports',
+        items: [
+          'DisplayPort 1.4 (Dual): Provides connectivity for two modern displays.',
+          'HDMI 2.0b: A versatile port for connecting monitors or TVs.',
+          'USB-C Multifunction: Supports DisplayPort over USB-C.',
+          'USB-C 3.2 Gen 2: A port for fast data transfer devices.',
+          'USB-A 3.2 Gen 1 (Triple): Ample ports for your keyboard mouse and other accessories.',
+          'Gigabit Ethernet (RJ-45): Delivers a reliable high-speed wired network connection.'
+        ]
+      },
+      {
+        title: 'Display Support',
+        items: [
+          'Dual Display: Easily supports up to dual Full HD (1080p) displays or a single 4K display.'
+        ]
+      },
+      {
+        title: 'Power Delivery',
+        items: [
+          'Standard Business Power: Delivers up to 90W (with 130W adapter) or 130W (with 180W adapter) to keep your laptop charged.'
+        ]
+      }
+    ],
+    benefits: [
+      'Streamlined Productivity: Connect all your peripherals—monitors keyboard mouse and network—through one single cable.',
+      'Modular Design: The industry-standard dock features a modular design allowing for simple upgrades.',
+      'Business Ready: Perfect for standard business productivity creating an efficient and clean desk setup.'
+    ],
+    summary: 'The Dell Docking Station WD19S is the modern modular solution for business environments. It provides essential connectivity for dual displays and peripherals all while charging your laptop through a single USB-C cable.'
   }
 },
 {
   id: 'dell-wd22tb4',
   slug: 'dell-thunderbolt-dock-wd22tb4',
   name: 'DELL Thunderbolt™ Dock – DELL-WD22TB4',
-  image: '/computerandlaptops/dell/dell-wd22tb4.png', // You may need to update this image path
+  image: '/dell-docking-station/5.jpg',
   category: 'Docking Station, Dell',
   categorySlug: 'accessories',
   price: 'Get a Quote',
   description: {
-    overview: 'Dell Thunderbolt 4 Dock - WD22TB4',
-    design: {
-      title: 'Next-Generation Thunderbolt 4',
-      formFactor: 'A premium, high-performance docking station leveraging Thunderbolt 4 technology. Features a swappable module design for future-proofing.',
-    },
-    performance: {
-      title: 'Ultimate Performance',
-      processor: 'N/A',
-      memory: 'N/A',
-      storage: 'N/A (Thunderbolt 4 bandwidth: 40Gbps)',
-    },
-    display: {
-      title: 'High-Resolution Display Support',
-      screen: 'Supports up to dual 4K displays at 60Hz or a single 8K display at 60Hz (on supported hosts).',
-      graphics: 'N/A',
-    },
-    connectivity: {
-      title: 'Thunderbolt 4 and USB-C',
-      ports: [
-        '2x Thunderbolt 4 ports (one for host)',
-        '1x USB-C 3.2 Gen 2 (with DisplayPort)',
-        '1x USB-C 3.2 Gen 2',
-        '4x USB-A 3.2 Gen 1 (5Gbps)',
-        '2x DisplayPort 1.4',
-        '1x HDMI 2.0',
-        '1x RJ-45 Gigabit Ethernet',
-      ],
-      wireless: ['N/A'],
-    },
-    functionality: {
-      title: 'Maximum Productivity',
-      versatility: 'Delivers up to 130W of power to Dell laptops (90W to non-Dell). The swappable module can be replaced with the WD19S module if needed.',
-      connectivityOptions: 'The ultimate dock for creative professionals and power users who need maximum bandwidth for displays and data.',
-    },
+    keyFeatures: [
+      {
+        title: 'Ports',
+        items: [
+          'Thunderbolt 4 (Dual): The ultimate high-speed connection (40Gbps) for host and peripherals.',
+          'DisplayPort 1.4 (Dual): Connect multiple 4K displays.',
+          'HDMI 2.0: An additional port for display flexibility.',
+          'USB-C 3.2 Gen 2 (Dual): Multiple ports for fast data and DisplayPort support.',
+          'USB-A 3.2 Gen 1 (Four): A large number of ports for all your standard devices.',
+          'Gigabit Ethernet (RJ-45): For a stable wired internet connection.'
+        ]
+      },
+      {
+        title: 'Display Support',
+        items: [
+          'High-Resolution Power: Supports up to dual 4K displays at 60Hz or a single 8K display at 60Hz on supported hosts.'
+        ]
+      },
+      {
+        title: 'Technology',
+        items: [
+          'Thunderbolt 4: Leverages next-generation 40Gbps bandwidth for maximum performance.'
+        ]
+      }
+    ],
+    benefits: [
+      'Ultimate Performance: The ideal dock for creative professionals and power users who need maximum bandwidth for displays and data.',
+      'Future-Proof Modularity: Features a premium swappable module design for easy upgrades.',
+      'Powerful Charging: Delivers up to 130W of power to Dell laptops (90W to non-Dell) to keep you productive.'
+    ],
+    summary: 'The Dell Thunderbolt 4 Dock WD22TB4 is a premium high-performance docking station. It offers next-generation connectivity for high-resolution displays and fast data transfer making it the ultimate solution for maximum productivity.'
   }
 },
 {
   id: 'dell-wd19s-usbc-210',
   slug: 'dell-wd19s-docking-station-usb-c-210w',
   name: 'Dell WD19S – docking station – USB-C – 210-AZBG',
-  image: '/computerandlaptops/dell/dell-wd19s-usbc-210.png', // You may need to update this image path
+  image: '/dell-docking-station/5.jpg',
   category: 'Docking Station, Dell',
   categorySlug: 'accessories',
   price: 'Get a Quote',
   description: {
-    overview: 'Dell WD19S USB-C Docking Station (with 210W Adapter)',
-    design: {
-      title: 'High-Power USB-C Dock',
-      formFactor: 'This is the WD19S docking station base, paired with a powerful 210W AC adapter for high-demand laptops.',
-    },
-    performance: {
-      title: 'Enhanced Power Delivery',
-      processor: 'N/A',
-      memory: 'N/A',
-      storage: 'N/A',
-    },
-    display: {
-      title: 'Multi-Monitor Setup',
-      screen: 'Supports multiple displays (e.g., dual 1080p or single QHD) via its DisplayPort and HDMI ports.',
-      graphics: 'N/A',
-    },
-    connectivity: {
-      title: 'Full Business Connectivity',
-      ports: [
-        '1x USB-C 3.2 Gen 2',
-        '1x USB-C Multifunction (DisplayPort over USB-C)',
-        '3x USB-A 3.2 Gen 1 (5Gbps)',
-        '2x DisplayPort 1.4',
-        '1x HDMI 2.0b',
-        '1x RJ-45 Gigabit Ethernet',
-      ],
-      wireless: ['N/A'],
-    },
-    functionality: {
-      title: 'Power for Workstations',
-      versatility: 'With a 210W adapter, this dock can deliver up to 180W of power to the connected laptop, making it suitable for mobile workstations.',
-      connectivityOptions: 'Ideal for users who need more than the standard 90W or 130W, ensuring your workstation stays charged under heavy load.',
-    },
+    keyFeatures: [
+      {
+        title: 'Ports',
+        items: [
+          'DisplayPort 1.4 (Dual): Connect to two monitors for an expanded workspace.',
+          'HDMI 2.0b: A versatile port for an additional display.',
+          'USB-C Multifunction: Supports DisplayPort over USB-C functionality.',
+          'USB-C 3.2 Gen 2: A port for modern high-speed accessories.',
+          'USB-A 3.2 Gen 1 (Triple): Connect your essential keyboard mouse and external drives.',
+          'Gigabit Ethernet (RJ-45): Ensures a fast and stable wired network connection.'
+        ]
+      },
+      {
+        title: 'Power Delivery',
+        items: [
+          'High-Power Charging: Paired with a 210W adapter this dock delivers up to 180W of power to the connected laptop.'
+        ]
+      },
+      {
+        title: 'Compatibility',
+        items: [
+          'Workstation Ready: Ideal for high-demand laptops and mobile workstations that require more than 130W of power.'
+        ]
+      }
+    ],
+    benefits: [
+      'Power for Workstations: Ensures your high-performance laptop stays fully charged even under heavy workloads.',
+      'Full Business Connectivity: Provides all the essential ports for a complete desktop setup.',
+      'Single-Cable Convenience: Declutter your desk by connecting all devices and power through a single USB-C cable.'
+    ],
+    summary: 'The Dell WD19S USB-C Docking Station with a 210W adapter is built for power. It is the perfect solution for users with mobile workstations providing enhanced power delivery alongside full business connectivity.'
   }
 },
 {
   id: 'dell-wd19s-180w',
   slug: 'dell-wired-usb-3-2-gen-2-dell-wd19s180w',
   name: 'DELL Wired USB 3.2 Gen 2 – DELL-WD19S180W',
-  image: '/computerandlaptops/dell/dell-wd19s-180w.png', // You may need to update this image path
+  image: '/dell-docking-station/1.jpg',
   category: 'Docking Station, Dell',
   categorySlug: 'accessories',
   price: 'Get a Quote',
   description: {
-    overview: 'Dell Wired USB 3.2 Gen 2 Dock - WD19S (with 180W Adapter)',
-    design: {
-      title: 'Reliable Wired Docking',
-      formFactor: 'The Dell WD19S is the enterprise workhorse, offering a single USB-C cable connection to your laptop in a durable, modular chassis.',
-    },
-    performance: {
-      title: 'Robust Power Delivery',
-      processor: 'N/A',
-      memory: 'N/A',
-      storage: 'N/A',
-    },
-    display: {
-      title: 'Dual Display Ready',
-      screen: 'Easily connects up to two Full HD monitors or a single 4K monitor, perfect for expanding your workspace.',
-      graphics: 'N/A',
-    },
-    connectivity: {
-      title: 'Essential Desktop Ports',
-      ports: [
-        '1x USB-C 3.2 Gen 2',
-        '1x USB-C Multifunction (DisplayPort over USB-C)',
-        '3x USB-A 3.2 Gen 1 (5Gbps)',
-        '2x DisplayPort 1.4',
-        '1x HDMI 2.0b',
-        '1x RJ-45 Gigabit Ethernet',
-      ],
-      wireless: ['N/A'],
-    },
-    functionality: {
-      title: 'Streamline Your Desk',
-      versatility: 'The 180W adapter provides up to 130W of power to your Dell laptop, enough for most high-performance models. Also features Dell ExpressCharge.',
-      connectivityOptions: 'Manage your dock with built-in features like MAC Address Pass-Through and PXE Boot. A single cable handles power, data, and video.',
-    },
+    keyFeatures: [
+      {
+        title: 'Ports',
+        items: [
+          'DisplayPort 1.4 (Dual): Easily connect two Full HD or QHD monitors.',
+          'HDMI 2.0b: An additional port for a third display or projector.',
+          'USB-C Multifunction: A flexible port that supports DisplayPort over USB-C.',
+          'USB-C 3.2 Gen 2: For high-speed data transfer peripherals.',
+          'USB-A 3.2 Gen 1 (Triple): Connect your standard desktop accessories like keyboard mouse and headset.',
+          'Gigabit Ethernet (RJ-45): For a reliable fast wired network connection.'
+        ]
+      },
+      {
+        title: 'Power Delivery',
+        items: [
+          'Robust Power: The 180W adapter provides up to 130W of power to your Dell laptop suitable for most high-performance models.'
+        ]
+      },
+      {
+        title: 'Manageability',
+        items: [
+          'Enterprise Features: Supports enterprise-level features like MAC Address Pass-Through and PXE Boot for easy management.'
+        ]
+      }
+    ],
+    benefits: [
+      'Streamline Your Desk: This enterprise workhorse allows you to handle power data and video with a single USB-C cable.',
+      'Rapid Charging: Features Dell ExpressCharge to quickly power your laptop and get you back to work.',
+      'Reliable Docking: A durable and modular chassis makes this a dependable choice for any business environment.'
+    ],
+    summary: 'The Dell Wired USB 3.2 Gen 2 Dock WD19S with a 180W adapter is the enterprise standard for productivity. It streamlines your desk provides robust power for performance laptops and includes key manageability features.'
   }
 },
-// --- END OF NEW DELL DOCKING STATIONS ---
+// --- END OF AMENDED DELL DOCKING STATIONS ---
 
 
   // --- Switches ---
@@ -2878,8 +2901,3137 @@ export const allProducts: Product[] = [
   description: hpLaserJetM501dnDescription, // <-- USES THE NEW DESCRIPTION
 },
 // --- END OF NEW PRODUCT ---
+// --- NEW: HP DISPLAYS (27 PRODUCTS) ---
+  {
+    id: "hp-d-1",
+    slug: "hp-322pv-21-4-full-hd-led-monitor",
+    name: "HP 322pv 21.4″ Full HD LED Monitor",
+    image: "/hp-display/12.jpg",
+    category: "HP Displays",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "An essential and budget-friendly 21.4-inch monitor, perfect for everyday office tasks and bulk deployments.",
+      design: {
+        title: "Design",
+        formFactor: "A 21.4-inch Full HD (1920x1080) panel in a standard black chassis with a tilt-adjustable stand. VESA mount compatible."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "21.4-inch Full HD (1920x1080) LED display. Likely a VA panel for high contrast, ideal for text and spreadsheets.",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["1x HDMI", "1x VGA"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "A reliable workhorse monitor for call centers, admin tasks, or any role needing a clear, simple display.",
+        connectivityOptions: "Essential ports for connecting to both modern and legacy computers."
+      }
+    }
+  },
+  {
+    id: "hp-d-2",
+    slug: "hp-324pf-23-8-fhd-ips-monitor-100hz",
+    name: "HP 324pf 23.8″ FHD IPS Monitor ? 100Hz, 5ms, HDMI/DP/VGA ? Slim LED Backlight for Work & Gaming",
+    image: "/hp-display/1.jpg",
+    category: "HP Displays",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A modern 23.8-inch Full HD monitor designed for a smooth, fluid user experience in the home or office.",
+      design: {
+        title: "Design",
+        formFactor: "A 23.8-inch IPS panel with 3-sided micro-edge bezels for a seamless look. Includes a tilt-adjustable stand."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "23.8-inch Full HD (1920x1080) IPS display with a 100Hz refresh rate and 5ms response time for blur-free scrolling.",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["1x HDMI", "1x DisplayPort", "1x VGA"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "The 100Hz refresh rate provides a noticeable step-up in smoothness for web browsing, video, and general productivity.",
+        connectivityOptions: "Flexible connectivity for a variety of devices."
+      }
+    }
+  },
+  {
+    id: "hp-d-3",
+    slug: "hp-324pv-24-full-hd-va-monitor-100hz",
+    name: "HP 324pv 24″ Full HD VA Monitor ? 100Hz, Eye Ease, 3000:1 Contrast ? Sleek & Flicker-Free",
+    image: "/hp-display/11.jpg",
+    category: "HP Displays",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "An affordable 24-inch monitor that combines a high-contrast VA panel with a smooth 100Hz refresh rate.",
+      design: {
+        title: "Design",
+        formFactor: "A 24-inch panel in a standard business-black chassis with a tilt-adjustable stand."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "24-inch Full HD (1920x1080) VA panel, providing deep blacks and high contrast. Features a 100Hz refresh rate.",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["1x HDMI", "1x VGA"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "A great value-oriented choice for users who want smooth motion without sacrificing the deep blacks of a VA panel.",
+        connectivityOptions: "Essential ports for standard computer connections."
+      }
+    }
+  },
+  {
+    id: "hp-d-4",
+    slug: "hp-524pu-23-8-fhd-ips-monitor-100hz-usb-c",
+    name: "HP 524PU 23.8″ FHD IPS Monitor ? 100Hz, USB-C 100W, Borderless Design",
+    image: "/hp-display/10.jpg",
+    category: "HP Displays",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A 23.8-inch business monitor designed for the modern hybrid workspace, featuring single-cable USB-C connectivity and a 100Hz refresh rate.",
+      design: {
+        title: "Design",
+        formFactor: "A 23.8-inch IPS display with 3-sided micro-edge bezels and a full ergonomic stand (height, tilt, swivel, pivot)."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "23.8-inch Full HD (1920x1080) IPS panel. 100Hz refresh rate provides smooth motion for all tasks.",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["1x USB-C (65W Power Delivery, DisplayPort Alt-Mode)", "1x HDMI", "1x DisplayPort", "USB-A Hub"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "Connect, charge, and display from your laptop with a single USB-C cable. The 100Hz refresh rate and ergonomic stand ensure comfort.",
+        connectivityOptions: "A true docking monitor for a clean and productive desk setup."
+      }
+    }
+  },
+  {
+    id: "hp-d-5",
+    slug: "hp-7-pro-24-wuxga-ips-monitor-8x534aa",
+    name: "HP 7 Pro 24″ WUXGA IPS Monitor – 8X534AA#ABU",
+    image: "/hp-display/4.jpg",
+    category: "HP Displays",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A premium 24-inch professional monitor from the HP 7 Pro series, featuring a 16:10 aspect ratio for enhanced productivity.",
+      design: {
+        title: "Design",
+        formFactor: "A 24-inch 16:10 IPS panel with 4-sided micro-edge bezels and a premium silver/black ergonomic stand."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "24-inch WUXGA (1920x1200) 16:10 IPS display. Factory calibrated for color accuracy (99% sRGB).",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["1x USB-C (100W Power Delivery)", "1x DisplayPort (In)", "1x DisplayPort (Out for daisy-chain)", "1x HDMI", "USB-A/C Hub"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "The 16:10 aspect ratio provides more vertical screen space for code, documents, and timelines. A powerful 100W USB-C docking monitor.",
+        connectivityOptions: "Single-cable docking and daisy-chaining to a second monitor."
+      }
+    }
+  },
+  {
+    id: "hp-d-6",
+    slug: "hp-p24h-g5-24-fhd-ips-monitor",
+    name: "HP 724pf 23.8″ FHD IPS Monitor ? 100Hz, 99% sRGB, Factory Calibrated",
+    image: "/hp-display/5.jpg",
+    category: "HP Displays",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A 24-inch G5 business monitor that delivers essential performance, comfort, and connectivity for everyday productivity.",
+      design: {
+        title: "Design",
+        formFactor: "A 23.8-inch Full HD IPS panel with 3-sided micro-edge bezels and a full ergonomic stand (height, tilt, swivel, pivot)."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "23.8-inch Full HD (1920x1080) IPS display with HP Eye Ease low blue light technology.",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["1x HDMI", "1x DisplayPort", "1x VGA", "USB-A Hub"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "The 'h' in P24h signifies its fully adjustable ergonomic stand, making it a comfortable workhorse for any office.",
+        connectivityOptions: "A built-in USB hub and a wide range of video inputs (HDMI, DP, VGA) offer total flexibility."
+      }
+    }
+  },
+  {
+    id: "hp-d-7",
+    slug: "hp-p24h-g5-24-full-hd-ips-monitor-75hz",
+    name: "HP 727pq 27″ Class WQHD LED Monitor – 16:9- 8J4D8AA#ABU",
+    image: "/hp-display/6.jpg",
+    category: "HP Displays",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A 24-inch G5 business monitor that combines ergonomic comfort with a smoother 75Hz refresh rate for everyday productivity.",
+      design: {
+        title: "Design",
+        formFactor: "A 23.8-inch Full HD IPS panel with 3-sided micro-edge bezels and a fully adjustable ergonomic stand (height, tilt, swivel, pivot)."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "23.8-inch Full HD (1920x1080) IPS display with a 75Hz refresh rate and HP Eye Ease technology.",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["1x HDMI", "1x DisplayPort", "1x VGA", "USB-A Hub"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "A fully ergonomic monitor with a 75Hz refresh rate that provides a slightly smoother visual experience than standard 60Hz monitors.",
+        connectivityOptions: "Connect to any PC, new or old, with HDMI, DisplayPort, and VGA inputs."
+      }
+    }
+  },
+  {
+    id: "hp-d-8",
+    slug: "hp-p27-g5-27-fhd-ips-monitor-64x89aa",
+    name: "HP 727pu 27″ WQHD IPS Black Monitor ? 120Hz, FreeSync Premium, HDR400, USB-C, KVM",
+    image: "/hp-display/8.jpg",
+    category: "HP Displays",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "An essential 27-inch G5 business monitor offering a large Full HD screen for multitasking.",
+      design: {
+        title: "Design",
+        formFactor: "A 27-inch Full HD IPS panel with 3-sided micro-edge bezels and a simple, tilt-adjustable stand."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "27-inch Full HD (1920x1080) IPS display. 75Hz refresh rate.",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["1x HDMI", "1x DisplayPort", "1x VGA"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "A large-screen monitor perfect for viewing multiple documents side-by-side. VESA mount compatibility allows for custom setups.",
+        connectivityOptions: "A full suite of video inputs ensures compatibility with virtually any business computer."
+      }
+    }
+  },
+  {
+    id: "hp-d-9",
+    slug: "hp-p27h-g5-27-fhd-ips-monitor-64w41aa",
+    name: "HP B250 VESA 100×100 Mounting Bracket – 8RA46AA",
+    image: "/hp-display/7.jpg",
+    category: "HP Displays",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A large, ergonomic 27-inch G5 business monitor designed for all-day comfort and productivity.",
+      design: {
+        title: "Design",
+        formFactor: "A 27-inch Full HD IPS panel with 3-sided micro-edge bezels and a fully adjustable ergonomic stand (height, tilt, swivel, pivot)."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "27-inch Full HD (1920x1080) IPS display with 75Hz refresh rate and HP Eye Ease low blue light.",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["1x HDMI", "1x DisplayPort", "1x VGA", "USB-A Hub"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "The fully ergonomic stand allows you to find the perfect viewing position, while the large screen is ideal for multitasking.",
+        connectivityOptions: "Built-in USB hub and versatile video inputs (HDMI, DP, VGA) create a complete workstation."
+      }
+    }
+  },
+  {
+    id: "hp-d-10",
+    slug: "hp-series-7-pro-24-wuxga-monitor-724pn",
+    name: "HP B550 Mounting Bracket for Monitor, Display, Desktop Computer, Chromebox",
+    image: "/hp-display/14.jpg",
+    category: "HP Displays",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A 24-inch monitor from the premium HP 7 Pro series, featuring a 16:10 aspect ratio for professionals who need to see more.",
+      design: {
+        title: "Design",
+        formFactor: "A 24-inch 16:10 IPS panel with 4-sided micro-edge bezels and a premium silver/black ergonomic stand."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "24-inch WUXGA (1920x1200) 16:10 IPS display. Factory calibrated for 99% sRGB color accuracy.",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["1x USB-C (100W Power Delivery)", "1x DisplayPort (In)", "1x DisplayPort (Out)", "1x HDMI", "USB-A/C Hub"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "The 16:10 aspect ratio is perfect for programmers, designers, and office workers. A 100W USB-C port provides single-cable docking.",
+        connectivityOptions: "Powers your laptop, connects to your network (via USB-C), and daisy-chains to a second monitor."
+      }
+    }
+  },
+  {
+    id: "hp-d-11",
+    slug: "hp-e22-g5-22-fhd-ips-monitor-6n4e8aa",
+    name: "HP E22 G5 22″ FHD IPS Monitor – 6N4E8AA#ABU",
+    image: "/hp-display/3.jpg",
+    category: "HP Displays",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A premium 22-inch G5 EliteDisplay monitor, offering superior ergonomics and eye comfort in a compact size.",
+      design: {
+        title: "Design",
+        formFactor: "A 21.5-inch Full HD IPS panel with 3-sided micro-edge bezels and a 4-way ergonomic stand (height, tilt, swivel, pivot)."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "21.5-inch Full HD (1920x1080) IPS display with 75Hz refresh rate and always-on HP Eye Ease low blue light filter.",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["1x HDMI", "1x DisplayPort", "1x VGA", "1x USB-B (upstream)", "4x USB-A 3.2 (downstream)"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "Part of the premium EliteDisplay series, this monitor is perfect for comfortable, all-day use in any business setting.",
+        connectivityOptions: "A built-in 4-port USB hub and versatile video inputs make this a highly productive, ergonomic monitor."
+      }
+    }
+  },
+  {
+    id: "hp-d-12",
+    slug: "hp-e24i-g4-24-ips-monitor-1920x1200",
+    name: "HP E24i G4 24″ IPS Monitor – 1920×1200, HDMI/DP, USB Hub",
+    image: "/hp-display/13.jpg",
+    category: "HP Displays",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A 24-inch G4 EliteDisplay monitor with a 16:10 aspect ratio, designed for professionals who need extra vertical screen space.",
+      design: {
+        title: "Design",
+        formFactor: "A 24-inch WUXGA (1920x1200) IPS panel with 3-sided micro-edge bezels and a full 4-way ergonomic stand."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "24-inch WUXGA (1920x1200) 16:10 IPS display. Features HP Eye Ease for comfortable viewing.",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["1x HDMI", "1x DisplayPort", "1x VGA", "1x USB-B (upstream)", "4x USB-A 3.2 (downstream)"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "The 16:10 aspect ratio is ideal for programmers, data analysts, and designers. A built-in USB hub reduces cable clutter.",
+        connectivityOptions: "Connect to any source with HDMI, DP, or VGA, and use the built-in hub for your peripherals."
+      }
+    }
+  },
+  {
+    id: "hp-d-13",
+    slug: "hp-e24mv-g4-24-fhd-ips-webcam-monitor",
+    name: "HP E24mv G4 24″ FHD IPS Webcam Monitor – 169L0AA#ABU",
+    image: "/hp-display/22.jpg",
+    category: "HP Displays",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A 24-inch G4 EliteDisplay monitor purpose-built for video conferencing, featuring an integrated 5MP webcam, dual mics, and speakers.",
+      design: {
+        title: "Design",
+        formFactor: "A 23.8-inch Full HD IPS panel with a 5MP pop-up webcam (Windows Hello compatible), built-in speakers, and an ergonomic stand."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "23.8-inch Full HD (1920x1080) IPS display with 75Hz refresh rate and HP Eye Ease.",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["1x HDMI", "1x DisplayPort", "1x VGA", "1x USB-B (upstream)", "4x USB-A 3.2 (downstream)"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "The all-in-one solution for hybrid work. The pop-up webcam ensures privacy, and the built-in audio creates a clean setup.",
+        connectivityOptions: "Connects to your PC via a single USB-B cable to activate the webcam, mic, speakers, and USB hub."
+      }
+    }
+  },
+  {
+    id: "hp-d-14",
+    slug: "hp-e27-g5-27-fhd-ips-monitor-6n4e2aa",
+    name: "HP E27 G5 27″ FHD IPS Monitor – 6N4E2AA#ABU",
+    image: "/hp-display/2.jpg",
+    category: "HP Displays",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A premium 27-inch G5 EliteDisplay monitor, offering superior ergonomics and eye comfort for multitasking.",
+      design: {
+        title: "Design",
+        formFactor: "A 27-inch Full HD IPS panel with 3-sided micro-edge bezels and a full 4-way ergonomic stand (height, tilt, swivel, pivot)."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "27-inch Full HD (1920x1080) IPS display with 75Hz refresh rate and always-on HP Eye Ease low blue light filter.",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["1x HDMI", "1x DisplayPort", "1x VGA", "1x USB-B (upstream)", "4x USB-A 3.2 (downstream)"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "A large, ergonomic display designed for comfortable, all-day use. The built-in USB hub simplifies your workspace.",
+        connectivityOptions: "A full suite of video inputs and a 4-port USB hub make this a productivity powerhouse."
+      }
+    }
+  },
+  {
+    id: "hp-d-15",
+    slug: "hp-e27k-g5-27-4k-uhd-monitor-ips-usb-c",
+    name: "HP E27k G5 27″ 4K UHD Monitor ? IPS Panel, USB-C 65W Charging, 99% sRGB, Ergonomic Design",
+    image: "/hp-display/3.jpg",
+    category: "HP Displays",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A premium 27-inch G5 EliteDisplay docking monitor with crystal-clear 4K resolution and single-cable USB-C connectivity.",
+      design: {
+        title: "Design",
+        formFactor: "A 27-inch 4K IPS panel with 3-sided micro-edge bezels and a full 4-way ergonomic stand."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "27-inch 4K UHD (3840x2160) IPS display with HP Eye Ease. Provides stunning clarity and detail.",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["1x USB-C (65W Power Delivery, DisplayPort Alt-Mode)", "1x HDMI", "1x DisplayPort", "USB-A Hub", "RJ-45 Ethernet"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "The ultimate 4K docking monitor. Connect your laptop via one USB-C cable to get 4K video, power, and a wired network connection.",
+        connectivityOptions: "A true single-cable solution for a clean and powerful workspace."
+      }
+    }
+  },
+  {
+    id: "hp-d-16",
+    slug: "hp-p22-g5-22-fhd-ips-monitor",
+    name: "HP E27u G5 27″ QHD USB-C Monitor – 6N4D3AA#ABU",
+    image: "/hp-display/10.jpg",
+    category: "HP Displays",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "An essential 22-inch G5 business monitor offering Full HD resolution and an IPS panel for wide viewing angles.",
+      design: {
+        title: "Design",
+        formFactor: "A 21.5-inch Full HD IPS panel with 3-sided micro-edge bezels and a tilt-adjustable stand."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "21.5-inch Full HD (1920x1080) IPS display. 75Hz refresh rate.",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["1x HDMI", "1x DisplayPort", "1x VGA"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "A compact, cost-effective monitor perfect for dual-screen setups or space-constrained desks. VESA mount compatible.",
+        connectivityOptions: "Modern and legacy ports (HDMI, DP, VGA) ensure broad compatibility."
+      }
+    }
+  },
+  {
+    id: "hp-d-17",
+    slug: "hp-p22h-g5-22-fhd-ips-monitor",
+    name: "HP M24m 24″ Class Webcam Full HD LED Monitor – 678U5AA#ABU",
+    image: "/hp-display/23.jpg",
+    category: "HP Displays",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A compact 22-inch G5 business monitor featuring full ergonomic adjustment for all-day comfort.",
+      design: {
+        title: "Design",
+        formFactor: "A 21.5-inch Full HD IPS panel with 3-sided micro-edge bezels and a 4-way ergonomic stand (height, tilt, swivel, pivot)."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "21.5-inch Full HD (1920x1080) IPS display with 75Hz refresh rate.",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["1x HDMI", "1x DisplayPort", "1x VGA", "USB-A Hub"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "The 'h' model provides full ergonomics, allowing users to find their perfect viewing angle, a key feature for employee wellness.",
+        connectivityOptions: "A built-in USB hub and flexible video inputs make this a very practical choice."
+      }
+    }
+  },
+  {
+    id: "hp-d-18",
+    slug: "hp-p22v-g5-22-class-full-hd-lcd-monitor",
+    name: "HP P22 G5 22″ Full HD IPS Monitor – 64X86AA#ABU",
+    image: "/hp/displays/hp-p22v-g5.jpg",
+    category: "HP Displays",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "An entry-level 22-inch G5 monitor that provides reliable Full HD performance for everyday computing at an affordable price.",
+      design: {
+        title: "Design",
+        formFactor: "A 21.5-inch Full HD panel in a standard chassis with a tilt-adjustable stand."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "21.5-inch Full HD (1920x1080) display. The 'v' suggests a VA panel, offering excellent contrast.",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["1x HDMI", "1x VGA"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "A no-frills, reliable monitor perfect for basic office applications, security stations, or large-scale deployments.",
+        connectivityOptions: "Essential HDMI and VGA ports cover all basic connection needs."
+      }
+    }
+  },
+  {
+    id: "hp-d-19",
+    slug: "hp-e27u-g5-27-qhd-usb-c-monitor",
+    name: "HP P22h G5 22″ FHD IPS Monitor – 64W30AA#ABU",
+    image: "/hp-display/16.jpg",
+    category: "HP Displays",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A premium 27-inch G5 EliteDisplay monitor that combines sharp QHD resolution with the simplicity of single-cable USB-C docking.",
+      design: {
+        title: "Design",
+        formFactor: "A 27-inch QHD IPS panel with 3-sided micro-edge bezels and a full 4-way ergonomic stand."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "27-inch QHD (2560x1440) IPS display with 75Hz refresh rate and HP Eye Ease low blue light.",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["1x USB-C (65W PD, DP Alt-Mode)", "1x HDMI", "1x DisplayPort (In)", "1x DisplayPort (Out)", "USB-A Hub", "RJ-45 Ethernet"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "The 'u' signifies it's a full docking station monitor. Connect your laptop via one USB-C cable to get QHD video, 65W power, a wired network connection, and access to all USB peripherals.",
+        connectivityOptions: "The DisplayPort-out allows you to daisy-chain a second monitor for a clean, multi-display setup."
+      }
+    }
+  },
+  {
+    id: "hp-d-20",
+    slug: "hp-m24m-24-class-webcam-full-hd-led",
+    name: "HP P22v G5 22″ Class Full HD LCD Monitor – 64V81AA#ABU",
+    image: "/hp-display/20.jpg",
+    category: "HP Displays",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A 24-inch all-in-one monitor from the M-series, designed for the ultimate home office video conferencing experience.",
+      design: {
+        title: "Design",
+        formFactor: "A 23.8-inch FHD IPS panel with a sleek, modern stand. Integrates a 5MP pop-up webcam, noise-canceling mics, and front-firing speakers."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "23.8-inch Full HD (1920x1080) IPS display with 75Hz refresh rate.",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["1x USB-C (65W Power Delivery, DP Alt-Mode)", "1x HDMI", "USB-A Hub"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "A complete solution for virtual meetings. The single-cable USB-C connection provides video, power, and webcam/audio access.",
+        connectivityOptions: "Certified for Zoom and Windows Hello, it's built for seamless collaboration."
+      }
+    }
+  },
+  {
+    id: "hp-d-21",
+    slug: "hp-series-7-pro-31-5-4k-thunderbolt-4-monitor",
+    name: "HP P24h G5 24″ FHD IPS Monitor – 64W34AA#ABU",
+    image: "/hp-display/17.jpg",
+    category: "HP Displays",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "An ultimate-performance 31.5-inch 4K monitor from the HP 7 Pro series, featuring an IPS Black panel and powerful Thunderbolt 4 docking.",
+      design: {
+        title: "Design",
+        formFactor: "A 31.5-inch 4K panel with 4-sided micro-edge bezels and a premium, fully ergonomic stand."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "31.5-inch 4K UHD (3840x2160) IPS Black panel. Delivers 2x the contrast of a standard IPS, with 98% DCI-P3 color accuracy.",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["1x Thunderbolt 4 (100W PD, Daisy-Chain)", "1x Thunderbolt 4 (Downstream)", "1x HDMI 2.0", "1x DisplayPort", "USB-A/C Hub", "RJ-45 Ethernet"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "A dream monitor for creative professionals and power users. The IPS Black panel provides stunning visuals, while Thunderbolt 4 offers a 40Gbps single-cable docking solution.",
+        connectivityOptions: "The ultimate connectivity hub for a high-performance desk."
+      }
+    }
+  },
+  {
+    id: "hp-d-22",
+    slug: "hp-series-7-pro-37-5-wqhd-thunderbolt-4",
+    name: "HP P24h G5 24″ Full HD IPS Monitor ? 75Hz, HDMI, DisplayPort | Slim Bezel Design",
+    image: "/hp-display/18.jpg",
+    category: "HP Displays",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A massive 37.5-inch curved ultrawide monitor from the HP 7 Pro series, designed for immersive multitasking with Thunderbolt 4 docking.",
+      design: {
+        title: "Design",
+        formFactor: "A 37.5-inch 21:9 curved IPS panel in a premium chassis with a fully ergonomic stand."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "37.5-inch Ultrawide WQHD+ (3840x1600) curved IPS display. Factory color-calibrated for accuracy.",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["1x Thunderbolt 4 (100W PD, Daisy-Chain)", "1x HDMI 2.0", "1x DisplayPort", "USB-A/C Hub", "RJ-45 Ethernet"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "The ultrawide screen space is equivalent to multiple monitors, perfect for video editors, financial analysts, and developers. A full-featured Thunderbolt 4 hub powers your workflow.",
+        connectivityOptions: "A single cable to your laptop unlocks this massive display, a wired network, and all your peripherals."
+      }
+    }
+  },
+  {
+    id: "hp-d-23",
+    slug: "hp-724pf-23-8-fhd-ips-monitor-100hz",
+    name: "HP P27 G5 27″ FHD IPS Monitor – 64X69AA#ABU",
+    image: "/hp-display/20.jpg",
+    category: "HP Displays",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A premium 23.8-inch monitor from the HP 7 series, combining a color-accurate IPS panel with a fluid 100Hz refresh rate.",
+      design: {
+        title: "Design",
+        formFactor: "A 23.8-inch IPS panel with 3-sided micro-edge bezels and a premium, fully ergonomic stand."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "23.8-inch Full HD (1920x1080) IPS display with 100Hz refresh rate and 99% sRGB color gamut.",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["1x USB-C (65W PD)", "1x HDMI", "1x DisplayPort", "USB-A Hub"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "A perfect monitor for the modern home office, providing vibrant colors, smooth motion, and single-cable USB-C docking.",
+        connectivityOptions: "Connect, charge, and display from your laptop with a single USB-C cable."
+      }
+    }
+  },
+  {
+    id: "hp-d-24",
+    slug: "hp-727pq-27-class-wqhd-led-monitor",
+    name: "HP P27h G5 27″ FHD IPS Monitor – 64W41AA#ABU",
+    image: "/hp-display/19.jpg",
+    category: "HP Displays",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A premium 27-inch professional monitor from the HP 7 series, offering sharp QHD resolution and advanced connectivity.",
+      design: {
+        title: "Design",
+        formFactor: "A 27-inch QHD IPS panel with 4-sided micro-edge bezels and a premium, fully ergonomic stand."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "27-inch QHD (2560x1440) IPS display. Factory color-calibrated for 99% sRGB and 90% DCI-P3.",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["1x USB-C (100W PD)", "1x DisplayPort (In)", "1x DisplayPort (Out)", "1x HDMI", "USB-A/C Hub", "RJ-45 Ethernet"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "A powerful QHD docking monitor for creative professionals and power users, featuring high color accuracy and daisy-chaining.",
+        connectivityOptions: "A single 100W USB-C cable provides video, power, a wired network, and a full USB hub."
+      }
+    }
+  },
+  {
+    id: "hp-d-25",
+    slug: "hp-727pu-27-wqhd-ips-black-monitor-120hz",
+    name: "HP Series 7 Pro 24″ WUXGA Monitor (724pn) ? 1920×1200, 16:10 Aspect Ratio, USB Hub, VESA Mount",
+    image: "/hp/displays/hp-727pu.jpg",
+    category: "HP Displays",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A high-performance 27-inch monitor from the HP 7 series, featuring a stunning IPS Black panel and a super-smooth 120Hz refresh rate.",
+      design: {
+        title: "Design",
+        formFactor: "A 27-inch QHD IPS Black panel with 4-sided micro-edge bezels and a premium ergonomic stand."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "27-inch QHD (2560x1440) IPS Black panel. Provides 2x the contrast of standard IPS panels. 120Hz refresh rate.",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["1x USB-C (100W PD)", "1x HDMI 2.1", "1x DisplayPort", "USB-A/C Hub", "RJ-45 Ethernet"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "A perfect monitor for users who demand both exceptional color/contrast and fluid motion. Ideal for creative work and premium office use.",
+        connectivityOptions: "A full-featured docking monitor with 100W USB-C and HDMI 2.1 for next-gen connectivity."
+      }
+    }
+  },
+  {
+    id: "hp-d-26",
+    slug: "hp-b250-vesa-100x100-mounting-bracket",
+    name: "HP Series 7 Pro 31.5″ 4K Thunderbolt 4 Monitor",
+    image: "/hp/displays/hp-b250-bracket.jpg",
+    category: "HP Displays",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A VESA mounting bracket designed to attach specific HP Mini PCs or Thin Clients directly to the back of a VESA-compatible monitor stand or arm.",
+      design: {
+        title: "Design",
+        formFactor: "A sturdy metal bracket with a 100x100mm VESA mounting pattern."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["N/A"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "Creates an all-in-one-like solution by mounting your HP Mini PC to your monitor, saving desk space.",
+        connectivityOptions: "Attaches to any 100x100mm VESA pattern."
+      }
+    }
+  },
+  {
+    id: "hp-d-27",
+    slug: "hp-b550-mounting-bracket-for-monitor",
+    name: "HP Series 7 Pro 37.5 inch WQHD+ Thunderbolt 4 Monitor – 8K167AA#ABU",
+    image: "/hp-display/6.jpg",
+    category: "HP Displays",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "An HP mounting bracket solution, likely used to mount an HP Mini PC, Thin Client, or Docking Station to an HP monitor or monitor stand.",
+      design: {
+        title: "Design",
+        formFactor: "A custom-designed metal mounting bracket, compatible with specific HP products."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["N/A"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "Integrates your HP compute device or dock seamlessly with your HP monitor, creating a clean, single-footprint solution.",
+        connectivityOptions: "Designed for specific HP hardware pairings."
+      }
+    }
+  },
+  // --- END OF HP DISPLAYS ---
 
+  // --- NEW: HP DOCKING STATIONS (4 PRODUCTS) ---
+  {
+    id: "hp-dock-1",
+    slug: "hp-usb-c-dock-g5-5tw10aa",
+    name: "HP Docking Station – D9Y32AA#ABA",
+    image: "/hp-docking-station/3.jpg",
+    category: "HP Docking Station",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A versatile USB-C dock designed for the modern workspace, providing video, data, and power over a single cable.",
+      design: {
+        title: "Design",
+        formFactor: "A compact, rectangular docking station designed to sit on a desk, providing easy access to ports."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A (Supports up to three displays, including one 4K display, via DisplayPort and HDMI).",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["1x USB-C (host)", "1x USB-C (data/power out)", "4x USB-A 3.0", "2x DisplayPort", "1x HDMI 2.0", "1x RJ-45 Ethernet"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "Delivers up to 65W of power to your laptop. Compatible with HP and non-HP USB-C enabled notebooks.",
+        connectivityOptions: "A single-cable solution to turn your laptop into a full desktop workstation."
+      }
+    }
+  },
+  {
+    id: "hp-dock-2",
+    slug: "hp-thunderbolt-dock-g4-280w-4j0a2aa",
+    name: "HP THUNDERBOLT DOCK 120W G2",
+    image: "/hp-docking-station/1.jpg",
+    category: "HP Docking Station",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A high-performance Thunderbolt 4 dock designed for power users, offering high-speed data transfer, multi-display support, and 230W power delivery.",
+      design: {
+        title: "Design",
+        formFactor: "A premium, sleek dock with a powerful 280W adapter, built for high-performance workstations."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A (Thunderbolt 4, 40Gbps)",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A (Supports up to four 4K displays at 60Hz for an immersive and productive setup).",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["1x Thunderbolt 4 (host)", "1x Thunderbolt 4 (downstream)", "1x USB-C", "4x USB-A 3.2", "2x DisplayPort 1.4", "1x HDMI 2.0", "1x RJ-45 Ethernet"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "The 280W adapter provides up to 230W of power, enough for demanding mobile workstations like the HP ZBook.",
+        connectivityOptions: "The ultimate docking solution for creators, engineers, and data analysts."
+      }
+    }
+  },
+  {
+    id: "hp-dock-3",
+    slug: "hp-usb-c-mini-dock-1pm64aa",
+    name: "HP USB-C G5 Dock for Business – 5TW10AA",
+    image: "/hp-docking-station/2.jpg",
+    category: "HP Docking Station",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A compact and portable docking station designed for professionals on the go. Easily add ports to your laptop.",
+      design: {
+        title: "Design",
+        formFactor: "A small, lightweight 'travel dock' with a wraparound USB-C cable for easy storage."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A (Supports one external display via HDMI or VGA).",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["1x USB-C (host)", "1x USB-C (power pass-through)", "2x USB-A", "1x HDMI", "1x VGA", "1x RJ-45 Ethernet"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "The perfect travel companion. Use your laptop's power adapter with the pass-through port to power the dock and your laptop.",
+        connectivityOptions: "Provides essential ports (HDMI, VGA, Ethernet) that are often missing on modern thin laptops."
+      }
+    }
+  },
+  {
+    id: "hp-dock-4",
+    slug: "hp-usb-c-a-universal-dock-g2-5tw13aa",
+    name: "HP USB-C/A Universal Dock G2 – 5TW13AA",
+    image: "/hp-docking-station/1.jpg",
+    category: "HP Docking Station",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A universal dock designed to work with both new (USB-C) and legacy (USB-A) laptops, ideal for mixed-device environments.",
+      design: {
+        title: "Design",
+        formFactor: "A flat, rectangular dock with a unique swappable-tip cable that supports both USB-C and USB-A 3.0 host connections."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A (Uses DisplayLink technology)",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A (Supports up to dual 4K displays via DisplayPort or HDMI, even on non-Thunderbolt laptops).",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["1x USB-C/A (host)", "1x USB-C", "4x USB-A 3.0", "2x DisplayPort", "2x HDMI", "1x RJ-45 Ethernet"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "The perfect solution for 'hot desking' or offices where employees use different types of laptops (e.g., HP, Dell, Lenovo, MacBook).",
+        connectivityOptions: "Provides 100W power delivery over USB-C and uses DisplayLink drivers for universal video compatibility."
+      }
+    }
+  },
+  // --- END OF HP DOCKING STATIONS ---
 
+// --- NEW: HP KEYBOARDS & KEYPADS (22 PRODUCTS) ---
+  {
+    id: "hp-kb-1",
+    slug: "hp-125-keyboard-cable-connectivity-usb-type",
+    name: "HP 125 Keyboard – Cable Connectivity – USB Type A Interface – Notebook – PC, Windows",
+    image: "/hp-keyboard-and-keypad/16.jpg",
+    category: "HP Keyboards & Keypads",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A reliable, full-size wired keyboard designed for business-class productivity and all-day comfort.",
+      design: {
+        title: "Design",
+        formFactor: "A full-size keyboard with a 3-zone layout including a numeric keypad. Features a durable, spill-resistant design and a standard USB-A cable."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["USB Type-A Cable"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "A plug-and-play solution for any Windows PC or notebook. The full-size layout and numeric keypad are ideal for spreadsheet and data entry tasks.",
+        connectivityOptions: "Simple wired USB-A connection ensures instant setup with no software required."
+      }
+    }
+  },
+  {
+    id: "hp-kb-2",
+    slug: "hp-125-keyboard-with-usb-cable-connectivity",
+    name: "HP 125 Keyboard with USB Cable Connectivity for Windows",
+    image: "/hp-keyboard-and-keypad/16.jpg",
+    category: "HP Keyboards & Keypads",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "The HP 125 Keyboard is a standard, plug-and-play USB keyboard built for reliability and straightforward use with Windows computers.",
+      design: {
+        title: "Design",
+        formFactor: "A classic full-size layout with tilt-adjustable legs for comfortable typing angles. Durable build for everyday use."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["USB-A Cable"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "A dependable keyboard for any home or office desktop setup. The numeric keypad allows for fast data entry.",
+        connectivityOptions: "Connects to any available USB port on your Windows PC or laptop."
+      }
+    }
+  },
+  {
+    id: "hp-kb-3",
+    slug: "hp-125-wired-usb-keyboard-french",
+    name: "HP 125 Wired USB Keyboard – French Layout, Black, for PC and Mac",
+    image: "/hp-keyboard-and-keypad/7.jpg",
+    category: "HP Keyboards & Keypads",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A reliable, full-size wired keyboard featuring a standard French (AZERTY) layout for native typing.",
+      design: {
+        title: "Design",
+        formFactor: "Full-size, 3-zone keyboard in black with a French AZERTY key layout. Features adjustable tilt legs."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["USB-A Cable"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "The ideal plug-and-play solution for French-speaking users on both PC and Mac platforms.",
+        connectivityOptions: "Simple USB-A wired connection provides instant power and compatibility."
+      }
+    }
+  },
+  {
+    id: "hp-kb-4",
+    slug: "hp-225-eco-friendly-wired-keyboard-and-mouse",
+    name: "HP 225 Eco-Friendly Wired Keyboard and Mouse Combo – USB Type A",
+    image: "/hp-keyboard-and-keypad/11.jpg",
+    category: "HP Keyboards & Keypads",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A sustainable and reliable wired keyboard and mouse combo, made with recycled materials without sacrificing performance.",
+      design: {
+        title: "Design",
+        formFactor: "Full-size keyboard and a comfortable ambidextrous mouse. Both are built using post-consumer recycled plastics."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["USB Type-A cables"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "An eco-friendly choice for businesses and individuals. Offers a plug-and-play setup for any desktop environment.",
+        connectivityOptions: "Connects via standard USB Type-A ports."
+      }
+    }
+  },
+  {
+    id: "hp-kb-5",
+    slug: "hp-225-keyboard-mouse-usb-cable",
+    name: "HP 225 Keyboard & Mouse – USB Cable Keyboard – USB Cable Mouse –",
+    image: "/hp-keyboard-and-keypad/12.jpg",
+    category: "HP Keyboards & Keypads",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A dependable wired keyboard and mouse set, providing a straightforward and reliable solution for everyday computing.",
+      design: {
+        title: "Design",
+        formFactor: "A full-size, spill-resistant keyboard paired with a precision optical mouse. Both feature a durable black finish."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["USB-A Cable (Keyboard)", "USB-A Cable (Mouse)"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "This combo is built for longevity and ease of use. Ideal for office, school, or home environments.",
+        connectivityOptions: "Separate USB-A cables for both the keyboard and mouse ensure simple, driver-free setup."
+      }
+    }
+  },
+  {
+    id: "hp-kb-6",
+    slug: "hp-225-wireless-keyboard-with-numeric",
+    name: "HP 225 Wireless Keyboard with Numeric Keypad – UK Layout",
+    image: "/hp-keyboard-and-keypad/17.jpg",
+    category: "HP Keyboards & Keypads",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A sleek, wireless keyboard designed for a clutter-free workspace, featuring a full numeric keypad and a UK layout.",
+      design: {
+        title: "Design",
+        formFactor: "A full-size wireless keyboard with a standard UK (QWERTY) layout and an integrated numeric keypad."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["N/A"],
+        wireless: ["2.4GHz RF via USB-A dongle"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "Frees your desk from cables. The numeric keypad is essential for fast data entry in spreadsheets and financial applications.",
+        connectivityOptions: "A single, tiny USB-A dongle provides a reliable 2.4GHz wireless connection."
+      }
+    }
+  },
+  {
+    id: "hp-kb-7",
+    slug: "hp-235-wireless-keyboard-mouse",
+    name: "HP 235 Wireless Keyboard & Mouse Combo – Black, 1600 DPI, Long Battery Life",
+    image: "/hp-keyboard-and-keypad/3.jpg",
+    category: "HP Keyboards & Keypads",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A reliable wireless keyboard and mouse combo designed for freedom and productivity, featuring a high-precision mouse and long battery life.",
+      design: {
+        title: "Design",
+        formFactor: "A full-size, spill-resistant keyboard with a comfortable, ambidextrous mouse. Both in a sleek black finish."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["N/A"],
+        wireless: ["2.4GHz RF via single USB-A dongle"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "The 1600 DPI mouse offers precise tracking, while the long battery life ensures you're always ready to work. Chiclet-style keys provide quiet typing.",
+        connectivityOptions: "A single USB receiver connects both the keyboard and mouse, saving a USB port."
+      }
+    }
+  },
+  {
+    id: "hp-kb-8",
+    slug: "hp-320mk-keyboard-mouse-english-usb",
+    name: "HP 320MK Keyboard & Mouse – English – USB Cable – USB Cable Mouse",
+    image: "/hp-keyboard-and-keypad/11.jpg",
+    category: "HP Keyboards & Keypads",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A professional-grade wired keyboard and mouse combo, specifically designed for reliability and ease of use in a business environment.",
+      design: {
+        title: "Design",
+        formFactor: "A full-size, spill-resistant keyboard with a standard English layout, paired with a comfortable optical mouse."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["USB-A Cable (Keyboard)", "USB-A Cable (Mouse)"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "A durable, no-nonsense combo that's perfect for commercial deployment, offering plug-and-play simplicity and reliability.",
+        connectivityOptions: "Wired USB-A connections ensure a stable, lag-free experience with no batteries required."
+      }
+    }
+  },
+  {
+    id: "hp-kb-9",
+    slug: "hp-320mk-usb-wired-keyboard-mouse",
+    name: "HP 320MK USB Wired Keyboard & Mouse Combo for Windows Notebooks – Ergonomic, Quiet & Optical",
+    image: "/hp-keyboard-and-keypad/12.jpg",
+    category: "HP Keyboards & Keypads",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "The HP 320MK combo provides a comfortable and quiet typing experience, making it an ideal companion for Windows notebooks in any office.",
+      design: {
+        title: "Design",
+        formFactor: "An ergonomically designed full-size keyboard with quiet-touch keys, plus a precision optical mouse."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["USB-A Cables"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "Designed for all-day use, this combo's quiet keys minimize distractions, while the optical mouse provides smooth, accurate tracking.",
+        connectivityOptions: "A simple, wired USB setup for instant compatibility with Windows laptops and desktops."
+      }
+    }
+  },
+  {
+    id: "hp-kb-10",
+    slug: "hp-405-backlit-wired-keyboard-usb-a-usb",
+    name: "HP 405 Backlit Wired Keyboard: USB-A & USB-C, LED Glow",
+    image: "/hp-keyboard-and-keypad/13.jpg",
+    category: "HP Keyboards & Keypads",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A modern, versatile wired keyboard featuring a subtle LED backlight and a dual USB-A/USB-C connector for universal compatibility.",
+      design: {
+        title: "Design",
+        formFactor: "A slim, full-size keyboard with backlit keys that provide a soft 'LED glow' for low-light environments."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["Attached USB cable with both USB-A and USB-C connectors"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "The dual-head connector makes this keyboard future-proof, allowing it to connect to any PC, whether it has traditional USB-A or modern USB-C ports.",
+        connectivityOptions: "Backlighting and a flexible connector make this an ideal choice for any modern workstation."
+      }
+    }
+  },
+  {
+    id: "hp-kb-11",
+    slug: "hp-455-programmable-wl-kbd",
+    name: "HP 455 PROGRAMMABLE WL KBD",
+    image: "/hp-keyboard-and-keypad/6.jpg",
+    category: "HP Keyboards & Keypads",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A full-size wireless keyboard designed for productivity, featuring customizable shortcut keys to streamline your workflow.",
+      design: {
+        title: "Design",
+        formFactor: "A full-size wireless keyboard with a standard layout, plus a bank of programmable keys for macros and shortcuts."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["N/A"],
+        wireless: ["2.4GHz RF via USB-A dongle"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "Boost your efficiency by programming keys to launch apps, insert text, or execute complex commands with a single press.",
+        connectivityOptions: "Connects wirelessly via a reliable 2.4GHz USB dongle."
+      }
+    }
+  },
+  {
+    id: "hp-kb-12",
+    slug: "hp-475-dual-mode-wireless-keyboard-jet",
+    name: "HP 475 Dual-Mode Wireless Keyboard: Jet Black, Bluetooth, USB-A, Eco-Friendly Design",
+    image: "/hp-keyboard-and-keypad/19.jpg",
+    category: "HP Keyboards & Keypads",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A versatile, eco-friendly wireless keyboard that connects to multiple devices via Bluetooth or USB dongle.",
+      design: {
+        title: "Design",
+        formFactor: "A slim, Jet Black keyboard made with recycled materials. Features a full-size layout in a compact footprint."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["N/A"],
+        wireless: ["Dual-Mode: Bluetooth 5.0 (supports 2 devices)", "2.4GHz RF via USB-A dongle (1 device)"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "Connect to and easily switch between up to three devices (1 via USB, 2 via Bluetooth). An eco-friendly choice for a multi-device workflow.",
+        connectivityOptions: "Flexible wireless connectivity for your laptop, tablet, and phone."
+      }
+    }
+  },
+  {
+    id: "hp-kb-13",
+    slug: "hp-4b5-keyboard-cable-connectivity-usb-type",
+    name: "HP 485 Keyboard – Cable Connectivity – USB Type A Interface – English (UK)",
+    image: "/hp-keyboard-and-keypad/10.jpg",
+    category: "HP Keyboards & Keypads",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A premium, wired keyboard with an English (UK) layout, designed for a comfortable and responsive typing experience.",
+      design: {
+        title: "Design",
+        formFactor: "A sleek, full-size keyboard with a durable chassis and quiet, low-profile keys. English (UK) layout."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["USB Type-A Cable"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "A high-quality, reliable wired keyboard for professional environments, offering a premium feel and simple setup.",
+        connectivityOptions: "Connects instantly to any PC or notebook via a standard USB-A port."
+      }
+    }
+  },
+  {
+    id: "hp-kb-14",
+    slug: "hp-655-keyboard-mouse-usb-type-a",
+    name: "HP 655 Keyboard & Mouse – USB Type A Wireless RF Keyboard",
+    image: "/hp-keyboard-and-keypad/5.jpg",
+    category: "HP Keyboards & Keypads",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A premium wireless keyboard and mouse combo offering a comfortable design and reliable connectivity for a professional workspace.",
+      design: {
+        title: "Design",
+        formFactor: "A full-size keyboard with quiet keys and an ergonomically designed mouse. Both connect via a single receiver."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["N/A"],
+        wireless: ["2.4GHz Wireless RF via USB Type-A dongle"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "This combo provides a clutter-free desk with a single dongle for both devices, offering a comfortable and productive typing experience.",
+        connectivityOptions: "The 2.4GHz RF connection ensures a stable, lag-free performance."
+      }
+    }
+  },
+  {
+    id: "hp-kb-15",
+    slug: "hp-655-wireless-keyboard-and-mouse",
+    name: "HP 655 Wireless Keyboard and Mouse Combo: Comfort, Productivity, and Sustainability",
+    image: "/hp-keyboard-and-keypad/3.jpg",
+    category: "HP Keyboards & Keypads",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "An eco-friendly wireless keyboard and mouse set, built with recycled materials and designed for all-day comfort and productivity.",
+      design: {
+        title: "Design",
+        formFactor: "A full-size, quiet-key keyboard and an ergonomic mouse, both made with a significant percentage of post-consumer recycled plastics."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["N/A"],
+        wireless: ["2.4GHz RF via USB-A dongle"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "A sustainable and comfortable choice for any workspace. Features long battery life and a reliable wireless connection.",
+        connectivityOptions: "A single USB-A dongle connects both devices to free up your computer's ports."
+      }
+    }
+  },
+  {
+    id: "hp-kb-16",
+    slug: "hp-685-comfort-dualmode-keyboard",
+    name: "HP 685 Comfort DualMode Keyboard: Wireless & AI-Enhanced",
+    image: "/hp-keyboard-and-keypad/10.jpg",
+    category: "HP Keyboards & Keypads",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A premium, ergonomically designed wireless keyboard featuring dual-mode connectivity and AI-enhanced smart features.",
+      design: {
+        title: "Design",
+        formFactor: "An ergonomic 'comfort' design, possibly split or curved, to promote a natural typing posture. Full-size layout."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["N/A"],
+        wireless: ["Dual-Mode: Bluetooth", "2.4GHz RF via USB-A dongle"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "Designed for power users, this keyboard features AI-driven shortcuts and can switch between multiple devices (via Bluetooth and RF).",
+        connectivityOptions: "Flexible dual-mode wireless connectivity for a seamless workflow across devices."
+      }
+    }
+  },
+  {
+    id: "hp-kb-17",
+    slug: "hp-6b5-keyboard-mouse-english-uk",
+    name: "HP 685 Keyboard & Mouse – English (UK) – USB Type A Wireless Bluetooth/RF 2.40 GHz Keyboard",
+    image: "/hp-keyboard-and-keypad/9.jpg",
+    category: "HP Keyboards & Keypads",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A premium, dual-mode wireless keyboard and mouse combo with an English (UK) layout and AI-enhanced features.",
+      design: {
+        title: "Design",
+        formFactor: "A full-size ergonomic 'comfort' keyboard (UK layout) paired with a precision mouse."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["N/A"],
+        wireless: ["Dual-Mode: Bluetooth", "2.4GHz RF via USB-A dongle"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "The ultimate productivity combo for UK users, offering ergonomic comfort, multi-device switching, and smart, AI-driven shortcuts.",
+        connectivityOptions: "Connect and switch between your PC, laptop, and tablet with ease."
+      }
+    }
+  },
+  {
+    id: "hp-kb-18",
+    slug: "hp-725-multi-device-rechargeable-wireless",
+    name: "HP 725 Multi-Device Rechargeable Wireless Keyboard and Mouse Combo",
+    image: "/hp-keyboard-and-keypad/1.jpg",
+    category: "HP Keyboards & Keypads",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A premium, rechargeable wireless keyboard and mouse set, designed for power users who work across multiple devices.",
+      design: {
+        title: "Design",
+        formFactor: "A sleek, slim, and compact keyboard paired with a sculpted mouse. Both are rechargeable via USB-C."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["USB-C (for charging)"],
+        wireless: ["Multi-Device: Bluetooth (up to 3 devices)"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "Seamlessly switch between your laptop, tablet, and smartphone with the press of a button. The rechargeable design eliminates battery waste.",
+        connectivityOptions: "Connects to up to three devices simultaneously via Bluetooth."
+      }
+    }
+  },
+  {
+    id: "hp-kb-19",
+    slug: "hp-950mk-wireless-rechargeable-keyboard",
+    name: "HP 950MK Wireless Rechargeable Keyboard and Mouse Combo",
+    image: "/hp-keyboard-and-keypad/5.jpg",
+    category: "HP Keyboards & Keypads",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "An executive-class wireless keyboard and mouse combo, featuring a premium build, rechargeable batteries, and smart, customizable features.",
+      design: {
+        title: "Design",
+        formFactor: "A full-size, slim keyboard with a premium metallic finish and a matching rechargeable mouse with a precision scroll wheel."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["USB-C (for charging)"],
+        wireless: ["Bluetooth", "2.4GHz RF via USB-A dongle"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "A top-tier set for discerning professionals, offering multi-device connectivity, programmable keys, and a luxurious typing experience.",
+        connectivityOptions: "Dual-mode wireless allows for flexible connections across multiple devices."
+      }
+    }
+  },
+  {
+    id: "hp-kb-20",
+    slug: "hp-975-rugged-keyboard-wireless",
+    name: "HP 975 Rugged Keyboard: Wireless Bluetooth & RF Connectivity for PC and Mac",
+    image: "/hp-keyboard-and-keypad/7.jpg",
+    category: "HP Keyboards & Keypads",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A premium, rugged wireless keyboard designed for durability and multi-device productivity, compatible with both PC and Mac.",
+      design: {
+        title: "Design",
+        formFactor: "A full-size keyboard with a ruggedized, spill-resistant chassis. Features customizable backlighting."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["USB-C (for charging)"],
+        wireless: ["Dual-Mode: Bluetooth", "2.4GHz RF via USB-A dongle"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "Combines rugged durability with premium features like rechargeable batteries, smart backlighting, and multi-device switching.",
+        connectivityOptions: "Connect and switch between your PC, Mac, and tablet with dual-mode wireless."
+      }
+    }
+  },
+  {
+    id: "hp-kb-21",
+    slug: "hp-compact-355-rugged-keyboard-wireless",
+    name: "HP Compact 355 Rugged Keyboard: Wireless Bluetooth Typing for Desktop, Laptop, and Mobile",
+    image: "/hp-keyboard-and-keypad/8.jpg",
+    category: "HP Keyboards & Keypads",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A durable and compact wireless keyboard, built to withstand spills and drops while offering flexible Bluetooth connectivity.",
+      design: {
+        title: "Design",
+        formFactor: "A compact, tenkeyless (TKL) design that saves-desk space. Spill-resistant and ruggedized for durability."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["N/A"],
+        wireless: ["Bluetooth"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "A perfect keyboard for mobile professionals, field workers, or busy environments. Its compact, rugged design pairs easily with laptops and tablets.",
+        connectivityOptions: "Connects wirelessly to any Bluetooth-enabled desktop, laptop, or mobile device."
+      }
+    }
+  },
+  {
+    id: "hp-kb-22",
+    slug: "hp-wired-desktop-320k-keyboard-usb",
+    name: "HP Wired Desktop 320K Keyboard – USB Connectivity, English (UK) for Desktop Computers",
+    image: "/hp-keyboard-and-keypad/13.jpg",
+    category: "HP Keyboards & Keypads",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A reliable, full-size wired keyboard with an English (UK) layout, designed for straightforward business and desktop use.",
+      design: {
+        title: "Design",
+        formFactor: "A full-size, spill-resistant keyboard with a standard English (UK) layout and integrated numeric keypad."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["USB-A Cable"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "A durable and cost-effective solution for any desktop computer. The plug-and-play USB connection ensures instant setup.",
+        connectivityOptions: "Standard USB-A cable for universal compatibility with desktop computers."
+      }
+    }
+  },
+  // --- END OF HP KEYBOARDS & KEYPADS ---
+
+  // --- NEW: HP PRINTERS (2 PRODUCTS) ---
+  {
+    id: "hp-print-1",
+    slug: "hp-color-laserjet-pro-mfp-m183fw",
+    name: "HP LaserJet Pro M501dn – J8H61A#BGJ",
+    image: "/hp/printers/hp-m183fw.jpg",
+    category: "HP Printer, Printers",
+    categorySlug: "printers",
+    price: "Get a Quote",
+    description: {
+      overview: "An efficient, wireless multifunction color laser printer designed for small businesses, offering print, copy, scan, and fax capabilities.",
+      design: {
+        title: "Design",
+        formFactor: "A compact multifunction printer (MFP) with an automatic document feeder (ADF) and a simple LCD control panel."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "256 MB DDR",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "2-Line LCD with numeric keypad",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["Hi-Speed USB 2.0", "Fast Ethernet 10/100Base-TX", "Fax port"],
+        wireless: ["Dual-band Wi-Fi 802.11n", "Wi-Fi Direct"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "Provides high-quality color printing, scanning, and copying. The HP Smart app allows for easy mobile printing and scanning.",
+        connectivityOptions: "Flexible connectivity with Ethernet, Wi-Fi, and Wi-Fi Direct for easy sharing."
+      }
+    }
+  },
+  {
+    id: "hp-print-2",
+    slug: "hp-officejet-200-mobile-printer-j8h61a",
+    name: "HP Officejet 200 Mobile Printer, Color – CZ993A#BHC",
+    image: "/hp/printers/hp-officejet-200.jpg",
+    category: "HP Printer, Printers",
+    categorySlug: "printers",
+    price: "Get a Quote",
+    description: {
+      overview: "A compact and portable printer that lets you print professional-quality documents on the go, directly from your laptop or mobile device.",
+      design: {
+        title: "Design",
+        formFactor: "A lightweight, portable printer designed to fit in a backpack or suitcase. Features a long-lasting rechargeable battery."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "128 MB DDR3",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "2.0-inch Hi-Res Mono Graphic Display",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["1x USB 2.0"],
+        wireless: ["Wi-Fi Direct", "802.11b/g/n"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "Ideal for mobile professionals who need to print invoices, contracts, or presentations anywhere. Fast charging and quiet performance.",
+        connectivityOptions: "Easily print from your laptop, smartphone, or tablet using Wi-Fi Direct, no network needed."
+      }
+    }
+  },
+  // --- END OF HP PRINTERS ---
+
+  // --- NEW: HP WORKSTATIONS (14 PRODUCTS) ---
+  {
+    id: "hp-ws-1",
+    slug: "hp-pro-290-g9-intel-core-i5-6z3w1et",
+    name: "HP Pro 290 G9 Intel® Core™ i5 – 623W1ET#ABU",
+    image: "/hp/workstations/hp-pro-290-g9.jpg",
+    category: "HP Workstation",
+    categorySlug: "workstations",
+    price: "Get a Quote",
+    description: {
+      overview: "A reliable and affordable tower PC designed for essential business productivity, powered by an Intel Core i5 processor.",
+      design: {
+        title: "Design",
+        formFactor: "A standard Microtower (MT) chassis in black, offering easy access to internals and room for expansion."
+      },
+      performance: {
+        title: "Performance",
+        processor: "Intel Core i5 processor for solid performance in everyday office tasks.",
+        memory: "Configured with DDR4 RAM for efficient multitasking.",
+        storage: "Fast NVMe SSD for quick boot times and application loading."
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A (Connects to external monitors)",
+        graphics: "Integrated Intel UHD Graphics."
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["HDMI", "VGA", "USB 3.1", "USB 2.0", "RJ-45 Ethernet"],
+        wireless: ["Optional Wi-Fi"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "A cost-effective desktop for small businesses and enterprise deployments needing a dependable work PC.",
+        connectivityOptions: "A mix of modern and legacy ports for broad peripheral compatibility."
+      }
+    }
+  },
+  {
+    id: "hp-ws-2",
+    slug: "hp-pro-400-g9-intel-core-i5",
+    name: "HP Pro 400 G9 Intel® Core™ i5 – 623W9ET#ABU",
+    image: "/hp/workstations/hp-pro-400-g9-mini.jpg",
+    category: "HP Workstation",
+    categorySlug: "workstations",
+    price: "Get a Quote",
+    description: {
+      overview: "A compact and powerful Mini PC designed for the modern workspace, delivering full-sized desktop performance in a tiny chassis.",
+      design: {
+        title: "Design",
+        formFactor: "A sleek, Mini Form Factor (MFF) desktop that can be VESA mounted behind a monitor or placed discreetly on a desk."
+      },
+      performance: {
+        title: "Performance",
+        processor: "Intel Core i5 processor (likely 12th or 13th Gen) for robust business performance.",
+        memory: "DDR4 SODIMM RAM.",
+        storage: "Fast M.2 NVMe SSD."
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A (Connects to external monitors)",
+        graphics: "Integrated Intel UHD or Iris Xe Graphics."
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["USB-C", "USB 3.2", "DisplayPort", "HDMI", "RJ-45 Ethernet"],
+        wireless: ["Wi-Fi 6", "Bluetooth"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "Ideal for open offices, remote work, or digital signage. Runs quietly and efficiently while handling demanding tasks.",
+        connectivityOptions: "A full suite of modern ports and fast wireless connectivity."
+      }
+    }
+  },
+  {
+    id: "hp-ws-3",
+    slug: "hp-tower-windows-11-pro-core-i9-14th-gen",
+    name: "HP Tower Windows 11 Pro Core i9 14th Gen i9 – Intel W680 Chip-996Y7ET#ABU",
+    image: "/hp/workstations/hp-tower-bundle.jpg",
+    category: "HP Workstation",
+    categorySlug: "workstations",
+    price: "Get a Quote",
+    description: {
+      overview: "A high-performance desktop tower solution, likely an HP Elite or Pro series, powered by a top-of-the-line 14th Gen Intel Core i9 processor.",
+      design: {
+        title: "Design",
+        formFactor: "A collection of HP tower desktops, showcasing various sizes from Small Form Factor (SFF) to full-size Towers."
+      },
+      performance: {
+        title: "Performance",
+        processor: "14th Gen Intel Core i9 processor, delivering elite performance for the most demanding applications.",
+        memory: "High-speed DDR5 RAM.",
+        storage: "Fast NVMe SSD."
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "High-performance integrated or optional discrete graphics."
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["USB-C/Thunderbolt", "USB 3.2", "DisplayPort", "HDMI", "RJ-45 Ethernet"],
+        wireless: ["Wi-Fi 6E", "Bluetooth 5.3"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "This is a powerhouse desktop for power users, developers, and creatives. Comes with Windows 11 Pro for business.",
+        connectivityOptions: "A comprehensive set of high-speed ports for a demanding workflow."
+      }
+    }
+  },
+  {
+    id: "hp-ws-4",
+    slug: "hp-z1-g9-desktop-computer-intel-core-i9",
+    name: "HP Z1 G9 Desktop Computer Intel Core i9 14th Gen i9-14900 -996V8ET#ABU",
+    image: "/hp/workstations/hp-z1-g9.jpg",
+    category: "HP Workstation",
+    categorySlug: "workstations",
+    price: "Get a Quote",
+    description: {
+      overview: "The HP Z1 G9 is a powerful and affordable tower workstation, certified for professional apps and powered by an Intel Core i9 processor.",
+      design: {
+        title: "Design",
+        formFactor: "A full-size Tower (TWR) chassis designed for performance, cooling, and expandability."
+      },
+      performance: {
+        title: "Performance",
+        processor: "Intel Core i9 processor for high-end computing and content creation.",
+        memory: "Supports DDR5 RAM for fast, responsive performance.",
+        storage: "Multiple bays for M.2 NVMe SSDs and traditional HDDs."
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "Supports professional discrete graphics cards (e.g., NVIDIA RTX A-series)."
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["USB-C", "USB 3.2 Gen 2", "DisplayPort", "RJ-45 Ethernet"],
+        wireless: ["Optional Wi-Fi 6E"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "An accessible workstation for 3D design, photo/video editing, and advanced data analysis. ISV certified for reliability.",
+        connectivityOptions: "Ample ports and internal expansion slots for growing workflows."
+      }
+    }
+  },
+  {
+    id: "hp-ws-5",
+    slug: "hp-z2-g9-workstation-core-i7-14th-gen",
+    name: "HP Z2 G9 Workstation – 1 Core i7 14th Gen i7 – Intel i7-14700 – 996Y3ET#ABU",
+    image: "/hp/workstations/hp-z2-g9-i7.jpg",
+    category: "HP Workstation",
+    categorySlug: "workstations",
+    price: "Get a Quote",
+    description: {
+      overview: "A high-performance HP Z2 G9 Tower Workstation, equipped with a 14th Gen Intel Core i7 processor for demanding professional workflows.",
+      design: {
+        title: "Design",
+        formFactor: "A robust Tower (TWR) workstation chassis, engineered for reliability, cooling, and tool-less access to components."
+      },
+      performance: {
+        title: "Performance",
+        processor: "14th Gen Intel Core i7 processor for blazing-fast performance in CAD, BIM, and rendering.",
+        memory: "High-speed DDR5 ECC or non-ECC RAM.",
+        storage: "Fast NVMe SSD storage for OS and applications."
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "Supports powerful professional NVIDIA or AMD discrete graphics cards."
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["USB-C", "USB 3.2 Gen 2", "DisplayPort", "RJ-45 Ethernet"],
+        wireless: ["Optional Wi-Fi 6E"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "The industry-standard workstation for architects, engineers, and product designers. ISV certified for reliability.",
+        connectivityOptions: "Extensive I/O and expansion capabilities for professional-grade peripherals."
+      }
+    }
+  },
+  {
+    id: "hp-ws-6",
+    slug: "hp-z2-g9-workstation-i7-14700-16gb",
+    name: "HP Z2 G9 Workstation ? Intel i7-14700, 16GB RAM, 1TB SSD – 8T1R4EA#ABU",
+    image: "/hp/workstations/hp-z2-g9-i7-14700-16.jpg",
+    category: "HP Workstation",
+    categorySlug: "workstations",
+    price: "Get a Quote",
+    description: {
+      overview: "A well-balanced configuration of the HP Z2 G9 Tower Workstation, featuring the Intel Core i7-14700 processor and 16GB of RAM.",
+      design: {
+        title: "Design",
+        formFactor: "A professional Tower (TWR) workstation designed for performance and expandability."
+      },
+      performance: {
+        title: "Performance",
+        processor: "Intel Core i7-14700 processor, offering a high core count for heavy multitasking.",
+        memory: "16GB of DDR5 RAM for professional applications.",
+        storage: "High-speed NVMe SSD."
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "Configured with professional-grade discrete graphics."
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["USB-C", "USB-A 3.2", "DisplayPort", "RJ-45 Ethernet"],
+        wireless: ["Optional Wi-Fi 6E"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "A great starting point for 2D/3D CAD and design, offering a powerful CPU and the ability to upgrade memory and graphics later.",
+        connectivityOptions: "A full set of ports for a professional design or engineering setup."
+      }
+    }
+  },
+  {
+    id: "hp-ws-7",
+    slug: "hp-z2-g9-workstation-i7-14700-32gb",
+    name: "HP Z2 G9 Workstation ? Intel i7-14700, 32GB RAM, 1TB SSD – 996Y2ET#ABU",
+    image: "/hp/workstations/hp-z2-g9-i7-14700-32.jpg",
+    category: "HP Workstation",
+    categorySlug: "workstations",
+    price: "Get a Quote",
+    description: {
+      overview: "A powerful HP Z2 G9 Tower Workstation configuration, ideal for professionals running large models or multiple applications.",
+      design: {
+        title: "Design",
+        formFactor: "The industry-leading Z2 Tower (TWR) chassis, providing excellent airflow and tool-less component access."
+      },
+      performance: {
+        title: "Performance",
+        processor: "Intel Core i7-14700 processor for high-frequency performance.",
+        memory: "32GB of high-speed DDR5 RAM, perfect for large datasets and complex renders.",
+        storage: "Fast NVMe SSD storage."
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "Equipped with a professional NVIDIA or AMD discrete graphics card."
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["USB-C", "USB-A 3.2", "DisplayPort", "RJ-45 Ethernet"],
+        wireless: ["Optional Wi-Fi 6E"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "This 32GB configuration is aimed at serious professionals who need smooth performance in memory-intensive applications.",
+        connectivityOptions: "ISV-certified reliability with extensive connectivity."
+      }
+    }
+  },
+  {
+    id: "hp-ws-8",
+    slug: "hp-z2-g9-workstation-intel-i7-14700",
+    name: "HP Z2 G9 Workstation | Intel i7-14700 | 996V7ET#ABU",
+    image: "/hp/workstations/hp-z2-g9-i7-14700.jpg",
+    category: "HP Workstation",
+    categorySlug: "workstations",
+    price: "Get a Quote",
+    description: {
+      overview: "A baseline HP Z2 G9 Tower Workstation featuring the powerful 14th Gen Intel Core i7-14700 processor.",
+      design: {
+        title: "Design",
+        formFactor: "A durable and expandable Tower (TWR) workstation, the industry benchmark for reliability."
+      },
+      performance: {
+        title: "Performance",
+        processor: "Intel Core i7-14700 processor, providing a significant boost in multi-core performance.",
+        memory: "Configurable with DDR5 RAM.",
+        storage: "Configurable with M.2 NVMe SSD."
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "Supports a wide range of professional discrete graphics."
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["USB-C", "USB-A 3.2", "DisplayPort", "RJ-45 Ethernet"],
+        wireless: ["Optional Wi-Fi 6E"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "A highly customizable workstation for architects, engineers, and designers who demand ISV-certified performance.",
+        connectivityOptions: "A platform built for expansion and pro-grade connectivity."
+      }
+    }
+  },
+  {
+    id: "hp-ws-9",
+    slug: "hp-z2-g9-workstation-intel-i7-14700k",
+    name: "HP Z2 G9 Workstation | Intel i7-14700K | 996V4ET#ABU",
+    image: "/hp/workstations/hp-z2-g9-i7-14700k.jpg",
+    category: "HP Workstation",
+    categorySlug: "workstations",
+    price: "Get a Quote",
+    description: {
+      overview: "A high-frequency HP Z2 G9 Tower Workstation, equipped with an unlocked Intel Core i7-14700K processor for maximum single-thread performance.",
+      design: {
+        title: "Design",
+        formFactor: "A Tower (TWR) workstation with enhanced cooling to handle the unlocked 'K' series processor."
+      },
+      performance: {
+        title: "Performance",
+        processor: "Intel Core i7-14700K processor, ideal for workflows that benefit from the highest clock speeds (e.g., 3D modeling, CAD).",
+        memory: "High-speed DDR5 RAM.",
+        storage: "Fast NVMe SSD."
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "Supports high-end NVIDIA or AMD professional graphics."
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["USB-C", "USB-A 3.2", "DisplayPort", "RJ-45 Ethernet"],
+        wireless: ["Optional Wi-Fi 6E"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "Engineered for designers, architects, and power users who need elite performance for frequency-bound applications.",
+        connectivityOptions: "A robust platform for a high-end, reliable workstation."
+      }
+    }
+  },
+  {
+    id: "hp-ws-10",
+    slug: "hp-z2-g9-workstation-intel-i9-14900k-rtx",
+    name: "HP Z2 G9 Workstation | Intel i9-14900K | RTX A2000 12GB | 32GB RAM | 1TB SSD",
+    image: "/hp/workstations/hp-z2-g9-i9-14900k.jpg",
+    category: "HP Workstation",
+    categorySlug: "workstations",
+    price: "Get a Quote",
+    description: {
+      overview: "The pinnacle of the Z2 G9 Tower series, this workstation combines the top-tier Intel Core i9-14900K processor with a powerful NVIDIA RTX graphics card.",
+      design: {
+        title: "Design",
+        formFactor: "A Tower (TWR) workstation with a high-performance power supply and advanced thermal solution to manage the i9-14900K."
+      },
+      performance: {
+        title: "Performance",
+        processor: "Unlocked Intel Core i9-14900K, the ultimate processor for single- and multi-threaded performance.",
+        memory: "32GB or more of high-speed DDR5 RAM.",
+        storage: "Top-tier NVMe SSD."
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "A high-end professional NVIDIA RTX graphics card for real-time rendering and VR."
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["USB-C/Thunderbolt", "USB-A 3.2 Gen 2", "DisplayPort", "RJ-45 Ethernet"],
+        wireless: ["Wi-Fi 6E", "Bluetooth 5.3"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "An elite workstation for simulation, real-time ray tracing, and 8K video editing. Uncompromising performance.",
+        connectivityOptions: "Maximum connectivity for the most demanding professional workflows."
+      }
+    }
+  },
+  {
+    id: "hp-ws-11",
+    slug: "hp-z2-g9-workstation-intel-w680-chip",
+    name: "HP Z2 G9 Workstation | Intel W680 Chip | 996V6ET#ABU",
+    image: "/hp/workstations/hp-z2-g9-w680.jpg",
+    category: "HP Workstation",
+    categorySlug: "workstations",
+    price: "Get a Quote",
+    description: {
+      overview: "A HP Z2 G9 Tower Workstation built on the Intel W680 chipset, enabling support for ECC (Error-Correcting Code) memory.",
+      design: {
+        title: "Design",
+        formFactor: "The expandable and reliable Tower (TWR) chassis, configurable for enterprise-grade components."
+      },
+      performance: {
+        title: "Performance",
+        processor: "Supports Intel Core processors (12th/13th/14th Gen) and the W680 chipset.",
+        memory: "Supports both DDR5 ECC and non-ECC memory for enhanced data integrity.",
+        storage: "NVMe SSD and SATA HDD bays."
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "Supports professional discrete graphics."
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["USB-C", "USB-A 3.2", "DisplayPort", "RJ-45 Ethernet"],
+        wireless: ["Optional Wi-Fi 6E"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "Ideal for scientific computing, financial modeling, and critical tasks where data integrity is paramount, thanks to ECC memory support.",
+        connectivityOptions: "A professional-grade, expandable, and ISV-certified platform."
+      }
+    }
+  },
+  {
+    id: "hp-ws-12",
+    slug: "hp-z2-mini-g9-workstation-1-core-i7",
+    name: "HP Z2 Mini G9 Workstation – 1 Core i7 14th Gen i7-14700K – 996W9ET#ABU",
+    image: "/hp/workstations/hp-z2-mini-g9-i7.jpg",
+    category: "HP Workstation",
+    categorySlug: "workstations",
+    price: "Get a Quote",
+    description: {
+      overview: "A remarkably powerful mini workstation that fits in the palm of your hand, featuring an Intel Core i7 processor and professional graphics.",
+      design: {
+        title: "Design",
+        formFactor: "An ultra-compact Mini PC, VESA mountable to the back of a monitor. Designed for a completely hidden, zero-footprint setup."
+      },
+      performance: {
+        title: "Performance",
+        processor: "Intel Core i7 processor (desktop-class) for pro-level performance.",
+        memory: "DDR5 SODIMM RAM.",
+        storage: "Fast M.2 NVMe SSD."
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "Supports low-profile professional NVIDIA RTX graphics for 3D modeling."
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["USB-C/Thunderbolt", "USB-A 3.2", "DisplayPort", "RJ-45 Ethernet"],
+        wireless: ["Wi-Fi 6E", "Bluetooth 5.3"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "The perfect workstation for CAD, architecture, or command centers where space is at a premium but performance is essential.",
+        connectivityOptions: "Drives multiple 4K displays and provides high-speed I/O in a tiny package."
+      }
+    }
+  },
+  {
+    id: "hp-ws-13",
+    slug: "hp-z2-mini-g9-workstation-compact",
+    name: "HP Z2 Mini G9 Workstation ? Compact Powerhouse for 3D & Pro Workflows",
+    image: "/hp/workstations/hp-z2-mini-g9-compact.jpg",
+    category: "HP Workstation",
+    categorySlug: "workstations",
+    price: "Get a Quote",
+    description: {
+      overview: "The HP Z2 Mini G9 redefines the workstation by packing incredible performance into an impossibly small, compact, and versatile design.",
+      design: {
+        title: "Design",
+        formFactor: "An extremely compact Mini workstation that can be VESA mounted, placed on a stand, or racked (with adapter)."
+      },
+      performance: {
+        title: "Performance",
+        processor: "Supports desktop-class Intel Core processors (up to i9).",
+        memory: "Up to 64GB of DDR5 SODIMM RAM.",
+        storage: "Up to 2 M.2 NVMe SSDs."
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "Supports low-profile NVIDIA RTX A-series graphics."
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["USB-C/Thunderbolt", "USB-A 3.2", "DisplayPort", "RJ-45 Ethernet"],
+        wireless: ["Wi-Fi 6E", "Bluetooth 5.3"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "A powerhouse for 3D design, trading floors, and OEM applications. ISV-certified for reliable performance.",
+        connectivityOptions: "Drives multi-display setups with ease and offers high-speed Thunderbolt connectivity."
+      }
+    }
+  },
+  {
+    id: "hp-ws-14",
+    slug: "hp-z2-mini-g9-workstation-i9-14900k",
+    name: "HP Z2 Mini G9 Workstation | i9-14900K, RTX A2000 12GB, 32GB RAM, 1TB SSD",
+    image: "/hp/workstations/hp-z2-mini-g9-i9.jpg",
+    category: "HP Workstation",
+    categorySlug: "workstations",
+    price: "Get a Quote",
+    description: {
+      overview: "An elite-performance HP Z2 Mini G9 workstation, configured with a top-of-the-line Intel Core i9 processor (likely i9-14900).",
+      design: {
+        title: "Design",
+        formFactor: "The ultimate compact workstation, VESA mountable and designed for extreme performance in tight spaces."
+      },
+      performance: {
+        title: "Performance",
+        processor: "Intel Core i9 processor (14th Gen) for maximum computing power in a mini form factor.",
+        memory: "High-speed DDR5 SODIMM RAM (e.g., 32GB or 64GB).",
+        storage: "High-speed M.2 NVMe SSD."
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "Paired with a low-profile NVIDIA RTX professional graphics card."
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["USB-C/Thunderbolt", "USB-A 3.2", "DisplayPort", "RJ-45 Ethernet"],
+        wireless: ["Wi-Fi 6E", "Bluetooth 5.3"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "An uncompromising mini-workstation for high-end rendering, complex design, and power-hungry applications.",
+        connectivityOptions: "The best-in-class performance and connectivity in a mini PC."
+      }
+    }
+  },
+  // --- END OF HP WORKSTATIONS ---
+
+  // --- NEW: LENOVO DOCKING STATIONS (3 PRODUCTS) ---
+  {
+    id: "lenovo-dock-1",
+    slug: "lenovo-thinkpad-universal-usb-c-dock-40ay0090us",
+    name: "Lenovo laptop dock/port – 40AY0090US",
+    image: "/lenovo/docks/lenovo-universal-usbc-dock.jpg",
+    category: "Lenovo, Docking Station,",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A universal USB-C dock designed to work with both ThinkPad and non-Lenovo laptops, providing a single-cable solution for video, data, and power.",
+      design: {
+        title: "Design",
+        formFactor: "A compact, rectangular docking station (model 40AY0090US) that sits on the desk to provide easy port access."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A (Uses USB-C DisplayPort Alt-Mode)",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A (Supports up to dual 4K displays or a single 5K display on compatible systems).",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["1x USB-C (host)", "2x DisplayPort 1.4", "1x HDMI 2.0", "3x USB-A 3.1", "2x USB 2.0", "1x USB-C (data/power)", "1x RJ-45 Ethernet"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "Delivers up to 65W of power to charge your laptop while you work. Universally compatible with most USB-C laptops.",
+        connectivityOptions: "A true one-cable workstation solution for a clean and productive desk."
+      }
+    }
+  },
+  {
+    id: "lenovo-dock-2",
+    slug: "lenovo-thinkpad-ultra-docking-station",
+    name: "Lenovo laptop dock/port replicator Docking – 40AJ0135US",
+    image: "/lenovo/docks/lenovo-ultra-dock.jpg",
+    category: "Lenovo, Docking Station,",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A professional, side-connecting mechanical dock for compatible ThinkPad laptops, offering enterprise-grade connectivity and security.",
+      design: {
+        title: "Design",
+        formFactor: "A 'slide-and-click' mechanical dock that the ThinkPad connects to directly. Features a key-lock for security."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A (Direct pass-through connection)",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A (Supports multiple displays, often up to three 4K monitors, depending on the laptop's graphics).",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["Multiple USB 3.1", "USB-C", "2x DisplayPort", "1x HDMI", "1x VGA", "1x RJ-45 Ethernet", "Stereo/Mic Combo Jack"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "Provides instant, driver-free port replication and charging for compatible ThinkPad laptops. The security lock is ideal for open offices.",
+        connectivityOptions: "A wide array of modern and legacy ports for total peripheral compatibility."
+      }
+    }
+  },
+  {
+    id: "lenovo-dock-3",
+    slug: "lenovo-thinkpad-hybrid-usb-c-with-usb-a-dock",
+    name: "Lenovo ThinkPad Hybrid USB-C with USB-A Dock – 40AF0135US",
+    image: "/lenovo/docks/lenovo-hybrid-usbc-usba-dock.jpg",
+    category: "Lenovo, Docking Station",
+    categorySlug: "accessories",
+    price: "Get a Quote",
+    description: {
+      overview: "A truly universal dock designed for any organization with a mixed-laptop environment, supporting both new USB-C and older USB-A laptops.",
+      design: {
+        title: "Design",
+        formFactor: "A compact rectangular dock with a unique split-tip cable that has both a USB-C and a USB-A connector."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A (Uses DisplayLink technology for universal compatibility)",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A (Supports up to dual 4K displays, regardless of the laptop's native graphics capabilities, thanks to DisplayLink).",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["1x USB-C/A (host)", "1x USB-C", "3x USB-A 3.1", "2x USB 2.0", "2x DisplayPort", "2x HDMI", "1x RJ-45 Ethernet"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "The perfect 'hot desking' solution. Any user can connect and get a dual-monitor setup, whether they have a new MacBook or an older PC.",
+        connectivityOptions: "Provides power over USB-C and uses DisplayLink drivers for universal video support."
+      }
+    }
+  },
+  // --- END OF LENOVO DOCKING STATIONS ---
+
+  // --- NEW: LENOVO WORKSTATIONS (3 PRODUCTS) ---
+  {
+    id: "lenovo-ws-1",
+    slug: "lenovo-thinkstation-p3-tiny-workstation",
+    name: "Lenovo ThinkCentre M70a Gen 3 Intel® – 11VL001MUK",
+    image: "/lenovo/workstations/lenovo-p3-tiny.jpg",
+    category: "Lenovo, Workstation",
+    categorySlug: "workstations",
+    price: "Get a Quote",
+    description: {
+      overview: "An astonishingly small 1L workstation, the ThinkStation P3 Tiny delivers professional-grade performance in a chassis 96% smaller than a traditional desktop.",
+      design: {
+        title: "Design",
+        formFactor: "A 1-liter 'Tiny' form factor that can be VESA mounted, placed on a desk, or hidden away for a zero-footprint solution."
+      },
+      performance: {
+        title: "Performance",
+        processor: "Supports desktop-class Intel Core processors (e.g., i7, i9) for powerful performance.",
+        memory: "Up to 64GB of high-speed DDR5 SODIMM RAM.",
+        storage: "Dual M.2 NVMe SSD slots for fast, high-capacity storage."
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A (Connects to external monitors)",
+        graphics: "Supports professional discrete graphics, such as the NVIDIA T400 or T1000, for CAD and 3D modeling."
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["Thunderbolt 4 / USB-C", "USB-A 3.2", "DisplayPort", "HDMI", "RJ-45 Ethernet"],
+        wireless: ["Wi-Fi 6E", "Bluetooth 5.3"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "The world's smallest ISV-certified workstation, perfect for architecture, finance, and OEM solutions where space is critical.",
+        connectivityOptions: "Drives multiple 4K displays and offers robust I/O despite its miniature size."
+      }
+    }
+  },
+  {
+    id: "lenovo-ws-3",
+    slug: "lenovo-thinkstation-p620-amd-threadripper-pro",
+    name: "Lenovo ThinkCentre neo 50q Intel® – 12LN000AUK",
+    image: "/lenovo/workstations/lenovo-p620-tower.jpg",
+    category: "Lenovo, Workstation",
+    categorySlug: "workstations",
+    price: "Get a Quote",
+    description: {
+      overview: "The world's first AMD Ryzen Threadripper PRO workstation, delivering the ultimate in performance with up to 64 cores for unrivaled multitasking and rendering.",
+      design: {
+        title: "Design",
+        formFactor: "A premium, full-size tower workstation with an advanced thermal design to cool the Threadripper PRO CPU."
+      },
+      performance: {
+        title: "Performance",
+        processor: "AMD Ryzen Threadripper PRO (up to 64 cores and 128 threads) for extreme processing power.",
+        memory: "Up to 1TB of 8-channel RDIMM ECC memory.",
+        storage: "Massive storage potential with multiple M.2 and 3.5-inch drive bays."
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "Supports up to two high-end NVIDIA RTX A6000 or GeForce RTX 4090 graphics cards."
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["PCIe Gen 4 slots", "10GbE built-in Ethernet", "USB 3.2 Gen 2 (Type-A and Type-C)"],
+        wireless: ["Optional Wi-Fi 6"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "An elite workstation for media & entertainment (8K editing), data science, and complex simulations that require maximum core count.",
+        connectivityOptions: "Unmatched performance and connectivity, including built-in 10 Gigabit Ethernet."
+      }
+    }
+  },
+  // --- END OF LENOVO WORKSTATIONS ---
+
+  // --- NEW: HP SWITCHES (10 PRODUCTS) ---
+  {
+    id: "hp-sw-1",
+    slug: "aruba-2930m-48g-poe-1-slot-managed-l3",
+    name: "Aruba 2930M 48G PoE+ 1-slot Managed L3 – JL322A",
+    image: "/hp/switches/aruba-2930m-48g.jpg",
+    category: "HP Switches, Switches",
+    categorySlug: "switches",
+    price: "Get a Quote",
+    description: {
+      overview: "A powerful and scalable Layer 3 access switch from the Aruba 2930M series, designed for high-performance enterprise networks.",
+      design: {
+        title: "Design",
+        formFactor: "A 1U rack-mountable switch with 48x Gigabit PoE+ ports and a 1-slot for uplink modules (e.g., SFP+ or Multi-Gigabit)."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A (Features Virtual Switching Framework - VSF - stacking)",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["48x 10/100/1000 PoE+ ports", "1x Uplink Module Slot", "1x Stacking Module Slot"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "A high-performance switch with advanced Layer 3 routing, VSF stacking, and a modular uplink slot for flexible, high-speed connections.",
+        connectivityOptions: "Ideal for enterprise edge, supporting robust PoE+ and modular 10G or 40G uplinks."
+      }
+    }
+  },
+  {
+    id: "hp-sw-2",
+    slug: "aruba-6100-48g-class4-poe-4sfp-370w",
+    name: "Aruba 6100 48G Class4 PoE 4SFP+ 370W Managed – JL675A",
+    image: "/hp/switches/aruba-6100-48g.jpg",
+    category: "HP Switches, Switches",
+    categorySlug: "switches",
+    price: "Get a Quote",
+    description: {
+      overview: "An entry-level Layer 2 switch series from Aruba CX, providing reliable and simple access for small businesses and branch offices.",
+      design: {
+        title: "Design",
+        formFactor: "A 1U rack-mountable switch with 48x Gigabit ports, 4x SFP+ 10G uplink ports, and a 370W PoE budget."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["48x 10/100/1000 PoE+ (Class 4) ports", "4x 1/10G SFP+ uplink ports"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "A cost-effective switch for connecting APs, cameras, and IoT devices. The 370W PoE budget provides ample power.",
+        connectivityOptions: "Features 10G SFP+ uplinks for high-speed connection to a network core."
+      }
+    }
+  },
+  {
+    id: "hp-sw-3",
+    slug: "aruba-cx-6300m-managed-l3-black",
+    name: "Aruba CX 6300M Managed L3 Black – JL658A",
+    image: "/hp/switches/aruba-cx-6300m.jpg",
+    category: "HP Switches, Switches",
+    categorySlug: "switches",
+    price: "Get a Quote",
+    description: {
+      overview: "A high-performance, stackable Layer 3 switch from the Aruba CX 6300M series, offering advanced features and high-speed uplinks.",
+      design: {
+        title: "Design",
+        formFactor: "A 1U rack-mountable switch, often with 24 or 48 ports and modular power supplies. Pictured in black."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A (High-performance VSF stacking for up to 10 switches)",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["Models available with Multi-Gigabit ports", "SFP+ (10G) or SFP28 (25G) uplink ports"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "A powerful switch for enterprise campus and data center access, running the modern AOS-CX operating system.",
+        connectivityOptions: "Supports high-speed 10G, 25G, and even 50G (via breakout) uplinks for a future-proof network."
+      }
+    }
+  },
+  {
+    id: "hp-sw-4",
+    slug: "aruba-instant-on-1960-48g-2xgt-2sfp",
+    name: "Aruba Instant On 1960 48G 2XGT 2SFP+ – JL808A#ABA",
+    image: "/hp/switches/aruba-1960-48g.jpg",
+    category: "HP Switches, Switches",
+    categorySlug: "switches",
+    price: "Get a Quote",
+    description: {
+      overview: "A smart-managed, stackable switch from the Instant On series, designed for high-bandwidth small businesses.",
+      design: {
+        title: "Design",
+        formFactor: "A 1U rack-mountable switch with 48 Gigabit ports and a mix of copper and fiber high-speed uplinks."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A (Supports 4-high stacking)",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["48x 10/100/1000 ports", "2x 10G-BaseT (Copper) ports", "2x 10G SFP+ (Fiber) ports"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "Manageable via a simple mobile app or cloud portal. The mix of 10G copper and fiber uplinks provides flexible, high-speed connections.",
+        connectivityOptions: "True stacking allows you to manage up to four switches as a single unit."
+      }
+    }
+  },
+  {
+    id: "hp-sw-5",
+    slug: "aruba-instant-on-1960-48g-40p-class4-8p",
+    name: "Aruba Instant On 1960 48G 40p Class4 8p Class6 – JL809A#ABA",
+    image: "/hp/switches/aruba-1960-48g-40p.jpg",
+    category: "HP Switches, Switches",
+    categorySlug: "switches",
+    price: "Get a Quote",
+    description: {
+      overview: "A 48-port smart-managed, stackable switch with a mix of PoE+ (Class 4) and high-power PoE++ (Class 6) ports.",
+      design: {
+        title: "Design",
+        formFactor: "A 1U rack-mountable switch with 48 Gigabit ports and high-speed uplink ports."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A (High PoE budget)",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["40x Gigabit PoE+ (Class 4) ports", "8x Gigabit PoE++ (Class 6) ports", "2x 10G-BaseT", "2x 10G SFP+"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "Ideal for powering a mix of devices, from standard APs and phones (PoE+) to high-power pan-tilt-zoom cameras (PoE++).",
+        connectivityOptions: "Features 10G copper and fiber uplinks, plus cloud-stacking capabilities."
+      }
+    }
+  },
+  {
+    id: "hp-sw-6",
+    slug: "hewlett-packard-enterprise-network-power-supply",
+    name: "Hewlett Packard Enterprise network switch – JL087A",
+    image: "/hp/switches/hpe-power-supply-1.jpg",
+    category: "HP Switches, Power Supply",
+    categorySlug: "switches",
+    price: "Get a Quote",
+    description: {
+      overview: "A modular power supply unit (PSU) for Hewlett Packard Enterprise (HPE) and Aruba network switches.",
+      design: {
+        title: "Design",
+        formFactor: "A hot-swappable power supply unit designed to fit into the chassis of modular HPE/Aruba switches."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A (Provides AC power input)"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["AC Power Inlet"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "Provides primary or redundant power to an enterprise switch, ensuring network uptime and high availability.",
+        connectivityOptions: "Allows for power redundancy by installing two units in a compatible switch."
+      }
+    }
+  },
+  {
+    id: "hp-sw-7",
+    slug: "hp-2930f-24g-poe-4sfp-managed-l3",
+    name: "HP 2930F 24G PoE+ 4SFP – Managed – L3 – Gigabit – JL261A",
+    image: "/hp/switches/hp-2930f-24g.jpg",
+    category: "HP Switches, Switches",
+    categorySlug: "switches",
+    price: "Get a Quote",
+    description: {
+      overview: "The Aruba 2930F is a high-performance Layer 3 access switch with 24 Gigabit PoE+ ports and 1G SFP uplinks.",
+      design: {
+        title: "Design",
+        formFactor: "A 1U rack-mountable, fanless switch (in this 24-port model) for silent operation in office spaces."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A (Supports VSF stacking)",
+        memory: "N/A",
+        storage: "N/A"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["24x 10/100/1000 PoE+ ports", "4x 1G SFP uplink ports"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "A workhorse for the enterprise edge, providing PoE+ for devices and Layer 3 static/RIP routing. Manageable via Aruba Central.",
+        connectivityOptions: "4 SFP ports provide fiber uplink options for connecting to other network closets."
+      }
+    }
+  },
+  {
+    id: "hp-sw-8",
+    slug: "hp-2930f-48g-poe-4sfp-switch-fiber-optic",
+    name: "HP 2930F 48G PoE+ 4SFP Switch – Fiber Optic – JL262A",
+    image: "/hp/switches/hp-2930f-48g.jpg",
+    category: "HP Switches, Switches",
+    categorySlug: "switches",
+    price: "Get a Quote",
+    description: {
+      overview: "A Layer 3 managed switch with 48 Gigabit PoE+ ports and 4 SFP fiber optic uplink ports, built for the enterprise edge.",
+      design: {
+        title: "Design",
+        formFactor: "A 1U rack-mountable switch with 48 ports, designed for high-density wiring closets."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A (Supports VSF stacking)",
+        memory: "N/A",
+        storage: "N/A (370W PoE budget)"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["48x 10/100/1000 PoE+ ports", "4x 1G SFP uplink ports"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "Provides robust power and connectivity for a full office, supporting APs, phones, and cameras. Features Layer 3 routing.",
+        connectivityOptions: "4 SFP ports allow for multiple fiber optic uplinks for redundancy or connecting to other buildings."
+      }
+    }
+  },
+  {
+    id: "hp-sw-9",
+    slug: "hp-aruba-2930f-48g-poe-4sfp-plus-managed-l3",
+    name: "HP Aruba 2930F 48G PoE+ 4SFP+ Managed L3 – JL256A",
+    image: "/hp/switches/hp-2930f-48g-sfp-plus.jpg",
+    category: "HP Switches, Switches",
+    categorySlug: "switches",
+    price: "Get a Quote",
+    description: {
+      overview: "A powerful Layer 3 access switch with 48 Gigabit PoE+ ports and high-speed 10G SFP+ uplinks for a non-blocking network.",
+      design: {
+        title: "Design",
+        formFactor: "A 1U rack-mountable switch designed for high-density, high-performance enterprise networks."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A (Supports VSF stacking)",
+        memory: "N/A",
+        storage: "N/A (370W PoE budget)"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["48x 10/100/1000 PoE+ ports", "4x 1/10G SFP+ uplink ports"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "This is a future-proof switch. The 48 PoE+ ports power all edge devices, while the 10G uplinks prevent bottlenecks to the network core.",
+        connectivityOptions: "Features Layer 3 routing, QoS, and cloud management via Aruba Central."
+      }
+    }
+  },
+  {
+    id: "hp-sw-10",
+    slug: "power-supply-jl088a",
+    name: "Power Supply – JL086A",
+    image: "/hp/switches/hpe-power-supply-jl088a.jpg",
+    category: "HP Switches, Power Supply",
+    categorySlug: "switches",
+    price: "Get a Quote",
+    description: {
+      overview: "The HPE JL088A is a modular power supply unit, specifically the X372 54VDC 680W 100-240VAC Power Supply.",
+      design: {
+        title: "Design",
+        formFactor: "A hot-swappable power supply unit designed for the Aruba 3810M and 2930M series switches."
+      },
+      performance: {
+        title: "Performance",
+        processor: "N/A",
+        memory: "N/A",
+        storage: "N/A (Provides 680W of power)"
+      },
+      display: {
+        title: "Display and Graphics",
+        screen: "N/A",
+        graphics: "N/A"
+      },
+      connectivity: {
+        title: "Connectivity",
+        ports: ["AC Power Inlet"],
+        wireless: ["N/A"]
+      },
+      functionality: {
+        title: "Functionality",
+        versatility: "Used to provide primary power or redundant N+1 power to a compatible switch, increasing its PoE budget and reliability.",
+        connectivityOptions: "Allows for power supply redundancy, a critical feature for enterprise-grade network uptime."
+      }
+    }
+  },
+  // --- END OF HP SWITCHES ---
   // --- HOMEPAGE PRODUCTS (Added to fix "Not Found" error) ---
 
   // --- From Featured Products ---
@@ -3232,7 +6384,7 @@ export const allProducts: Product[] = [
     name: 'Lenovo ThinkCentre M75s Gen 2 – 11R8002QUK', 
     price: "Get a Quote", 
     image: '/lenovo/1.png', 
-    category: 'Workstations, Lenovo', 
+    category: 'Lenovo, Workstations', 
     categorySlug: 'workstations', 
     slug: 'lenovo-thinkcentre-m75s-gen-2-11r8002quk', 
     description: {
@@ -3249,7 +6401,7 @@ export const allProducts: Product[] = [
   id: 'dell-optiplex-7010-7k8h1',
   slug: 'dell-optiplex-7010-intel-core-i5-7k8h1',
   name: 'DELL OptiPlex 7010 Intel® Core™ i5 – 7K8H11',
-  image: '/computerandlaptops/dell/dell-optiplex-7010-sff.png', // You may need to update this image path
+  image: '/dell-workstation/1.jpg', // You may need to update this image path
   category: 'Workstation, Dell',
   categorySlug: 'workstations',
   price: 'Get a Quote',
@@ -3337,7 +6489,7 @@ export const allProducts: Product[] = [
   id: 'dell-optiplex-plus-7410-hj6vr',
   slug: 'dell-optiplex-plus-7410-intel-core-i5-hj6vr',
   name: 'DELL OptiPlex Plus 7410 Intel® Core™ i5 – HJ6VR',
-  image: '/computerandlaptops/dell/dell-optiplex-7410-aio.png', // You may need to update this image path
+  image: '/dell-workstation/2.jpg', // You may need to update this image path
   category: 'Workstation, Dell',
   categorySlug: 'workstations',
   price: 'Get a Quote',
@@ -3716,8 +6868,2495 @@ export const allProducts: Product[] = [
       connectivity: { title: "Connectivity", ports: ["Thunderbolt 4", "USB-A 3.2", "HDMI 2.1", "Ethernet (RJ-45)"], wireless: ["Wi-Fi 6E or 7", "Bluetooth 5.3"] },
       functionality: { title: "Functionality", versatility: "An ultimate gaming machine designed for maximum performance, with a large, immersive screen and top-tier components.", connectivityOptions: "A full suite of ports to power a complete gaming desktop setup." }
     }
-  }
+  },
   // --- End of HOMEPAGE PRODUCTS ---
+// --- NEW: AVAYA & NORTEL PRODUCTS (78 Total) ---
+  {
+    id: "avaya-1",
+    name: "Avaya 1403DigitalTelephone700469927",
+    price: "Get a Quote",
+    image: "/avaya/1403.jpg",
+    category: "Avaya, Digital Phone",
+    categorySlug: "accessories",
+    slug: "avaya-1403-digital-telephone-700469927",
+    description: {
+      overview: "Avaya 1403 Digital Telephone Overview",
+      design: { title: "Design", formFactor: "A cost-effective digital deskphone designed for common areas and walk-up users. Features a simple 2-line display and 3 programmable feature keys." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "2-line x 16 character backlit display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["Digital line interface", "Handset port"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "Ideal for basic communication needs in lobbies, stockrooms, or guest rooms. Provides essential call handling features.", connectivityOptions: "Connects to Avaya IP Office systems." }
+    }
+  },
+  {
+    id: "avaya-2",
+    name: "Avaya 1416Phone-700469869",
+    price: "Get a Quote",
+    image: "/avaya/1416.jpg",
+    category: "Avaya, Digital Phone",
+    categorySlug: "accessories",
+    slug: "avaya-1416-phone-700469869",
+    description: {
+      overview: "Avaya 1416 Digital Deskphone Overview",
+      design: { title: "Design", formFactor: "A professional digital phone for receptionists and power users. Features a 4-line backlit display and 16 programmable line/feature keys with dual LEDs (red/green)." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "4-line adjustable graphical display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["Digital line interface", "Headset port", "Expansion module port"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "Supports up to 3 Avaya DBM32 expansion modules, making it ideal for managing a high volume of calls and lines.", connectivityOptions: "Connects to Avaya IP Office systems." }
+    }
+  },
+  {
+    id: "avaya-3",
+    name: "Avaya 1603SWIPPhone700458508",
+    price: "Get a Quote",
+    image: "/avaya/1603.jpg",
+    category: "Avaya, IP Phone",
+    categorySlug: "accessories",
+    slug: "avaya-1603sw-ip-phone-700458508",
+    description: {
+      overview: "Avaya 1603SW IP Deskphone Overview",
+      design: { title: "Design", formFactor: "An entry-level IP phone designed for common areas like lobbies, break rooms, and waiting areas. Features a simple 2-line display and 3 line appearances." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "2-line x 16 character backlit display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["2x 10/100 Ethernet ports (one for PC pass-through)"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "Provides essential VoIP functionality with a built-in 2-port switch. A cost-effective solution for basic IP telephony needs.", connectivityOptions: "Supports PoE (Power over Ethernet) or an optional local power adapter." }
+    }
+  },
+  {
+    id: "avaya-4",
+    name: "Avaya 9404DigitalTelephone(700500204)",
+    price: "Get a Quote",
+    image: "/avaya/9404.jpg",
+    category: "Avaya, Digital Phone",
+    categorySlug: "accessories",
+    slug: "avaya-9404-digital-telephone-700500204",
+    description: {
+      overview: "Avaya 9404 Digital Deskphone Overview",
+      design: { title: "Design", formFactor: "A modern, professional digital phone for everyday users. Features a 4-line graphical display, 12 programmable feature keys, and a high-quality speakerphone." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "4-line x 32 character white backlit graphical display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["Digital line interface", "Headset port"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "A smart, reliable phone for users who handle moderate call volumes and need one-touch access to features.", connectivityOptions: "Designed for Avaya Aura systems." }
+    }
+  },
+  {
+    id: "avaya-5",
+    name: "Avaya 9408DigitalTelephone(700500205)",
+    price: "Get a Quote",
+    image: "/avaya/9408.jpg",
+    category: "Avaya, Digital Phone",
+    categorySlug: "accessories",
+    slug: "avaya-9408-digital-telephone-700500205",
+    description: {
+      overview: "Avaya 9408 Digital Deskphone Overview",
+      design: { title: "Design", formFactor: "An advanced digital phone for executives and receptionists. Features a large 8-line display and 24 programmable feature/line keys." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "8-line x 32 character white backlit graphical display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["Digital line interface", "Headset port", "Expansion module port"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "A powerhouse for managing high call volumes. Supports up to three 12-button expansion modules for extensive line appearances.", connectivityOptions: "Designed for Avaya Aura systems." }
+    }
+  },
+  {
+    id: "avaya-6",
+    name: "Avaya 9504TELSETFORIPOICO",
+    price: "Get a Quote",
+    image: "/avaya/9504.jpg",
+    category: "Avaya, Digital Phone",
+    categorySlug: "accessories",
+    slug: "avaya-9504-telset-for-ip-oico",
+    description: {
+      overview: "Avaya 9504 Digital Deskphone for IP Office",
+      design: { title: "Design", formFactor: "A sleek, modern digital phone with a 4-line display, designed for everyday users in an Avaya IP Office environment." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "4-line x 32 character white backlit graphical display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["Digital line interface", "Headset port"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "Features 12 programmable feature keys with dual LEDs, a high-quality speakerphone, and an intuitive interface.", connectivityOptions: "Specifically designed for and compatible with Avaya IP Office systems." }
+    }
+  },
+  {
+    id: "avaya-7",
+    name: "Avaya 9508IPphoneCharcoal,GreyWiredhandsetLCD",
+    price: "Get a Quote",
+    image: "/avaya/9508.jpg",
+    category: "Avaya, Digital Phone",
+    categorySlug: "accessories",
+    slug: "avaya-9508-ip-phone-charcoal-grey-wired-handset-lcd",
+    description: {
+      overview: "Avaya 9508 Digital Deskphone Overview",
+      design: { title: "Design", formFactor: "A charcoal grey digital phone for executives and managers. Features a large 8-line display and 24 programmable feature keys (8 keys with 3 levels)." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "8-line x 32 character white backlit graphical display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["Digital line interface", "Headset port", "Expansion module port"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "Supports a 32-button expansion module, making it ideal for receptionists or users managing many lines. Features a full-duplex speakerphone.", connectivityOptions: "Designed for Avaya IP Office systems." }
+    }
+  },
+  {
+    id: "avaya-8",
+    name: "Avaya 9601(700506783)SIPIPPhone",
+    price: "Get a Quote",
+    image: "/avaya/9601.jpg",
+    category: "Avaya, IP Phone",
+    categorySlug: "accessories",
+    slug: "avaya-9601-700506783-sip-ip-phone",
+    description: {
+      overview: "Avaya 9601 SIP IP Phone Overview",
+      design: { title: "Design", formFactor: "A cost-effective, entry-level SIP phone for common areas and basic user needs. Features a simple 2-line display." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "2-line monochrome display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["1x 10/100 Ethernet port"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "Provides basic SIP telephony features in a simple, no-frills package. Ideal for lobbies, hallways, and guest rooms.", connectivityOptions: "Powered by PoE (Power over Ethernet) only." }
+    }
+  },
+  {
+    id: "avaya-9",
+    name: "Avaya B159Analog/DECTtelephoneBlack",
+    price: "Get a Quote",
+    image: "/avaya/B159.jpg",
+    category: "Avaya, Conference Phone",
+    categorySlug: "accessories",
+    slug: "avaya-b159-analog-dect-telephone-black",
+    description: {
+      overview: "Avaya B159 Analog Conference Phone Overview",
+      design: { title: "Design", formFactor: "A powerful analog conference phone in black, designed for medium to large meeting rooms. Features a simple keypad and LCD display." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "Backlit graphical LCD display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["Analog (RJ11) connection", "Expansion microphone ports", "DECT 6.0 (for accessory connection)"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "Features Avaya's OmniSound technology for crystal-clear audio. Can be expanded with extra microphones for larger rooms and supports an SD card for call recording.", connectivityOptions: "Connects to a standard analog phone line or analog PBX port." }
+    }
+  },
+  {
+    id: "avaya-10",
+    name: "Avaya H229TRIMLINEIPPHONEGLOBAL",
+    price: "Get a Quote",
+    image: "/avaya/H229.jpg",
+    category: "Avaya, IP Phone",
+    categorySlug: "accessories",
+    slug: "avaya-h229-trimline-ip-phone-global",
+    description: {
+      overview: "Avaya H229 Trimline IP Phone Overview",
+      design: { title: "Design", formFactor: "A slim, 'trimline' phone designed for wall mounting or tight spaces. Ideal for hospitality, elevators, or courtesy phone needs." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "No display, features a standard 12-button keypad.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["1x 10/100 Ethernet port"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "A simple, durable, and cost-effective IP phone for basic communication. Features programmable keys and is PoE powered.", connectivityOptions: "Connects to a standard IP network and is powered via PoE." }
+    }
+  },
+  {
+    id: "avaya-11",
+    name: "Avaya H239CordedSIPPhone700513933",
+    price: "Get a Quote",
+    image: "/avaya/H239.jpg",
+    category: "Avaya, IP Phone",
+    categorySlug: "accessories",
+    slug: "avaya-h239-corded-sip-phone-700513933",
+    description: {
+      overview: "Avaya H239 Corded SIP Phone Overview",
+      design: { title: "Design", formFactor: "An entry-level SIP phone with a 2.8-inch color display and 6 programmable soft keys." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "2.8-inch (320x240) color LCD display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["2x 10/100 Ethernet ports", "Headset port"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "A cost-effective phone for business users with a color display, HD audio, and 6-way audio conferencing support.", connectivityOptions: "PoE support and a built-in 2-port switch for PC pass-through." }
+    }
+  },
+  {
+    id: "avaya-12",
+    name: "Avaya H249CORDEDSIPPHONEW/DISPLAY",
+    price: "Get a Quote",
+    image: "/avaya/H249.jpg",
+    category: "Avaya, IP Phone",
+    categorySlug: "accessories",
+    slug: "avaya-h249-corded-sip-phone-with-display",
+    description: {
+      overview: "Avaya H249 Corded SIP Phone Overview",
+      design: { title: "Design", formFactor: "A high-end corded SIP phone featuring a large 5-inch color display and programmable DSS keys for power users." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "5-inch (800x480) color LCD display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["2x Gigabit Ethernet ports", "Headset port", "USB 2.0 port"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "Designed for receptionists and executives. Features 10 physical DSS keys (5 levels) for 50 programmable functions. Supports 6-way audio conferencing and HD audio.", connectivityOptions: "Gigabit Ethernet for high-speed pass-through and PoE support." }
+    }
+  },
+  {
+    id: "avaya-13",
+    name: "Avaya J129IPPHONENOPWRSUPP",
+    price: "Get a Quote",
+    image: "/avaya/J129.jpg",
+    category: "Avaya, IP Phone",
+    categorySlug: "accessories",
+    slug: "avaya-j129-ip-phone-no-power-supply",
+    description: {
+      overview: "Avaya J129 IP Phone (No Power Supply) Overview",
+      design: { title: "Design", formFactor: "A cost-effective, single-line IP phone for basic communication needs in common areas or desktops. This model ships without a power supply." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "Monochrome graphical display (128x32).", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["2x 10/100 Ethernet ports"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "Ideal for users with basic communication needs. Supports one line, two concurrent calls, and three softkeys.", connectivityOptions: "Designed to be powered by PoE (Power over Ethernet). A separate power supply must be purchased if PoE is not available." }
+    }
+  },
+  {
+    id: "avaya-14",
+    name: "Avaya 1 PORT 10GBase-SR XFP Transceiver",
+    price: "Get a Quote",
+    image: "/avaya/xfp-sr.jpg",
+    category: "Avaya, Transceiver",
+    categorySlug: "switches",
+    slug: "avaya-1-port-10gbase-sr-xfp-transceiver-dupe",
+    description: {
+      overview: "Avaya 1-Port 10GBase-SR XFP Transceiver Overview",
+      design: { title: "Design", formFactor: "An XFP (10 Gigabit Small Form Factor Pluggable) optical transceiver module for high-speed network connections." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "N/A", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["Duplex LC connector"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "Provides a 10 Gigabit 'Short Range' (SR) connection over multimode fiber, typically up to 300 meters.", connectivityOptions: "Plugs into XFP-compatible ports on Avaya switches and routers." }
+    }
+  },
+  {
+    id: "avaya-15",
+    name: "Avaya 1000BASE-LX, SFP network transceiver module 1000 Mbit/s",
+    price: "Get a Quote",
+    image: "/avaya/sfp-lx.jpg",
+    category: "Avaya, Transceiver, SFP",
+    categorySlug: "switches",
+    slug: "avaya-1000base-lx-sfp-network-transceiver-module-1000-mbit-s",
+    description: {
+      overview: "Avaya 1000BASE-LX SFP Transceiver Overview",
+      design: { title: "Design", formFactor: "A standard SFP (Small Form-factor Pluggable) module for 1 Gigabit Ethernet connectivity." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "N/A", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["Duplex LC connector"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "Provides a 1 Gbps 'Long Range' (LX) connection over single-mode fiber, with a reach of up to 10 kilometers.", connectivityOptions: "Hot-swappable module for SFP-compatible ports on Avaya networking equipment." }
+    }
+  },
+  {
+    id: "avaya-16",
+    name: "Avaya 1120E IP PHONE GRAPHITE – NO PSU",
+    price: "Get a Quote",
+    image: "/avaya/1120E.jpg",
+    category: "Avaya, IP Phone",
+    categorySlug: "accessories",
+    slug: "avaya-1120e-ip-phone-graphite-no-psu-dupe",
+    description: {
+      overview: "Avaya 1120E IP Phone (Graphite, No PSU) Overview",
+      design: { title: "Design", formFactor: "A professional, multi-line IP phone in a graphite finish. Features a large high-resolution graphical display and 4 softkeys." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "High-resolution, backlit grayscale display (240x80 pixels).", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["2x Gigabit Ethernet ports", "Headset port", "USB port"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "A flexible phone for knowledge workers, supporting up to 4 line/feature keys. The USB port supports peripherals. Ships without a power supply, intended for PoE.", connectivityOptions: "Gigabit Ethernet pass-through and PoE support." }
+    }
+  },
+  {
+    id: "avaya-17",
+    name: "Avaya 1120SA – VoIP phone",
+    price: "Get a Quote",
+    image: "/avaya/1120SA.jpg",
+    category: "Avaya, VoIP Phone",
+    categorySlug: "accessories",
+    slug: "avaya-1120sa-voip-phone-dupe",
+    description: {
+      overview: "Avaya 1120SA VoIP Phone Overview",
+      design: { title: "Design", formFactor: "A secure, multi-line IP phone, likely a variant of the 1120E with specific security or software enhancements." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "High-resolution, backlit grayscale display (240x80 pixels).", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["2x Gigabit Ethernet ports", "Headset port", "USB port"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "Provides secure, reliable VoIP communications for business users. Features high-quality audio and a built-in Ethernet switch.", connectivityOptions: "Supports PoE and Gigabit Ethernet." }
+    }
+  },
+  {
+    id: "avaya-19",
+    name: "Avaya 1140E IP Deskphone",
+    price: "Get a Quote",
+    image: "/avaya/1140E.jpg",
+    category: "Avaya, IP Phone",
+    categorySlug: "accessories",
+    slug: "avaya-1140e-ip-deskphone-dupe",
+    description: {
+      overview: "Avaya 1140E IP Deskphone Overview",
+      design: { title: "Design", formFactor: "An executive-class, multi-line IP phone with a high-resolution graphical display, designed for managers and power users." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "High-resolution, backlit grayscale display (240x160 pixels).", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["2x Gigabit Ethernet ports", "Headset port", "USB port"], wireless: ["Bluetooth (with adapter)"] },
+      functionality: { title: "Functionality", versatility: "Supports up to 12 line/feature keys and features a USB port for expansion and Bluetooth headset support (via optional adapter).", connectivityOptions: "Gigabit Ethernet and PoE support." }
+    }
+  },
+  {
+    id: "avaya-21",
+    name: "Avaya 1151B1 POWER SUPPLY",
+    price: "Get a Quote",
+    image: "/avaya/1151B1.jpg",
+    category: "Avaya, Power Supply",
+    categorySlug: "accessories",
+    slug: "avaya-1151b1-power-supply-dupe",
+    description: {
+      overview: "Avaya 1151B1 Power Supply Overview",
+      design: { title: "Design", formFactor: "A local AC power adapter (power brick) designed to provide power to Avaya IP phones when PoE is not available." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "N/A", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["AC power input", "DC power output (to phone)"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "Provides reliable, local power to a single Avaya deskphone. A necessary accessory for non-PoE network drops.", connectivityOptions: "Compatible with various Avaya 1600, 9600, and other IP phone series." }
+    }
+  },
+  {
+    id: "avaya-22",
+    name: "Avaya 1408IPphoneBlackWired",
+    price: "Get a Quote",
+    image: "/avaya/1408.jpg",
+    category: "Avaya, IP Phone",
+    categorySlug: "accessories",
+    slug: "avaya-1408-ip-phone-black-wired",
+    description: {
+      overview: "Avaya 1408 IP Deskphone Overview",
+      design: { title: "Design", formFactor: "A digital phone for everyday users, featuring a 3-line display and 8 programmable line/feature keys with dual LEDs." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "3-line x 24 character backlit display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["Digital line interface", "Headset port"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "A reliable digital phone with a high-quality speakerphone and context-sensitive softkeys. Ideal for users who manage a moderate number of calls.", connectivityOptions: "Connects to Avaya IP Office systems." }
+    }
+  },
+  {
+    id: "avaya-23",
+    name: "Avaya 1416 DIGITAL PHONE BLK",
+    price: "Get a Quote",
+    image: "/avaya/1416-blk.jpg",
+    category: "Avaya, Digital Phone",
+    categorySlug: "accessories",
+    slug: "avaya-1416-digital-phone-blk-dupe",
+    description: {
+      overview: "Avaya 1416 Digital Deskphone (Black) Overview",
+      design: { title: "Design", formFactor: "A black digital phone for receptionists and power users. Features 16 programmable line/feature keys and a 4-line backlit display." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "4-line adjustable graphical display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["Digital line interface", "Headset port", "Expansion module port"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "Supports up to 3 DBM32 expansion modules, providing a total of 112 programmable keys for high-volume call handling.", connectivityOptions: "Designed for Avaya IP Office." }
+    }
+  },
+  {
+    id: "avaya-24",
+    name: "Avaya 1608-I IP DESKPHONE ICON ONLY",
+    price: "Get a Quote",
+    image: "/avaya/1608-icon.jpg",
+    category: "Avaya, IP Phone",
+    categorySlug: "accessories",
+    slug: "avaya-1608-i-ip-deskphone-icon-only-700415557",
+    description: {
+      overview: "Avaya 1608-I IP Deskphone Overview",
+      design: { title: "Design", formFactor: "A multi-line IP phone for everyday users, featuring a 3-line display and 8 programmable line/feature keys with dual LEDs. 'Icon Only' version." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "3-line x 24 character backlit display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["2x 10/100 Ethernet ports", "Headset port"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "A reliable workhorse for users who need one-touch access to features and lines. Supports a full-duplex speakerphone.", connectivityOptions: "PoE support and a PC pass-through port." }
+    }
+  },
+  {
+    id: "avaya-25",
+    name: "Avaya 1608IPPhone(700415557)",
+    price: "Get a Quote",
+    image: "/avaya/1608-icon.jpg",
+    category: "Avaya, IP Phone",
+    categorySlug: "accessories",
+    slug: "avaya-1608ipphone-700415557",
+    description: {
+      overview: "Avaya 1608 IP Phone (700415557) Overview",
+      design: { title: "Design", formFactor: "A standard 8-line IP deskphone for everyday users, featuring a 3-line backlit display and 8 programmable keys." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "3-line x 24 character backlit display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["2x 10/100 Ethernet ports", "Headset port"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "Provides all essential IP telephony features, including a speakerphone and headset support, for moderate call volumes.", connectivityOptions: "Powered via PoE or optional local power supply." }
+    }
+  },
+  {
+    id: "avaya-26",
+    name: "Avaya 1616-I IP phone Black 16 lines",
+    price: "Get a Quote",
+    image: "/avaya/1616.jpg",
+    category: "Avaya, IP Phone",
+    categorySlug: "accessories",
+    slug: "avaya-1616-i-ip-phone-black-16-lines",
+    description: {
+      overview: "Avaya 1616-I IP Deskphone Overview",
+      design: { title: "Design", formFactor: "A high-volume IP phone for receptionists and power users. Features 16 programmable line/feature keys and a 4-line display." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "4-line adjustable backlit display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["2x 10/100 Ethernet ports", "Headset port", "Expansion module port"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "Designed for call-intensive environments. Supports a 32-button expansion module (BM32) to add even more programmable keys.", connectivityOptions: "PoE support and a PC pass-through port." }
+    }
+  },
+  {
+    id: "avaya-27",
+    name: "Avaya 1616IPPhone(700415565)",
+    price: "Get a Quote",
+    image: "/avaya/1616.jpg",
+    category: "Avaya, IP Phone",
+    categorySlug: "accessories",
+    slug: "avaya-1616ipphone-700415565",
+    description: {
+      overview: "Avaya 1616 IP Phone (700415565) Overview",
+      design: { title: "Design", formFactor: "A 16-line IP deskphone designed for users who answer and transfer calls frequently. Features 16 physical keys with dual LEDs." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "Adjustable 4-line backlit display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["2x 10/100 Ethernet ports", "Headset port", "Expansion module port"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "An ideal solution for receptionists and assistants. Supports the BM32 expansion module for a total of 48 feature keys.", connectivityOptions: "Full-duplex speakerphone and PoE support." }
+  }
+},
+  {
+    id: "avaya-28",
+    name: "Avaya 3735 IP phone Black LCD 700513192",
+    price: "Get a Quote",
+    image: "/avaya/3735.jpg",
+    category: "Avaya, DECT Phone",
+    categorySlug: "accessories",
+    slug: "avaya-3735-ip-phone-black-lcd-700513192-dupe",
+    description: {
+      overview: "Avaya 3735 DECT Handset Overview",
+      design: { title: "Design", formFactor: "A rugged DECT wireless handset designed for demanding environments like healthcare and manufacturing. Features a color display and Bluetooth." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "Color LCD display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["Headset port"], wireless: ["DECT", "Bluetooth"] },
+      functionality: { title: "Functionality", versatility: "Provides secure, high-quality wireless voice communication. Features include a built-in speakerphone and Bluetooth for wireless headsets.", connectivityOptions: "Connects to Avaya IP Office or Aura via a DECT base station." }
+    }
+  },
+  {
+    id: "avaya-29",
+    name: "Avaya 3745 IP phone Black LCD 700510284",
+    price: "Get a Quote",
+    image: "/avaya/3745.jpg",
+    category: "Avaya, DECT Phone",
+    categorySlug: "accessories",
+    slug: "avaya-3745-ip-phone-black-lcd-700510284-dupe",
+    description: {
+      overview: "Avaya 3745 DECT Handset Overview",
+      design: { title: "Design", formFactor: "A ruggedized, enterprise-grade DECT handset for industrial environments. Features a backlit color display and keypad, and IP65 rating for water/dust resistance." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "Color LCD display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["Headset port"], wireless: ["DECT", "Bluetooth"] },
+      functionality: { title: "Functionality", versatility: "Built for tough conditions, offering secure wireless communication with long battery life, speakerphone, and Bluetooth headset support.", connectivityOptions: "Integrates with Avaya Aura and IP Office DECT systems." }
+    }
+  },
+  {
+    id: "avaya-30",
+    name: "Avaya 3901 Headsets",
+    price: "Get a Quote",
+    image: "/avaya/3901-headset.jpg",
+    category: "Avaya, Headset",
+    categorySlug: "accessories",
+    slug: "avaya-3901-headsets-dupe",
+    description: {
+      overview: "Avaya 3901 Headset Overview",
+      design: { title: "Design", formFactor: "An entry-level, over-the-head single-ear (monaural) headset with a noise-canceling microphone." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "N/A", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["Quick Disconnect (QD) or RJ9 port"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "A cost-effective solution for call centers or office users who need a basic, reliable wired headset for hands-free communication.", connectivityOptions: "Connects to compatible Avaya digital or IP phones via an RJ9 or QD cable." }
+    }
+  },
+  {
+    id: "avaya-31",
+    name: "Avaya 3904 Digital Deskphone",
+    price: "Get a Quote",
+    image: "/avaya/3904.jpg",
+    category: "Avaya, Digital Phone",
+    categorySlug: "accessories",
+    slug: "avaya-3904-digital-deskphone-dupe",
+    description: {
+      overview: "Avaya (Nortel) M3904 Digital Deskphone Overview",
+      design: { title: "Design", formFactor: "A professional, multi-line digital phone for managers and power users. Features a large 5-line graphical display and 6 programmable feature keys." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "5-line x 24 character graphical display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["Digital line interface", "Headset port", "Expansion module port"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "A versatile phone that supports an expansion module and a PC utility for easy programming. Features a high-quality speakerphone.", connectivityOptions: "Designed for Nortel/Avaya Meridian and CS 1000 systems." }
+    }
+  },
+  {
+    id: "avaya-32",
+    name: "Avaya 3905 Digital Deskphone",
+    price: "Get a Quote",
+    image: "/avaya/3905.jpg",
+    category: "Avaya, Digital Phone",
+    categorySlug: "accessories",
+    slug: "avaya-3905-digital-deskphone-dupe",
+    description: {
+      overview: "Avaya (Nortel) M3905 Digital Deskphone Overview",
+      design: { title: "Design", formFactor: "An advanced digital phone for call center agents and receptionists. Features a large display and 8 programmable line/feature keys." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "Large 8-line graphical display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["Digital line interface", "2x Headset ports"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "A call center workhorse with a direct-connect headset jack and features tailored for agent productivity.", connectivityOptions: "Connects to Nortel/Avaya Meridian and CS 1000 systems." }
+    }
+  },
+  {
+    id: "avaya-33",
+    name: "Avaya 4550T WITH 48 10/100 BASETX",
+    price: "Get a Quote",
+    image: "/avaya/4550T.jpg",
+    category: "Avaya, Switch",
+    categorySlug: "switches",
+    slug: "avaya-4550t-with-48-10-100-basetx-dupe",
+    description: {
+      overview: "Avaya 4550T 48-Port 10/100 Switch Overview",
+      design: { title: "Design", formFactor: "A 48-port, 1U rack-mountable Ethernet Routing Switch. Features 48 10/100 Fast Ethernet ports and uplink ports." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "N/A", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["48x 10/100Base-TX ports", "2x SFP/1000Base-T combo ports"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "A stackable Layer 3 switch for the network edge, providing reliable connectivity and routing features for enterprise networks.", connectivityOptions: "Offers high-density Fast Ethernet ports and Gigabit uplinks for aggregation." }
+    }
+  },
+  {
+    id: "avaya-34",
+    name: "Avaya 5520-48T-PWR with 48 10/100/1000",
+    price: "Get a Quote",
+    image: "/avaya/5520-48T.jpg",
+    category: "Avaya, Switch",
+    categorySlug: "switches",
+    slug: "avaya-5520-48t-pwr-with-48-10-100-1000-dupe",
+    description: {
+      overview: "Avaya 5520-48T-PWR 48-Port Gigabit Switch Overview",
+      design: { title: "Design", formFactor: "A 48-port, 1U rack-mountable Gigabit Ethernet Routing Switch with PoE (Power over Ethernet) capability." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "N/A", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["48x 10/100/1000 PoE ports", "4x SFP uplink ports"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "A high-density, stackable Layer 3 switch for the network edge, providing Gigabit speeds and power to devices like IP phones and access points.", connectivityOptions: "Supports stacking and SFP uplinks for a scalable and resilient network." }
+    }
+  },
+  {
+    id: "avaya-35",
+    name: "Avaya 6416D+M Digital Telephone",
+    price: "Get a Quote",
+    image: "/avaya/6416D.jpg",
+    category: "Avaya, Digital Phone",
+    categorySlug: "accessories",
+    slug: "avaya-6416d-m-digital-telephone-dupe",
+    description: {
+      overview: "Avaya 6416D+M Digital Telephone Overview",
+      design: { title: "Design", formFactor: "A professional multi-line digital phone with a 2-line display and 16 programmable keys. The '+M' indicates it has a built-in speakerphone." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "2-line x 24 character LCD display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["Digital line interface", "Headset port"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "A reliable digital phone for users with high call volumes. Features 16 programmable keys for lines, features, or speed dials.", connectivityOptions: "Connects to Avaya Definity and Communication Manager systems." }
+    }
+  },
+  {
+    id: "avaya-36",
+    name: "Avaya 700466253 mobile device charger Black Indoor",
+    price: "Get a Quote",
+    image: "/avaya/7004806253.jpg",
+    category: "Avaya, Charger",
+    categorySlug: "accessories",
+    slug: "avaya-700466253-mobile-device-charger-black-indoor",
+    description: {
+      overview: "Avaya 700466253 Mobile Device Charger Overview",
+      design: { title: "Design", formFactor: "A charging cradle or base station designed to charge Avaya mobile devices, such as DECT handsets." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "N/A", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["DC power input"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "Provides a stable, indoor charging solution to ensure Avaya wireless handsets are always ready for use.", connectivityOptions: "Specific to compatible Avaya mobile devices." }
+    }
+  },
+  {
+    id: "avaya-38",
+    name: "Avaya 700513569 J179 IP phone Wired handset",
+    price: "Get a Quote",
+    image: "/avaya/J179.jpg",
+    category: "Avaya, IP Phone",
+    categorySlug: "accessories",
+    slug: "avaya-700513569-j179-ip-phone-wired-handset-dupe",
+    description: {
+      overview: "Avaya J179 IP Phone (700513569) Overview",
+      design: { title: "Design", formFactor: "A high-performance IP phone for power users. Features a large color display, 8 programmable keys with dual LEDs, and a wired handset." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "2.8-inch (320x240) color display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["2x Gigabit Ethernet ports", "Headset port", "USB port"], wireless: ["Wi-Fi (via optional J100 module)"] },
+      functionality: { title: "Functionality", versatility: "Supports Avaya's SIP and H.323 protocols. Can be expanded with up to three 24-button expansion modules. Supports HD audio.", connectivityOptions: "Gigabit Ethernet, PoE, and optional Wi-Fi/Bluetooth." }
+    }
+  },
+  {
+    id: "avaya-39",
+    name: "Avaya 700513905 Vantage K175 IP phone Black,Grey Wi-Fi",
+    price: "Get a Quote",
+    image: "/avaya/K175.jpg",
+    category: "Avaya, IP Phone",
+    categorySlug: "accessories",
+    slug: "avaya-700513905-vantage-k175-ip-phone-black-grey-wi-fi",
+    description: {
+      overview: "Avaya Vantage K175 IP Phone Overview",
+      design: { title: "Design", formFactor: "A premium, all-glass touchscreen deskphone. Features a large 8-inch color touchscreen and an optional wired or wireless handset." },
+      performance: { title: "Performance", processor: "Runs on a powerful Android-based OS", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "8-inch capacitive touchscreen (1280x800).", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["2x Gigabit Ethernet ports", "Headset port", "USB-C"], wireless: ["Integrated Wi-Fi", "Integrated Bluetooth"] },
+      functionality: { title: "Functionality", versatility: "A next-generation collaboration device. Runs third-party apps, supports video conferencing (with optional camera), and provides a rich, intuitive user experience.", connectivityOptions: "Full connectivity with Gigabit Ethernet, PoE, Wi-Fi, and Bluetooth." }
+    }
+  },
+  {
+    id: "avaya-40",
+    name: "Avaya 700513916 J139 IP phone Wired handset",
+    price: "Get a Quote",
+    image: "/avaya/J139.jpg",
+    category: "Avaya, IP Phone",
+    categorySlug: "accessories",
+    slug: "avaya-700513916-j139-ip-phone-wired-handset",
+    description: {
+      overview: "Avaya J139 IP Phone (700513916) Overview",
+      design: { title: "Design", formFactor: "An entry-level IP phone for everyday users. Features a 2.8-inch color display and 4 programmable softkeys." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "2.8-inch (320x240) color display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["2x Gigabit Ethernet ports", "Headset port"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "A cost-effective choice for users who need basic telephony on a modern, color-display IP phone. Supports 4 line appearances.", connectivityOptions: "Gigabit Ethernet and PoE support." }
+    }
+  },
+  {
+    id: "avaya-41",
+    name: "Avaya 9611G IP phone",
+    price: "Get a Quote",
+    image: "/avaya/9611G.jpg",
+    category: "Avaya, IP Phone",
+    categorySlug: "accessories",
+    slug: "avaya-9611g-ip-phone",
+    description: {
+      overview: "Avaya 9611G IP Deskphone Overview",
+      design: { title: "Design", formFactor: "A professional, multi-line IP phone with a 2.8-inch color display and 8 programmable line/feature keys." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "2.8-inch (320x240) color display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["2x Gigabit Ethernet ports", "Headset port", "USB port"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "A powerful phone for essential users. Features wideband audio, a full-duplex speakerphone, and support for a 12-button expansion module.", connectivityOptions: "Gigabit Ethernet, PoE, and a built-in USB port." }
+    }
+  },
+  {
+    id: "avaya-42",
+    name: "Avaya 9641 IP phone Wired handset LCD 5 lines",
+    price: "Get a Quote",
+    image: "/avaya/9641.jpg",
+    category: "Avaya, IP Phone",
+    categorySlug: "accessories",
+    slug: "avaya-9641-ip-phone-wired-handset-lcd-5-lines",
+    description: {
+      overview: "Avaya 9641G IP Deskphone Overview",
+      design: { title: "Design", formFactor: "An executive-class IP phone with a large 5-inch color touchscreen, designed for power users and navigators." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "5-inch (480x272) color touchscreen.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["2x Gigabit Ethernet ports", "Headset port", "USB port"], wireless: ["Integrated Bluetooth"] },
+      functionality: { title: "Functionality", versatility: "A premium phone with wideband audio, a full-duplex speakerphone, and integrated Bluetooth for wireless headsets.", connectivityOptions: "Gigabit Ethernet, PoE, and USB support." }
+    }
+  },
+  {
+    id: "avaya-43",
+    name: "Avaya B100 Expansion Microphones-700501539",
+    price: "Get a Quote",
+    image: "/avaya/B100-mics.jpg",
+    category: "Avaya, Conference Phone, Accessory",
+    categorySlug: "accessories",
+    slug: "avaya-b100-expansion-microphones-700501539-dupe",
+    description: {
+      overview: "Avaya B100 Expansion Microphones Overview",
+      design: { title: "Design", formFactor: "A pair of expansion microphones designed to extend the audio pickup range of Avaya B100-series conference phones." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "N/A", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["Proprietary connection cables"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "Increases the voice pickup range, making them ideal for larger conference rooms. Features mute buttons on each microphone pod.", connectivityOptions: "Plug-and-play connection to compatible Avaya conference phones (e.g., B149, B159, B179)." }
+    }
+  },
+  {
+    id: "avaya-44",
+    name: "Avaya B109 Conference Phone",
+    price: "Get a Quote",
+    image: "/avaya/B109.jpg",
+    category: "Avaya, Conference Phone",
+    categorySlug: "accessories",
+    slug: "avaya-b109-conference-phone-dupe",
+    description: {
+      overview: "Avaya B109 Conference Phone Overview",
+      design: { title: "Design", formFactor: "A compact, portable conference phone designed for small meeting rooms and huddle spaces. Fits easily in a briefcase." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "Small LCD display for call information.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["USB 2.0"], wireless: ["Bluetooth with NFC", "Headset port (3.5mm)"] },
+      functionality: { title: "Functionality", versatility: "A highly flexible device. Connects to a PC via USB for VoIP calls or to a mobile phone/tablet via Bluetooth. Features OmniSound audio and a built-in rechargeable battery.", connectivityOptions: "Connects to laptops, smartphones, and tablets." }
+    }
+  },
+  {
+    id: "avaya-45",
+    name: "Avaya B149 Conference Phone",
+    price: "Get a Quote",
+    image: "/avaya/B149.jpg",
+    category: "Avaya, Conference Phone",
+    categorySlug: "accessories",
+    slug: "avaya-b149-conference-phone-dupe",
+    description: {
+      overview: "Avaya B149 Analog Conference Phone Overview",
+      design: { title: "Design", formFactor: "An analog conference phone for small to mid-sized rooms. Features a simple keypad and backlit LCD display." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "Backlit graphical LCD display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["Analog (RJ11) connection", "Expansion microphone ports"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "Features OmniSound 2.0 for superior audio quality. Can be supplemented with expansion microphones for larger groups.", connectivityOptions: "Connects to any standard analog phone line or PBX port." }
+    }
+  },
+  {
+    id: "avaya-46",
+    name: "Avaya B159 Conference Phone",
+    price: "Get a Quote",
+    image: "/avaya/B159-alt.jpg",
+    category: "Avaya, Conference Phone",
+    categorySlug: "accessories",
+    slug: "avaya-b159-conference-phone-dupe",
+    description: {
+      overview: "Avaya B159 Analog Conference Phone Overview",
+      design: { title: "Design", formFactor: "A powerful analog conference phone for medium to large rooms. Features an alphanumeric keypad and graphical display." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "Backlit graphical LCD display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["Analog (RJ11) connection", "Expansion microphone ports"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "Features OmniSound technology and supports call recording to an SD card. Can be expanded with microphones for larger tables.", connectivityOptions: "Connects to a standard analog phone line." }
+    }
+  },
+  {
+    id: "avaya-47",
+    name: "Avaya B169 Wireless Conference Phone",
+    price: "Get a Quote",
+    image: "/avaya/B169.jpg",
+    category: "Avaya, Conference Phone",
+    categorySlug: "accessories",
+    slug: "avaya-b169-wireless-conference-phone-dupe",
+    description: {
+      overview: "Avaya B169 Wireless Conference Phone Overview",
+      design: { title: "Design", formFactor: "A wireless conference phone that runs on a rechargeable battery, allowing for a cable-free meeting table. Connects via a DECT base station." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "Backlit graphical LCD display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["USB port", "Charging pins"], wireless: ["DECT 6.0"] },
+      functionality: { title: "Functionality", versatility: "Provides the freedom of a wireless connection with OmniSound audio quality. Can record calls to an SD card. Long-lasting battery.", connectivityOptions: "The DECT base station connects to an analog phone line or PBX." }
+    }
+  },
+  {
+    id: "avaya-48",
+    name: "Avaya B169IPconferencephone",
+    price: "Get a Quote",
+    image: "/avaya/B169.jpg",
+    category: "Avaya, Conference Phone",
+    categorySlug: "accessories",
+    slug: "avaya-b169-ip-conference-phone",
+    description: {
+      overview: "Avaya B169 Wireless Conference Phone Overview",
+      design: { title: "Design", formFactor: "A wireless DECT conference phone, providing a clean, cable-free solution for meeting rooms. Includes a charging base and rechargeable battery." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "Backlit graphical LCD display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["USB port (on phone)", "Analog (RJ11) (on base)"], wireless: ["DECT 6.0"] },
+      functionality: { title: "Functionality", versatility: "Features OmniSound HD audio, SD card recording, and a long battery life for all-day meetings.", connectivityOptions: "The base station connects to an analog line, while the phone unit is completely wireless." }
+    }
+  },
+  {
+    id: "avaya-49",
+    name: "Avaya B169WIRELESSCONFERENCEPHONE",
+    price: "Get a Quote",
+    image: "/avaya/B169.jpg",
+    category: "Avaya, Conference Phone",
+    categorySlug: "accessories",
+    slug: "avaya-b169-wireless-conference-phone-dupe-2",
+    description: {
+      overview: "Avaya B169 Wireless Conference Phone Overview",
+      design: { title: "Design", formFactor: "A wireless DECT conference phone designed for flexible meeting spaces. Includes main unit, charging cradle, and DECT base station." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "Backlit graphical LCD display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["USB", "Analog (on base)"], wireless: ["DECT"] },
+      functionality: { title: "Functionality", versatility: "Allows for cable-free conferencing with OmniSound HD audio and a built-in battery. Supports SD card recording.", connectivityOptions: "Base connects to an analog phone line; unit is wireless." }
+    }
+  },
+  {
+    id: "avaya-50",
+    name: "Avaya B179 Conference VoIP phone",
+    price: "Get a Quote",
+    image: "/avaya/B179.jpg",
+    category: "Avaya, Conference Phone",
+    categorySlug: "accessories",
+    slug: "avaya-b179-conference-voip-phone-dupe",
+    description: {
+      overview: "Avaya B179 SIP Conference Phone Overview",
+      design: { title: "Design", formFactor: "A powerful, network-connected SIP conference phone for medium to large rooms. Features a backlit graphical display." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "Backlit graphical LCD display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["1x 10/100 Ethernet port (PoE)", "Expansion microphone ports"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "Connects directly to your IP network (SIP). Features OmniSound HD audio, SD card recording, and can be expanded with microphones.", connectivityOptions: "Powered via PoE or optional local power supply." }
+    }
+  },
+  {
+    id: "avaya-51",
+    name: "Avaya B179 CONFERENCE PHONE",
+    price: "Get a Quote",
+    image: "/avaya/B179-alt.jpg",
+    category: "Avaya, Conference Phone",
+    categorySlug: "accessories",
+    slug: "avaya-b179-conference-phone",
+    description: {
+      overview: "Avaya B179 SIP Conference Phone Overview",
+      design: { title: "Design", formFactor: "A versatile SIP-based conference phone designed for IP networks. Features OmniSound HD audio and a backlit display." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "Backlit graphical LCD display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["1x 10/100 Ethernet port (PoE)", "Expansion microphone ports"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "Ideal for boardrooms, this phone supports SD card recording, expansion microphones, and integrates with Avaya Aura and IP Office.", connectivityOptions: "Connects to your network via Ethernet and is powered by PoE." }
+    }
+  },
+  {
+    id: "avaya-52",
+    name: "Avaya B189 IP Conference Phone",
+    price: "Get a Quote",
+    image: "/avaya/B189.jpg",
+    category: "Avaya, Conference Phone",
+    categorySlug: "accessories",
+    slug: "avaya-b189-ip-conference-phone-dupe",
+    description: {
+      overview: "Avaya B189 IP Conference Phone Overview",
+      design: { title: "Design", formFactor: "An executive IP conference phone with a large 5-inch color touchscreen and a sleek, modern profile." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "5-inch color touchscreen display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["1x Gigabit Ethernet port (PoE)"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "Delivers exceptional audio clarity with OmniSound technology. The intuitive touchscreen makes call management and setup easy.", connectivityOptions: "Connects to Avaya Aura systems. Powered via PoE." }
+    }
+  },
+  {
+    id: "avaya-53",
+    name: "Avaya B199 IP conference phone 700514246",
+    price: "Get a Quote",
+    image: "/avaya/B199-alt.jpg",
+    category: "Avaya, Conference Phone",
+    categorySlug: "accessories",
+    slug: "avaya-b199-ip-conference-phone-700514246",
+    description: {
+      overview: "Avaya B199 IP Conference Phone Overview",
+      design: { title: "Design", formFactor: "A next-generation SIP conference phone with a 4.3-inch color touchscreen and a modern, modular design." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "4.3-inch color touchscreen.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["1x Gigabit Ethernet port (PoE)", "USB 3.0", "Expansion ports"], wireless: ["Bluetooth", "NFC"] },
+      functionality: { title: "Functionality", versatility: "Features Avaya OmniSound with HD audio. Can be daisy-chained with other B199 units or expansion microphones for very large rooms.", connectivityOptions: "Connects via Gigabit PoE, USB, or Bluetooth to mobile devices." }
+    }
+  },
+  {
+    id: "avaya-54",
+    name: "Avaya Conference Phone B199",
+    price: "Get a Quote",
+    image: "/avaya/B199.jpg",
+    category: "Avaya, Conference Phone",
+    categorySlug: "accessories",
+    slug: "avaya-conference-phone-b199-dupe",
+    description: {
+      overview: "Avaya B199 IP Conference Phone Overview",
+      design: { title: "Design", formFactor: "A modular, SIP-based conference phone with a 4.3-inch color touchscreen for intuitive call control." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "4.3-inch color touchscreen.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["Gigabit Ethernet (PoE)", "USB 3.0", "Expansion ports"], wireless: ["Bluetooth", "NFC"] },
+      functionality: { title: "Functionality", versatility: "Delivers exceptional audio quality with OmniSound. Highly scalable, allowing connection of expansion mics or daisy-chaining multiple B199 units.", connectivityOptions: "A future-proof solution with SIP, USB, and Bluetooth connectivity." }
+    }
+  },
+  {
+    id: "avaya-55",
+    name: "AVAYA CU360 HUDDLE ROOM DEVICE 700513892 – NEW",
+    price: "Get a Quote",
+    image: "/avaya/room-device.jpg",
+    category: "Avaya, Video Conference",
+    categorySlug: "accessories",
+    slug: "avaya-cu360-huddle-room-device-700513892-new",
+    description: {
+      overview: "Avaya CU360 Collaboration Unit Overview",
+      design: { title: "Design", formFactor: "An all-in-one, camera-top video conferencing system designed for huddle rooms. Features an integrated 4K camera and microphone array." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "N/A (Connects to TV/Monitor)", graphics: "4K camera sensor" },
+      connectivity: { title: "Connectivity", ports: ["HDMI output", "HDMI input", "USB", "Ethernet"], wireless: ["Wi-Fi", "Bluetooth"] },
+      functionality: { title: "Functionality", versatility: "Turns any display into a video collaboration system. Integrates with cloud video services (like Zoom, Teams) and Avaya Spaces. Supports screen sharing.", connectivityOptions: "Easy to set up, connects to your network via Wi-Fi or Ethernet." }
+    }
+  },
+  {
+    id: "avaya-56",
+    name: "Avaya DECT 3730 DECT telephone handset Caller",
+    price: "Get a Quote",
+    image: "/avaya/3730.jpg",
+    category: "Avaya, DECT Phone",
+    categorySlug: "accessories",
+    slug: "avaya-dect-3730-telephone-handset-caller-dupe",
+    description: {
+      overview: "Avaya DECT 3730 Handset Overview",
+      design: { title: "Design", formFactor: "A reliable DECT wireless handset for general office use. Features a monochrome backlit display and speakerphone." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "Monochrome backlit display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["Headset port (2.5mm)"], wireless: ["DECT"] },
+      functionality: { title: "Functionality", versatility: "Provides high-quality wireless voice communication for mobile employees in an office environment. Supports messaging and a local phonebook.", connectivityOptions: "Connects to Avaya IP Office or Aura via a DECT base station system." }
+    }
+  },
+  {
+    id: "avaya-57",
+    name: "Avaya ETHERNET ROUTING SWITCH 4526T WITH",
+    price: "Get a Quote",
+    image: "/avaya/4526T.jpg",
+    category: "Avaya, Switch",
+    categorySlug: "switches",
+    slug: "avaya-ethernet-routing-switch-4526t-with",
+    description: {
+      overview: "Avaya Ethernet Routing Switch 4526T Overview",
+      design: { title: "Design", formFactor: "A 1U rack-mountable switch with 24 10/100 Fast Ethernet ports and 2 combo Gigabit SFP/T ports." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "N/A", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["24x 10/100Base-TX ports", "2x Combo Gigabit SFP/T ports"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "A stackable Layer 3 switch for the network edge, providing reliable connectivity and basic routing for small to mid-sized networks.", connectivityOptions: "Supports stacking and offers fiber/copper Gigabit uplinks." }
+    }
+  },
+  {
+    id: "avaya-58",
+    name: "Avaya GLOBAL SNGL PT POE INJECTOR KIT",
+    price: "Get a Quote",
+    image: "/avaya/poe-injector.jpg",
+    category: "Avaya, PoE Injector",
+    categorySlug: "accessories",
+    slug: "avaya-global-sngl-pt-poe-injector-kit-dupe",
+    description: {
+      overview: "Avaya Single Port PoE Injector Kit Overview",
+      design: { title: "Design", formFactor: "A compact, single-port Power over Ethernet (PoE) injector, used to power a single IP device." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "N/A", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["1x RJ45 Data In", "1x RJ45 Data & Power Out", "AC power input"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "Adds PoE capability to a non-PoE network switch port. Used to power a single IP phone, access point, or camera.", connectivityOptions: "Provides power and data over a single Ethernet cable to the end device." }
+    }
+  },
+  {
+    id: "avaya-59",
+    name: "Avaya H175VIDEOCOLLABSTN",
+    price: "Get a Quote",
+    image: "/avaya/H175.jpg",
+    category: "Avaya, Video Conference",
+    categorySlug: "accessories",
+    slug: "avaya-h175-video-collab-stn-dupe",
+    description: {
+      overview: "Avaya H175 Video Collaboration Station Overview",
+      design: { title: "Design", formFactor: "An executive video phone with a 7-inch touchscreen, 1080p camera, and a detachable wireless handset." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "7-inch capacitive touchscreen.", graphics: "1080p HD camera" },
+      connectivity: { title: "Connectivity", ports: ["2x Gigabit Ethernet ports", "HDMI output", "USB"], wireless: ["Wi-Fi", "Bluetooth"] },
+      functionality: { title: "Functionality", versatility: "An all-in-one desktop device for voice, video, and collaboration. Runs on Android and supports Avaya communication platforms.", connectivityOptions: "Full connectivity with Gigabit Ethernet, PoE, Wi-Fi, and Bluetooth." }
+    }
+  },
+  {
+    id: "avaya-60",
+    name: "Avaya IP PHONE 1616-I BLK",
+    price: "Get a Quote",
+    image: "/avaya/1616-blk.jpg",
+    category: "Avaya, IP Phone",
+    categorySlug: "accessories",
+    slug: "avaya-ip-phone-1616-i-blk-dupe",
+    description: {
+      overview: "Avaya 1616-I IP Deskphone (Black) Overview",
+      design: { title: "Design", formFactor: "A black 16-line IP phone for receptionists. Features 16 programmable keys, an adjustable 4-line display, and an expansion port." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "4-line adjustable backlit display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["2x 10/100 Ethernet ports", "Headset port", "Expansion module port"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "Designed for high-volume call handling, supporting the BM32 expansion module for up to 48 programmable keys.", connectivityOptions: "PoE support and a PC pass-through port." }
+    }
+  },
+  {
+    id: "avaya-61",
+    name: "Avaya IP PHONE 9611G ICON ONLY",
+    price: "Get a Quote",
+    image: "/avaya/9611G.jpg",
+    category: "Avaya, IP Phone",
+    categorySlug: "accessories",
+    slug: "avaya-ip-phone-9611g-icon-only-dupe",
+    description: {
+      overview: "Avaya 9611G IP Deskphone (Icon Only) Overview",
+      design: { title: "Design", formFactor: "A multi-line Gigabit IP phone with a 2.8-inch color display and 8 programmable keys. 'Icon Only' version uses universal icons on keys." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "2.8-inch (320x240) color display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["2x Gigabit Ethernet ports", "Headset port", "USB port"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "A powerful phone for essential users. Features wideband audio and a full-duplex speakerphone. Supports an expansion module.", connectivityOptions: "Gigabit Ethernet for high-speed pass-through and PoE support." }
+    }
+  },
+  {
+    id: "avaya-62",
+    name: "Avaya J159 IP phone LED Wi-Fi",
+    price: "Get a Quote",
+    image: "/avaya/J159.jpg",
+    category: "Avaya, IP Phone",
+    categorySlug: "accessories",
+    slug: "avaya-j159-ip-phone-led-wi-fi-dupe",
+    description: {
+      overview: "Avaya J159 IP Phone Overview",
+      design: { title: "Design", formFactor: "An advanced IP phone with two color displays, 10 programmable keys, and LED indicators. Designed for power users." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "Primary 2.8-inch color display and secondary 2.4-inch color display for programmable keys.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["2x Gigabit Ethernet ports", "Headset port", "USB port"], wireless: ["Wi-Fi (via optional J100 module)"] },
+      functionality: { title: "Functionality", versatility: "A high-performance phone with 10 physical keys (5 levels) for 50 feature/line appearances. Supports HD audio.", connectivityOptions: "Gigabit Ethernet, PoE, and optional Wi-Fi." }
+    }
+  },
+  {
+    id: "avaya-63",
+    name: "Avaya J169 Ip Phone Black Wired Handset",
+    price: "Get a Quote",
+    image: "/avaya/J169.jpg",
+    category: "Avaya, IP Phone",
+    categorySlug: "accessories",
+    slug: "avaya-j169-ip-phone-black-wired-handset-dupe",
+    description: {
+      overview: "Avaya J169 IP Phone Overview",
+      design: { title: "Design", formFactor: "A mid-range IP phone with a sleek, modern design. Features a grayscale graphical display and 8 programmable keys with dual LEDs." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "3.5-inch grayscale display (160x320).", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["2x Gigabit Ethernet ports", "Headset port"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "A perfect choice for users who need a high-quality phone with multiple line appearances and feature keys. Supports HD audio.", connectivityOptions: "Gigabit Ethernet and PoE support." }
+    }
+  },
+  {
+    id: "avaya-64",
+    name: "Avaya JEM24 Expansion Module 700514337 for",
+    price: "Get a Quote",
+    image: "/avaya/JEM24.jpg",
+    category: "Avaya, Expansion Module",
+    categorySlug: "accessories",
+    slug: "avaya-jem24-expansion-module-700514337-dupe",
+    description: {
+      overview: "Avaya JEM24 Expansion Module Overview",
+      design: { title: "Design", formFactor: "An add-on module for Avaya J169 and J179 phones. Provides 24 additional programmable keys with dual-color LEDs." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "Grayscale display for button labels.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["Connects directly to the side of the host phone"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "Expands the capabilities of a J169/J179 phone, making it ideal for receptionists and admins. Up to three modules can be connected.", connectivityOptions: "Powered by the host phone." }
+    }
+  },
+  {
+    id: "avaya-65",
+    name: "Avaya L119 Headset Quick",
+    price: "Get a Quote",
+    image: "/avaya/L119.jpg",
+    category: "Avaya, Headset",
+    categorySlug: "accessories",
+    slug: "avaya-l119-headset-quick-dupe",
+    description: {
+      overview: "Avaya L119 Headset Overview",
+      design: { title: "Design", formFactor: "An entry-level, over-the-head single-ear (monaural) headset with a flexible boom mic and Quick Disconnect (QD)." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "N/A", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["Quick Disconnect (QD)"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "A cost-effective headset for call centers, featuring a noise-canceling microphone. The QD allows users to unplug without removing the headset.", connectivityOptions: "Requires a separate QD-to-RJ9/USB adapter cable." }
+    }
+  },
+  {
+    id: "avaya-66",
+    name: "Avaya L129 Headset",
+    price: "Get a Quote",
+    image: "/avaya/L129.jpg",
+    category: "Avaya, Headset",
+    categorySlug: "accessories",
+    slug: "avaya-l129-headset-dupe",
+    description: {
+      overview: "Avaya L129 Headset Overview",
+      design: { title: "Design", formFactor: "A single-ear (monaural) wired headset with a noise-canceling microphone and an RJ9 connector." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "N/A", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["RJ9 connector"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "An entry-level headset designed for users who need a simple, reliable hands-free solution for their desk phone.", connectivityOptions: "Plugs directly into the headset port of most Avaya phones." }
+    }
+  },
+  {
+    id: "avaya-67",
+    name: "Avaya L139 QD Mono Headset",
+    price: "Get a Quote",
+    image: "/avaya/L139.jpg",
+    category: "Avaya, Headset",
+    categorySlug: "accessories",
+    slug: "avaya-l139-qd-mono-headset-dupe",
+    description: {
+      overview: "Avaya L139 Monaural Headset Overview",
+      design: { title: "Design", formFactor: "A professional, over-the-head single-ear (monaural) headset with a flexible noise-canceling boom mic." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "N/A", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["Quick Disconnect (QD)"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "A durable headset for call-intensive environments. The noise-canceling mic filters background noise. QD provides walkaway convenience.", connectivityOptions: "Requires a compatible QD adapter cable for your phone or PC." }
+    }
+  },
+  {
+    id: "avaya-68",
+    name: "Avaya L149 Headset",
+    price: "Get a Quote",
+    image: "/avaya/L149.jpg",
+    category: "Avaya, Headset",
+    categorySlug: "accessories",
+    slug: "avaya-l149-headset-dupe",
+    description: {
+      overview: "Avaya L149 Binaural Headset Overview",
+      design: { title: "Design", formFactor: "A professional, over-the-head dual-ear (binaural) headset with a noise-canceling boom mic." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "N/A", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["Quick Disconnect (QD)"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "Ideal for noisy environments, the dual speakers block out distractions, allowing for better focus. Features a noise-canceling mic.", connectivityOptions: "Connects via a Quick Disconnect (QD) adapter cable." }
+    }
+  },
+  {
+    id: "avaya-69",
+    name: "Avaya L159 Headset",
+    price: "Get a Quote",
+    image: "/avaya/L159.jpg",
+    category: "Avaya, Headset",
+    categorySlug: "accessories",
+    slug: "avaya-l159-headset-dupe",
+    description: {
+      overview: "Avaya L159 Binaural Headset Overview",
+      design: { title: "Design", formFactor: "A premium, dual-ear (binaural) headset with a 360-degree boom mic and leatherette ear cushions for all-day comfort." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "N/A", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["Quick Disconnect (QD)"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "A top-tier headset for call center professionals and remote workers needing superior audio quality and noise isolation.", connectivityOptions: "Quick Disconnect (QD) for multi-device flexibility (with different adapters)." }
+    }
+  },
+  {
+    id: "avaya-70",
+    name: "Avaya NTYS03AFE61120EIPDeskphone",
+    price: "Get a Quote",
+    image: "/avaya/NTYS03.jpg",
+    category: "Avaya, IP Phone",
+    categorySlug: "accessories",
+    slug: "avaya-ntys03afe61120eipdeskphone",
+    description: {
+      overview: "Avaya (Nortel) 1120E IP Deskphone Overview",
+      design: { title: "Design", formFactor: "A multi-line IP phone with a large high-resolution graphical display, 4 softkeys, and a built-in USB port." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "High-resolution, backlit grayscale display (240x80 pixels).", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["2x Gigabit Ethernet ports", "Headset port", "USB port"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "A flexible phone for knowledge workers, supporting up to 4 line/feature keys. The USB port supports peripherals.", connectivityOptions: "Gigabit Ethernet pass-through and PoE support." }
+    }
+  },
+  {
+    id: "avaya-71",
+    name: "Avaya Room System XT4300",
+    price: "Get a Quote",
+    image: "/avaya/XT4300.jpg",
+    category: "Avaya, Video Conference",
+    categorySlug: "accessories",
+    slug: "avaya-room-system-xt4300-dupe",
+    description: {
+      overview: "Avaya Scopia XT4300 Room System Overview",
+      design: { title: "Design", formFactor: "A compact, all-in-one video conferencing system for small to mid-sized rooms. Includes a main codec/camera unit and a microphone pod." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "N/A (Connects to TV)", graphics: "Supports 1080p 60fps video and content sharing." },
+      connectivity: { title: "Connectivity", ports: ["HDMI in/out", "Ethernet", "USB"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "A powerful and cost-effective room system offering dual 1080p/60fps video, H.264 High Profile, and Scalable Video Coding (SVC).", connectivityOptions: "Integrates with Avaya's video conferencing infrastructure." }
+    }
+  },
+  {
+    id: "avaya-72",
+    name: "Avaya Room System XT5000",
+    price: "Get a Quote",
+    image: "/avaya/XT5000.jpg",
+    category: "Avaya, Video Conference",
+    categorySlug: "accessories",
+    slug: "avaya-room-system-xt5000-dupe",
+    description: {
+      overview: "Avaya Scopia XT5000 Room System Overview",
+      design: { title: "Design", formFactor: "A high-performance video conferencing system for large meeting rooms. Includes a powerful codec, a PTZ (pan-tilt-zoom) camera, and a microphone pod." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "N/A (Connects to TV)", graphics: "Supports dual 1080p 60fps video streams (live video & content)." },
+      connectivity: { title: "Connectivity", ports: ["HDMI in/out", "DVI-I", "Ethernet", "USB"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "The flagship room system, offering exceptional video and audio performance. Supports 9-way multi-party conferencing (embedded MCU).", connectivityOptions: "A highly flexible system for complex collaboration needs." }
+    }
+  },
+  {
+    id: "avaya-73",
+    name: "Avaya Room System XT7100",
+    price: "Get a Quote",
+     image: "/avaya/XT7100.jpg",
+    category: "Avaya, Video Conference",
+    categorySlug: "accessories",
+    slug: "avaya-room-system-xt7100-dupe",
+    description: {
+      overview: "Avaya Scopia XT7100 Room System Overview",
+      design: { title: "Design", formFactor: "An elite, all-in-one video conferencing system with an integrated 4K camera and codec, designed for simplicity and power." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "N/A (Connects to TV)", graphics: "Supports 4K video and content sharing." },
+      connectivity: { title: "Connectivity", ports: ["HDMI in/out", "Ethernet", "USB 3.0"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "Delivers an ultra-HD 4K experience. Features H.265 (HEVC) for high-efficiency video, saving bandwidth.", connectivityOptions: "A top-of-the-line system for executive boardrooms." }
+    }
+  },
+  {
+    id: "avaya-74",
+    name: "Avaya Routing Switch 4524GT-PWR – switch – 24 ports",
+    price: "Get a Quote",
+    image: "/avaya/4524GT-PWR.jpg",
+    category: "Avaya, Switch",
+    categorySlug: "switches",
+    slug: "avaya-routing-switch-4524gt-pwr-switch-24-ports",
+    description: {
+      overview: "Avaya 4524GT-PWR 24-Port Switch Overview",
+      design: { title: "Design", formFactor: "A 24-port, 1U rack-mountable Gigabit Ethernet Routing Switch with PoE (Power over Ethernet)." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "N/A", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["24x 10/100/1000 PoE ports", "4x SFP combo uplink ports"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "A stackable Layer 3 switch for the network edge, providing Gigabit speeds and power to IP phones, APs, and cameras.", connectivityOptions: "Features 4 SFP combo ports for flexible fiber or copper uplinks." }
+    }
+  },
+  {
+    id: "avaya-75",
+    name: "Avaya1 603IPPhone(700415540)",
+    price: "Get a Quote",
+    image: "/avaya/1603.jpg",
+    category: "Avaya, IP Phone",
+    categorySlug: "accessories",
+    slug: "avaya-1603-ip-phone-700415540",
+    description: {
+      overview: "Avaya 1603 IP Phone (700415540) Overview",
+      design: { title: "Design", formFactor: "An entry-level IP phone for common area use. Features a 2-line display and 3 programmable feature keys." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "2-line x 16 character backlit display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["1x 10/100 Ethernet port"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "A simple, cost-effective phone for basic VoIP communication, ideal for lobbies or guest rooms. Does not have a PC pass-through port.", connectivityOptions: "Powered by PoE or optional local power supply." }
+    }
+  },
+  {
+    id: "avaya-76",
+    name: "Nortel IPPhone1140E(NTYS05)",
+    price: "Get a Quote",
+    image: "/avaya/Nortel-1140E.jpg",
+    category: "Nortel, Avaya, IP Phone",
+    categorySlug: "accessories",
+    slug: "nortel-ip-phone-1140e-ntys05",
+    description: {
+      overview: "Nortel (Avaya) 1140E IP Deskphone Overview",
+      design: { title: "Design", formFactor: "An executive-class, multi-line IP phone with a high-resolution graphical display, designed for managers and power users." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "High-resolution, backlit grayscale display (240x160 pixels).", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["2x Gigabit Ethernet ports", "Headset port", "USB port"], wireless: ["Bluetooth (with adapter)"] },
+      functionality: { title: "Functionality", versatility: "Supports up to 12 line/feature keys and features a USB port for expansion and Bluetooth headset support (via optional adapter).", connectivityOptions: "Gigabit Ethernet and PoE support." }
+    }
+  },
+  {
+    id: "avaya-77",
+    name: "Nortel M3902DigitalPhone(NTMN32)",
+    price: "Get a Quote",
+    image: "/avaya/Nortel-M3902.jpg",
+    category: "Nortel, Avaya, Digital Phone",
+    categorySlug: "accessories",
+    slug: "nortel-m3902-digital-phone-ntmn32",
+    description: {
+      overview: "Nortel (Avaya) M3902 Digital Phone Overview",
+      design: { title: "Design", formFactor: "An economical, single-line digital phone for common areas or users with light call volume. Features a simple display." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "1-line x 24 character display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["Digital line interface"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "A reliable, basic digital phone for Nortel/Avaya Meridian and CS 1000 systems. Features 6 fixed feature keys.", connectivityOptions: "Connects to a digital station port." }
+    }
+  },
+  {
+    id: "avaya-78",
+    name: "Nortel M3904DigitalPhone(NTMN34)",
+    price: "Get a Quote",
+    image: "/avaya/Nortel-M3904.jpg",
+    category: "Nortel, Avaya, Digital Phone",
+    categorySlug: "accessories",
+    slug: "nortel-m3904-digital-phone-ntmn34",
+    description: {
+      overview: "Nortel (Avaya) M3904 Digital Phone Overview",
+      design: { title: "Design", formFactor: "A professional, multi-line digital phone for managers and power users. Features a large 5-line graphical display and 6 programmable feature keys." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "5-line x 24 character graphical display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["Digital line interface", "Headset port", "Expansion module port"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "A versatile phone that supports an expansion module and a PC utility for easy programming. Features a high-quality speakerphone.", connectivityOptions: "Designed for Nortel/Avaya Meridian and CS 1000 systems." }
+    }
+  },
+  {
+    id: "avaya-79",
+    name: "Nortel M3905DigitalPhone(NTMN35)",
+    price: "Get a Quote",
+    image: "/avaya/Nortel-M3905.jpg",
+    category: "Nortel, Avaya, Digital Phone",
+    categorySlug: "accessories",
+    slug: "nortel-m3905-digital-phone-ntmn35",
+     description: {
+      overview: "Nortel (Avaya) M3905 Digital Deskphone Overview",
+      design: { title: "Design", formFactor: "An advanced digital phone for call center agents and receptionists. Features a large display and 8 programmable line/feature keys." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "Large 8-line graphical display.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["Digital line interface", "2x Headset ports"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "A call center workhorse with a direct-connect headset jack and features tailored for agent productivity.", connectivityOptions: "Connects to Nortel/Avaya Meridian and CS 1000 systems." }
+    }
+  },
+  {
+    id: "avaya-80",
+    name: "Nortel NTMN31MeridianM3901CharcoalSingle-Line",
+    price: "Get a Quote",
+    image: "/avaya/Nortel-M3901.jpg",
+    category: "Nortel, Avaya, Digital Phone",
+    categorySlug: "accessories",
+     slug: "nortel-ntmn31-meridian-m3901-charcoal-single-line",
+    description: {
+      overview: "Nortel (Avaya) M3901 Digital Phone Overview",
+      design: { title: "Design", formFactor: "An entry-level, single-line digital phone in a charcoal finish. Designed for common areas or low-call-volume users." },
+      performance: { title: "Performance", processor: "N/A", memory: "N/A", storage: "N/A" },
+      display: { title: "Display and Graphics", screen: "No display. Features fixed keys for essential functions.", graphics: "N/A" },
+      connectivity: { title: "Connectivity", ports: ["Digital line interface"], wireless: ["N/A"] },
+      functionality: { title: "Functionality", versatility: "A simple and reliable phone for basic call needs on a Meridian or CS 1000 system.", connectivityOptions: "Connects directly to a digital station port." }
+    }
+  },
+// --- END: AVAYA & NORTEL (78 Total) ---
+
+// --- NEW: AXIS PRODUCTS (1 Total) ---
+  {
+    id: "axis-1",
+    name: "Axis 5801-352 network switch",
+    price: "Get a Quote",
+    image: "/axis/axis-5801-352.jpg",
+    category: "Axis, Network Switch",
+    categorySlug: "switches",
+    slug: "axis-5801-352-network-switch",
+    description: {
+      overview: "Axis 5801-352 Network Switch Overview",
+      design: { 
+        title: "Design", 
+        formFactor: "A compact, unmanaged network switch, likely designed for use with Axis network video products and other IP devices." 
+      },
+      performance: { 
+        title: "Performance", 
+        processor: "N/A", 
+        memory: "N/A", 
+        storage: "N/A" 
+      },
+      display: { 
+        title: "Display and Graphics", 
+        screen: "N/A (LED indicators for power and port activity)", 
+        graphics: "N/A" 
+      },
+      connectivity: { 
+        title: "Connectivity", 
+        ports: ["Multiple Ethernet ports (e.g., 5 or 8 ports)", "Likely 10/100/1000 Gigabit speeds"], 
+        wireless: ["N/A"] 
+      },
+      functionality: { 
+        title: "Functionality", 
+        versatility: "A simple, plug-and-play solution for expanding a network, ideal for small-scale IP camera installations or connecting a group of networked devices.", 
+        connectivityOptions: "Provides straightforward network connectivity without the need for complex configuration." 
+      }
+    }
+  },
+// --- END: AXIS PRODUCTS ---
+
+// --- NEW: MICROSOFT DOCKING STATION (1 Total) ---
+  {
+    id: "microsoft-1",
+    name: "Microsoft Surface Dock mobile device – PF3-00005",
+    price: "Get a Quote",
+    image: "/microsoft/surface-dock-pf3.jpg",
+    category: "Docking Station, Microsoft",
+    categorySlug: "accessories",
+    slug: "microsoft-surface-dock-mobile-device-pf3",
+    description: {
+      overview: "Microsoft Surface Dock Overview",
+      design: { 
+        title: "Design", 
+        formFactor: "A compact and sleek docking station designed specifically for Microsoft Surface devices, turning your portable Surface into a powerful desktop workstation." 
+      },
+      performance: { 
+        title: "Performance", 
+        processor: "N/A", 
+        memory: "N/A", 
+        storage: "N/A" 
+      },
+      display: { 
+        title: "Display and Graphics", 
+        screen: "N/A (Supports multiple external displays via Mini DisplayPort)", 
+        graphics: "N/A" 
+      },
+      connectivity: { 
+        title: "Connectivity", 
+        ports: ["Proprietary Surface Connect cable", "Multiple USB 3.0 ports", "Gigabit Ethernet port", "Audio out port", "Mini DisplayPort outputs"], 
+        wireless: ["N/A"] 
+      },
+      functionality: { 
+        title: "Functionality", 
+        versatility: "Provides power, data, and external display connectivity to a compatible Surface device through a single magnetic Surface Connect cable.", 
+        connectivityOptions: "Instantly adds multiple USB ports, a wired network connection, and multi-monitor support to your Surface Pro, Surface Laptop, or Surface Book." 
+      }
+    }
+  },
+// --- END: MICROSOFT DOCKING STATION ---
+
+// --- NEW: HIKVISION PRODUCTS (95 Total) ---
+  {
+    id: "hik-1",
+    name: "Hikvision 6MP IP Bullet camera IP66 H.265+",
+    price: "Get a Quote",
+    image: "/hikvision/6mp-bullet-ip66.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-6mp-ip-bullet-camera-ip66-h265-plus",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-2",
+    name: "Hikvision DeepinView DS-2TD2617B-6/PA",
+    price: "Get a Quote",
+    image: "/hikvision/ds-2td2617b-6-pa.jpg",
+    category: "Hikvision, Thermal Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-deepinview-ds-2td2617b-6-pa",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-3",
+    name: "Hikvision Digital Technology 2.0 MP CMOS Vari-Focal Network Bullet Camera – IPC-B620-Z",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-2mp.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-2mp-bullet",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-4",
+    name: "Hikvision Digital Technology 2CD2747G2-LZS(3.6-9mm) (C) IPC",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-2cd2747g2.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-2cd2747g2",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-5",
+    name: "Hikvision Digital Technology 4.0 MP CMOS Network Turret Camera – IPC-T640-Z",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-4mp.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-4mp-dome",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-6",
+    name: "Hikvision Digital Technology AcuSense Dome",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-acusense.jpg",
+    category: "Hikvision, Network Camera, AcuSense",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-acusense-dome",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-7",
+    name: "Hikvision Digital Technology Bullet",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-bullet.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-bullet",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-8",
+    name: "Hikvision Digital Technology Bullet IR DS-2CD2T86G2-2I(2.8mm)(C) 8MP – Network Camera",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-bullet-ir.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-bullet-ir-ds",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-9",
+    name: "Hikvision Digital Technology Dome IR DS-2CD2746G2-IZS 2.8-12mm C 4M",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-dome-ir.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-dome-ir-ds",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-10",
+    name: "Hikvision Digital Technology DS-2AE4215T-D3(C)",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-dome-1.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-dome-1",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-11",
+    name: "Hikvision Digital Technology DS-2AE5225TI-A(E)",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-dome-2.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-dome-2",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-12",
+    name: "Hikvision Digital Technology DS-2CD2025FWD-I",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-dome-3.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-dome-3",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-13",
+    name: "Hikvision Digital Technology DS-2CD2047G2-LU",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-dome-4.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-dome-4",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-14",
+    name: "Hikvision Digital Technology DS-2CD2125G0-IMS",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-dome-5.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-dome-5",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-15",
+    name: "Hikvision Digital Technology DS-2CD2143G0-I",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-dome-6.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-dome-6",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-16",
+    name: "Hikvision Digital Technology DS-2CD2145FWD-I",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-dome-7.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-dome-7",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-17",
+    name: "Hikvision Digital Technology DS-2CD2145FWD-I",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-dome-8.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-dome-8",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-18",
+    name: "Hikvision Digital Technology DS-2CD2146G2-ISU",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-dome-9.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-dome-9",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-19",
+    name: "Hikvision Digital Technology DS-2CD2146G2-ISU IP security camera Outdoor Dome Ceiling/wall 2592 x 19",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-bullet-p2.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-bullet-p2",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-20",
+    name: "Hikvision Digital Technology DS-2CD2163G0-I",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-bullet-1-p3.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-bullet-1-p3",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-21",
+    name: "Hikvision Digital Technology DS-2CD2323G0-I",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-bullet-2-p3.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-bullet-2-p3",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-22",
+    name: "Hikvision Digital Technology DS-2CD2346G1-I",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-turret-1-p3.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-turret-1-p3",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-23",
+    name: "Hikvision Digital Technology DS-2CD2347G1-LU",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-dome-1-p3.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-dome-1-p3",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-24",
+    name: "Hikvision Digital Technology DS-2CD2347G1-LU",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-bullet-3-p3.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-bullet-3-p3",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-25",
+    name: "Hikvision Digital Technology DS-2CD2347G2-LU",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-ptz-1-p3.jpg",
+    category: "Hikvision, PTZ Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-ptz-1-p3",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-26",
+    name: "Hikvision Digital Technology DS-2CD2383G0-I",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-ptz-2-p3.jpg",
+    category: "Hikvision, PTZ Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-ptz-2-p3",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-27",
+    name: "Hikvision Digital Technology DS-2CD2386G2-ISU/SL(2.8mm)(C)",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-ptz-3-p3.jpg",
+    category: "Hikvision, PTZ Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-ptz-3-p3",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-28",
+    name: "Hikvision Digital Technology DS-2CD2386G2-IU(2.8MM) 8MP TUURET AUDIO",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-bullet-4-p3.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-bullet-4-p3",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-29",
+    name: "Hikvision Digital Technology DS-2CD2387G2P-LSU/SL(4MM)(C)",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-bullet-5-p3.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-bullet-5-p3",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-30",
+    name: "Hikvision Digital Technology DS-2CD2623G0-IZS",
+    price: "Get a Quote",
+    image: "/hikvision/ds-small-switch.jpg",
+    category: "Hikvision, Switch",
+    categorySlug: "switches",
+    slug: "hikvision-digital-technology-ds-small-switch",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-31",
+    name: "Hikvision Digital Technology DS-2CD2645FWD-IZS",
+    price: "Get a Quote",
+    image: "/hikvision/ds-nvr-1-p4.jpg",
+    category: "Hikvision, NVR",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-nvr-1-p4",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-32",
+    name: "Hikvision Digital Technology DS-2CD2686G2-IZS security camera IP",
+    price: "Get a Quote",
+    image: "/hikvision/ds-nvr-2-p4.jpg",
+    category: "Hikvision, NVR",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-nvr-2-p4",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-33",
+    name: "Hikvision Digital Technology DS-2CD2745FWD-IZS",
+    price: "Get a Quote",
+    image: "/hikvision/ds-nvr-3-p4.jpg",
+    category: "Hikvision, NVR",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-nvr-3-p4",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-34",
+    name: "Hikvision Digital Technology DS-2CD2786G2-IZS(2.8-12MM)(C)( O-STD)",
+    price: "Get a Quote",
+    image: "/hikvision/ds-7608ni.jpg",
+    category: "Hikvision, NVR",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-7608ni",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-35",
+    name: "Hikvision Digital Technology DS-2CD2T43G0-I5",
+    price: "Get a Quote",
+    image: "/hikvision/ds-7616ni.jpg",
+    category: "Hikvision, NVR",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-7616ni",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-36",
+    name: "Hikvision Digital Technology DS-2CD2T47G2-L",
+    price: "Get a Quote",
+    image: "/hikvision/ds-7732ni.jpg",
+    category: "Hikvision, NVR",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-7732ni",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-37",
+    name: "Hikvision Digital Technology DS-2CD2T87G2-L(4MM)(C)",
+    price: "Get a Quote",
+    image: "/hikvision/ds-kh6320.jpg",
+    category: "Hikvision, Intercom",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-kh6320",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-38",
+    name: "Hikvision Digital Technology DS-2CD6924F-IS",
+    price: "Get a Quote",
+    image: "/hikvision/ds-kis603-left.jpg",
+    category: "Hikvision, Intercom",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-kis603-left",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-39",
+    name: "Hikvision Digital Technology DS-2CE56H0T-IT3E",
+    price: "Get a Quote",
+    image: "/hikvision/ds-kis603-right.jpg",
+    category: "Hikvision, Intercom",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-kis603-right",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-40",
+    name: "Hikvision Digital Technology DS-2CE56H0T-ITME",
+    price: "Get a Quote",
+    image: "/hikvision/ds-2af4215t-d3c.jpg",
+    category: "Hikvision, PTZ Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-2af4215t-d3c",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-41",
+    name: "Hikvision Digital Technology DS-2DE5425IW-AE(T5)",
+    price: "Get a Quote",
+    image: "/hikvision/ds-2cd2065g1-i.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-2cd2065g1-i",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-42",
+    name: "Hikvision Digital Technology DS-2DE7225IW-AE",
+    price: "Get a Quote",
+    image: "/hikvision/ds-2cd2123g0-i.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-2cd2123g0-i",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-43",
+    name: "Hikvision Digital Technology DS-2DF6225X-AEL",
+    price: "Get a Quote",
+    image: "/hikvision/ds-2cd2143g0-i.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-2cd2143g0-i",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-44",
+    name: "Hikvision Digital Technology DS-2TD2617-3/V1",
+    price: "Get a Quote",
+    image: "/hikvision/ds-2cd2143g0-is.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-2cd2143g0-is",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-45",
+    name: "Hikvision Digital Technology DS-2TD2636B-15/P",
+    price: "Get a Quote",
+    image: "/hikvision/ds-2cd2145fwd-i.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-2cd2145fwd-i",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-46",
+    name: "Hikvision Digital Technology DS-3E0310HP-E network switch",
+    price: "Get a Quote",
+    image: "/hikvision/ds-2cd2163g0-i.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-2cd2163g0-i",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-47",
+    name: "Hikvision Digital Technology DS-7204HUHI-K1/P digital video recorder (DVR) Black",
+    price: "Get a Quote",
+    image: "/hikvision/ds-2cd2183g0-i.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-2cd2183g0-i",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-48",
+    name: "Hikvision Digital Technology DS-7208HQHI-K2/P digital video recorder (DVR) Black",
+    price: "Get a Quote",
+    image: "/hikvision/ds-2cd2345fwd-i.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-2cd2345fwd-i",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-49",
+    name: "Hikvision Digital Technology DS-7216HUHI-K2/P digital video recorder (DVR) Black",
+    price: "Get a Quote",
+    image: "/hikvision/ds-2cd2346g1-i.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-2cd2346g1-i",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-50",
+    name: "Hikvision Digital Technology DS-7608NI-K1/8P(C)",
+    price: "Get a Quote",
+    image: "/hikvision/ds-2cd2346g2.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-2cd2346g2",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-51",
+    name: "Hikvision Digital Technology DS-7616NI-I2/16P",
+    price: "Get a Quote",
+    image: "/hikvision/ds-2cd2347g1-lu.jpg",
+    category: "Hikvision, Network Camera, ColorVu",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-2cd2347g1-lu",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-52",
+    name: "Hikvision Digital Technology DS-7732NI-I4/KB/CVBS",
+    price: "Get a Quote",
+    image: "/hikvision/ds-2cd2355fwd-ib.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-2cd2355fwd-ib",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-53",
+    name: "Hikvision Digital Technology DS-KH6320-WTE1 INDOOR STAT 7inch TOUCH",
+    price: "Get a Quote",
+    image: "/hikvision/ds-2cd2363g0-i.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-2cd2363g0-i",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-54",
+    name: "Hikvision Digital Technology DS-KIS603-P",
+    price: "Get a Quote",
+    image: "/hikvision/ds-2cd2365g1-i.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-2cd2365g1-i",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-55",
+    name: "Hikvision Digital Technology DS-KIS603-P intercom system accessory",
+    price: "Get a Quote",
+    image: "/hikvision/ds-2cd2385g1-i.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-2cd2385g1-i",
+     description: placeholderDescription
+  },
+  {
+    id: "hik-56",
+    name: "Hikvision DS-2AE4215T-D3(C)",
+    price: "Get a Quote",
+    image: "/hikvision/ds-2cd2512f-is.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-2cd2512f-is",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-57",
+    name: "Hikvision DS-2CD2065G1-I",
+    price: "Get a Quote",
+    image: "/hikvision/2cd2623g0-izs.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-2cd2623g0-izs",
+  description: placeholderDescription
+  },
+  {
+    id: "hik-58",
+    name: "Hikvision DS-2CD2123G0-I",
+    price: "Get a Quote",
+    image: "/hikvision/ds-2cd2646g2-izs-4mp.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-2cd2646g2-izs-4mp",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-59",
+    name: "Hikvision DS-2CD2143G0-I",
+    price: "Get a Quote",
+    image: "/hikvision/ds-2cd2745fwd-izs.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-2cd2745fwd-izs",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-60",
+    name: "Hikvision DS-2CD2143G0-IS",
+    price: "Get a Quote",
+    image: "/hikvision/ds-2cd2785g0-izs.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-2cd2785g0-izs",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-61",
+    name: "Hikvision DS-2CD2145FWD-I",
+    price: "Get a Quote",
+    image: "/hikvision/ds-2cd2h45fwd-izs.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-2cd2h45fwd-izs",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-62",
+    name: "Hikvision DS-2CD2163G0-I",
+    price: "Get a Quote",
+    image: "/hikvision/ds-2cd2t43g0-is.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-2cd2t43g0-is",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-63",
+    name: "Hikvision DS-2CD2183G0-I",
+    price: "Get a Quote",
+    image: "/hikvision/ds-2cd2t63g0-is.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-2cd2t63g0-is",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-64",
+    name: "Hikvision DS-2CD2345FWD-I",
+    price: "Get a Quote",
+    image: "/hikvision/ds-2cd6924f-is.jpg",
+    category: "Hikvision, PanoVu Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-2cd6924f-is",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-65",
+    name: "Hikvision DS-2CD2346G1-I",
+    price: "Get a Quote",
+    image: "/hikvision/ds-2ce16d8t-it3ze.jpg",
+    category: "Hikvision, Turbo HD Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-2ce16d8t-it3ze-2-8-12mm",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-66",
+    name: "Hikvision DS-2CD2346G2-IU(2.8MM)4MP ACU AUDIO TUR",
+    price: "Get a Quote",
+    image: "/hikvision/ds-2ce37u8t-a.jpg",
+    category: "Hikvision, Turbo HD Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-2ce37u8t-a-security-camera-box",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-67",
+    name: "Hikvision DS-2CD2347G1-LU",
+    price: "Get a Quote",
+    image: "/hikvision/ds-2ce72kf3t-le.jpg",
+    category: "Hikvision, Turbo HD Camera, ColorVu",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-2ce72kf3t-le-2-8mm",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-68",
+    name: "Hikvision DS-2CD2355FWD-IB",
+    price: "Get a Quote",
+    image: "/hikvision/ds-2de5225w-ae.jpg",
+    category: "Hikvision, PTZ Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-2de5225w-ae",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-69",
+    name: "Hikvision DS-2CD2363G0-I",
+    price: "Get a Quote",
+    image: "/hikvision/ds-2de5330w-ae.jpg",
+    category: "Hikvision, PTZ Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-2de5330w-ae",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-70",
+    name: "Hikvision DS-2CD2365G1-I",
+    price: "Get a Quote",
+    image: "/hikvision/ds-2td2628-3-qa.jpg",
+    category: "Hikvision, Thermal Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-2td2628-3-qa",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-71",
+    name: "Hikvision DS-2CD2385G1-I",
+    price: "Get a Quote",
+    image: "/hikvision/ds-3e0109p-ec.jpg",
+    category: "Hikvision, PoE Switch",
+    categorySlug: "switches",
+    slug: "hikvision-ds-3e0109p-e-c-8ch-100mbps-poe",
+  description: placeholderDescription
+  },
+  {
+    id: "hik-72",
+    name: "Hikvision DS-2CD2512F-IS",
+    price: "Get a Quote",
+    image: "/hikvision/ds-3e1318p-e.jpg",
+    category: "Hikvision, PoE Switch",
+    categorySlug: "switches",
+    slug: "hikvision-ds-3e1318p-e-network-switch-managed",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-73",
+    name: "Hikvision DS-2CD2623G0-IZS",
+    price: "Get a Quote",
+    image: "/hikvision/ds-3e1326p-e.jpg",
+    category: "Hikvision, PoE Switch",
+    categorySlug: "switches",
+    slug: "hikvision-ds-3e1326p-e-network-switch-managed",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-74",
+    name: "Hikvision DS-2CD2646G2-IZS 4MP ACUSENSE BULLET",
+    price: "Get a Quote",
+    image: "/hikvision/ds-7316hqhi-k4.jpg",
+    category: "Hikvision, DVR",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-7316hqhi-k4-digital-video-recorder",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-75",
+    name: "Hikvision DS-2CD2745FWD-IZS",
+    price: "Get a Quote",
+    image: "/hikvision/ds-7604ni-k1.jpg",
+    category: "Hikvision, NVR",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-7604ni-k1-network-video-recorder",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-76",
+    name: "Hikvision DS-2CD2785G0-IZS",
+    price: "Get a Quote",
+    image: "/hikvision/ds-7608ni-k2.jpg",
+    category: "Hikvision, NVR",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-7608ni-k2-network-video-recorder",
+   description: placeholderDescription
+  },
+  {
+    id: "hik-77",
+    name: "Hikvision DS-2CD2H45FWD-IZS",
+    price: "Get a Quote",
+    image: "/hikvision/ds-7608ni-m2-8p.jpg",
+    category: "Hikvision, NVR, PoE",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-7608ni-m2-8p",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-78",
+    name: "Hikvision DS-2CD2T43G0-I5",
+    price: "Get a Quote",
+    image: "/hikvision/ds-7616ni-i2.jpg",
+    category: "Hikvision, NVR",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-7616ni-i2-network-video-recorder",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-79",
+    name: "Hikvision DS-2CD2T63G0-I5",
+    price: "Get a Quote",
+    image: "/hikvision/ds-7616ni-k2.jpg",
+    category: "Hikvision, NVR",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-7616ni-k2-network-video-recorder",
+   description: placeholderDescription
+  },
+  {
+    id: "hik-80",
+    name: "Hikvision DS-2CD6924F-IS",
+    price: "Get a Quote",
+    image: "/hikvision/ds-7616ni-m2-16p.jpg",
+    category: "Hikvision, NVR, PoE",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-7616ni-m2-16p",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-81",
+    name: "Hikvision DS-2CE16D8T-IT3ZE (2.8-12MM)",
+    price: "Get a Quote",
+    image: "/hikvision/ds-7632ni-i2.jpg",
+    category: "Hikvision, NVR",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-7632ni-i2-network-video-recorder",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-82",
+    name: "Hikvision DS-2CE37U8T-A security camera Box 3840 x 2160 pixels",
+    price: "Get a Quote",
+    image: "/hikvision/ds-7716ni-k4.jpg",
+    category: "Hikvision, NVR",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-7716ni-k4-network-video-recorder",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-83",
+    name: "Hikvision DS-2CE72KF3T-LE(2.8MM)",
+    price: "Get a Quote",
+    image: "/hikvision/ds-7732ni-k4.jpg",
+    category: "Hikvision, NVR",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-7732ni-k4-network-video-recorder",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-84",
+    name: "Hikvision DS-2DE5225W-AE",
+    price: "Get a Quote",
+    image: "/hikvision/ds-7732ni-m4-16p.jpg",
+    category: "Hikvision, NVR, PoE",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-7732ni-m4-16p",
+   description: placeholderDescription
+  },
+  {
+    id: "hik-85",
+    name: "Hikvision DS-2DE5330W-AE",
+    price: "Get a Quote",
+    image: "/hikvision/ds-9664ni-m8.jpg",
+    category: "Hikvision, NVR",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-9664ni-m8",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-86",
+    name: "Hikvision DS-2TD2628-3/QA",
+    price: "Get a Quote",
+    image: "/hikvision/ds-d5022fn-c.jpg",
+    category: "Hikvision, Monitor",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-d5022fn-c",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-87",
+    name: "Hikvision DS-3E0109P-E(C) 8CH 100MBPS POE SWITCH",
+    price: "Get a Quote",
+    image: "/hikvision/ds-k1t201mf.jpg",
+    category: "Hikvision, Access Control",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-k1t201mf-access-control-reader",
+   description: placeholderDescription
+  },
+  {
+    id: "hik-88",
+    name: "Hikvision DS-3E1318P-E network switch Managed",
+    price: "Get a Quote",
+    image: "/hikvision/ds-k1t500s.jpg",
+    category: "Hikvision, Access Control",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-k1t500s-access-control-reader",
+  description: placeholderDescription
+  },
+  {
+    id: "hik-89",
+    name: "Hikvision DS-3E1326P-E network switch Managed",
+    price: "Get a Quote",
+    image: "/hikvision/ds-k1t501sf.jpg",
+    category: "Hikvision, Access Control",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-k1t501sf-access-control-reader",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-90",
+    name: "Hikvision DS-7316HQHI-K4 digital video recorder (DVR) Black",
+    price: "Get a Quote",
+    image: "/hikvision/ds-k1t804ef-1.jpg",
+    category: "Hikvision, Access Control",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-k1t804ef-1-access-control-reader",
+   description: placeholderDescription 
+  },
+  { 
+    id: "hik-91",
+    name: "Hikvision DS-7604NI-K1 network video recorder 1U Black",
+    price: "Get a Quote",
+    image: "/hikvision/ds-k1t804mf-1.jpg",
+    category: "Hikvision, Access Control",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-k1t804mf-1-access-control-reader",
+     description: placeholderDescription
+  },
+  {
+    id: "hik-92",
+    name: "Hikvision DS-7608NI-K2 network video recorder 1U Black",
+    price: "Get a Quote",
+    image: "/hikvision/ds-kis203.jpg",
+    category: "Hikvision, Intercom",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-kis203-video-intercom-system",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-93",
+    name: "Hikvision DS-7608NI-M2/8P",
+   price: "Get a Quote",
+    image: "/hikvision/ds-7208hqhi-k1-4s.jpg",
+    category: "Hikvision, DVR",
+    categorySlug: "accessories",
+    slug: "hikvision-ds-7208hqhi-k1-4s",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-94",
+    name: "Hikvision DS-7616NI-I2 network video recorder Black,Silver",
+    price: "Get a Quote",
+    image: "/hikvision/ds-7316hqhi-m4-s.jpg",
+   category: "Hikvision, DVR",
+    categorySlug: "accessories",
+     slug: "hikvision-ds-7316hqhi-m4-s",
+    description: placeholderDescription
+  },
+  {
+    id: "hik-95",
+    name: "Hikvision DS-7616NI-K2 network video recorder 1U Black",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-dome-10.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-dome-10",
+    description: placeholderDescription
+  },
+{
+    id: "hik-96",
+    name: "Hikvision DS-7616NI-M2/16P",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-dome-10.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-dome-10",
+    description: placeholderDescription
+  },
+{
+    id: "hik-97",
+    name: "Hikvision DS-7632NI-I2 network video recorder 1U Black",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-dome-10.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-dome-10",
+    description: placeholderDescription
+  },
+{
+    id: "hik-98",
+    name: "Hikvision DS-7716NI-K4 network video recorder 1.5U Black",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-dome-10.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-dome-10",
+    description: placeholderDescription
+  },
+{
+    id: "hik-99",
+    name: "Hikvision DS-7732NI-K4 network video recorder 1.5U Black",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-dome-10.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-dome-10",
+    description: placeholderDescription
+  },
+{
+    id: "hik-100",
+    name: "Hikvision DS-7732NI-M4/16P",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-dome-10.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-dome-10",
+    description: placeholderDescription
+  },
+{
+    id: "hik-101",
+    name: "Hikvision DS-9664NI-M8",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-dome-10.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-dome-10",
+    description: placeholderDescription
+  },{
+    id: "hik-102",
+    name: "Hikvision DS-D5022FN-C",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-dome-10.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-dome-10",
+    description: placeholderDescription
+  },{
+    id: "hik-103",
+    name: "Hikvision DS-K1201MF access control reader",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-dome-10.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-dome-10",
+    description: placeholderDescription
+  },{
+    id: "hik-104",
+    name: "Hikvision DS-K1T500S access control reader Black,Silver",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-dome-10.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-dome-10",
+    description: placeholderDescription
+  },{
+    id: "hik-105",
+    name: "Hikvision DS-K1T501SF access control reader Basic access control reader Grey",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-dome-10.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-dome-10",
+    description: placeholderDescription
+  },
+{
+    id: "hik-106",
+    name: "Hikvision DS-K1T804EF-1 access control reader Basic access control reader Black",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-dome-10.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-dome-10",
+    description: placeholderDescription
+  },{
+    id: "hik-107",
+    name: "Hikvision DS-K1T804MF-1 access control reader Basic access control reader Black",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-dome-10.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-dome-10",
+    description: placeholderDescription
+  },{
+    id: "hik-108",
+    name: "Hikvision DS-KIS203 video intercom system 17.8 cm (7″) Grey,White",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-dome-10.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-dome-10",
+    description: placeholderDescription
+  },{
+    id: "hik-109",
+    name: "Hikvision IDS-7208HQHI-K1/4S",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-dome-10.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-dome-10",
+    description: placeholderDescription
+  },
+{
+    id: "hik-110",
+    name: "Hikvision IDS-7316HQHI-M4/S",
+    price: "Get a Quote",
+    image: "/hikvision/digital-tech-dome-10.jpg",
+    category: "Hikvision, Network Camera",
+    categorySlug: "accessories",
+    slug: "hikvision-digital-technology-ds-dome-10",
+    description: placeholderDescription
+  },
+// --- END: HIKVISION PRODUCTS (110 Total) ---
 
 ];
 

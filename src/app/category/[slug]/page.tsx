@@ -1,4 +1,3 @@
-// src/app/category/[slug]/page.tsx
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -152,7 +151,8 @@ const FilterSidebar = ({
               value={minPrice}
               onChange={handleMinChange}
               className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-              style={{ accentColor: '#2563eb' }}
+              // --- CHANGED: Slider accent color to dark blue ---
+              style={{ accentColor: '#00001E' }} 
             />
           </div>
 
@@ -168,7 +168,8 @@ const FilterSidebar = ({
               value={maxPrice}
               onChange={handleMaxChange}
               className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-              style={{ accentColor: '#2563eb' }}
+              // --- CHANGED: Slider accent color to dark blue ---
+              style={{ accentColor: '#00001E' }} 
             />
           </div>
         </div>
@@ -179,6 +180,7 @@ const FilterSidebar = ({
         
         <button
           onClick={onFilterClick}
+          // --- CHANGED: Filter button background to dark blue, hover to dark gray ---
           className="w-full bg-[#00001E] text-white font-medium py-2 px-4 rounded-md hover:bg-gray-800 transition mt-6"
         >
           Filter
@@ -187,6 +189,7 @@ const FilterSidebar = ({
     </div>
   );
 };
+
 
 const LatestProductsSidebar = () => {
   return (
@@ -234,11 +237,18 @@ const categoryCounts = categoriesData.reduce((acc, category) => {
 
 
 const CategoriesSidebar = () => (
-  <div className="border border-[#00001E] rounded-lg overflow-hidden">
+  // --- Container stays with the light gray border ---
+  <div className="border border-gray-200 rounded-lg overflow-hidden">
+    
+    {/* --- "Show All" is light gray, but HOVERS dark blue --- */}
     <Link 
-  href="/categories" 
-  className="block p-4 border-b border-gray-200 transition bg-[#00001E] text-white font-medium hover:bg-gray-800"
->
+      href="/categories" 
+      className="
+        block p-4 border-b border-gray-200 transition 
+        bg-gray-100 text-gray-800 font-medium 
+        hover:bg-[#00001E] hover:text-white
+      "
+    >
       Show All Categories
     </Link>
     
@@ -246,18 +256,18 @@ const CategoriesSidebar = () => (
       <Link 
         key={category.slug}
         href={`/category/${category.slug}`} 
+        // --- Links are white bg, black text, but HOVER dark blue ---
         className={`
-  block p-4 text-gray-800 transition hover:bg-[#00001E] hover:text-white
-  ${index < categoriesData.length - 1 ? 'border-b border-gray-200' : ''}
-`}
+          block p-4 text-gray-800 transition 
+          hover:bg-[#00001E] hover:text-white
+          ${index < categoriesData.length - 1 ? 'border-b border-gray-200' : ''}
+        `}
       >
         {category.name} ({categoryCounts[category.slug] || 0})
       </Link>
     ))}
   </div>
 );
-// --- END: NEW COMPONENT ---
-
 
 const SortToolbar = ({ viewMode, setViewMode, setSortBy, setPerPage, totalProducts, perPage, sortBy }: {
   viewMode: 'grid' | 'list',
@@ -328,7 +338,8 @@ const ProductCard = ({ product, viewMode }: { product: Product, viewMode: 'grid'
   // --- LIST VIEW ---
   if (viewMode === 'list') {
     return (
-      <div className="w-full flex flex-col md:flex-row gap-6 border border-gray-200 rounded-lg p-6 bg-[#00001E] text-white">
+      // --- 5. CHANGED: List view card styles ---
+      <div className="w-full flex flex-col md:flex-row gap-6 border border-gray-200 rounded-lg p-6 bg-white text-gray-900">
         <Link href={productUrl} className="w-full md:w-1/3 h-60 md:h-full shrink-0">
           <Image 
             src={product.image} 
@@ -339,15 +350,16 @@ const ProductCard = ({ product, viewMode }: { product: Product, viewMode: 'grid'
           />
         </Link>
         <div className="grow">
-          <span className="text-xs text-gray-400">{product.category}</span>
-          <Link href={productUrl}><h3 className="text-lg font-bold hover:text-blue-400 transition mt-1">{product.name}</h3></Link>
+          {/* --- 6. CHANGED: List view text colors --- */}
+          <span className="text-xs text-gray-500">{product.category}</span>
+          <Link href={productUrl}><h3 className="text-lg font-bold hover:text-blue-600 transition mt-1">{product.name}</h3></Link>
           <p className="text-xl font-bold my-3">{priceDisplay}</p>
-          <p className="text-sm text-gray-300 mb-4">This is a placeholder description for the product. More details would go here.</p>
+          <p className="text-sm text-gray-600 mb-4">This is a placeholder description for the product. More details would go here.</p>
           <div className="flex items-center gap-4">
             <button className="bg-blue-600 text-white font-bold py-2 px-5 rounded-md hover:bg-blue-700 transition">
               {productPrice !== -1 ? 'Add to Cart' : 'Get a Quote'}
             </button>
-            <button className="flex items-center gap-2 text-sm text-gray-300 font-medium hover:text-blue-400">
+            <button className="flex items-center gap-2 text-sm text-gray-600 font-medium hover:text-blue-600">
               <HeartIcon className="w-5 h-5" /> Add to wishlist
             </button>
           </div>
@@ -359,21 +371,24 @@ const ProductCard = ({ product, viewMode }: { product: Product, viewMode: 'grid'
   // --- GRID VIEW ---
   return (
     <div
-      className="relative w-full border border-gray-800 rounded-lg group transition-all bg-[#00001E] text-white"
+      // --- 7. CHANGED: Grid view card styles ---
+      className="relative w-full border border-gray-200 rounded-lg group transition-all bg-white text-gray-900 shadow-sm hover:shadow-lg"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <button className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-gray-700 hover:bg-blue-600 hover:text-white text-gray-200 transition">
+      {/* --- 8. CHANGED: Grid view icon button styles --- */}
+      <button className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-blue-600 hover:text-white text-gray-700 transition">
         <HeartIcon className="w-4 h-4" />
       </button>
       
-      <Link href={productUrl} className="block w-full h-48 bg-gray-900 p-3 rounded-t-lg">
+      {/* --- 9. CHANGED: Grid view image background --- */}
+      <Link href={productUrl} className="block w-full h-48 bg-white p-3 rounded-t-lg">
         <Image 
           src={product.image} 
           alt={product.name} 
           width={300} 
           height={300} 
-          className="w-full h-full object-cover rounded-md group-hover:scale-105 transition-transform"
+          className="w-full h-full object-contain rounded-md group-hover:scale-105 transition-transform"
         />
       </Link>
       
@@ -381,9 +396,10 @@ const ProductCard = ({ product, viewMode }: { product: Product, viewMode: 'grid'
         {!isHovered ? (
           // --- DEFAULT VIEW (TEXT & PRICE) ---
           <div>
-            <span className="text-xs text-gray-400">{product.category}</span>
+            {/* --- 10. CHANGED: Grid view text colors --- */}
+            <span className="text-xs text-gray-500">{product.category}</span>
             <Link href={productUrl}>
-              <h3 className="text-sm font-semibold hover:text-blue-400 transition mt-1 h-10 overflow-hidden">
+              <h3 className="text-sm font-semibold hover:text-blue-600 transition mt-1 h-10 overflow-hidden">
                 {product.name}
               </h3>
             </Link>
@@ -391,18 +407,24 @@ const ProductCard = ({ product, viewMode }: { product: Product, viewMode: 'grid'
           </div>
         ) : (
           // --- HOVER VIEW (BUTTONS) ---
-          <div className="animate-fadeIn">
-            <button className="bg-blue-600 text-white w-full py-2 rounded-md font-bold mb-2 hover:bg-blue-700">
-              Get a Quote
+          <div className="animate-fadeIn flex flex-col gap-2">
+            
+            {/* --- Main "Get a Quote" Button --- */}
+            <button className="bg-blue-600 text-white w-full py-2 rounded-md font-bold text-sm hover:bg-blue-700 transition">
+              {productPrice !== -1 ? 'Add to Cart' : 'Get a Quote'}
             </button>
-            <div className="flex justify-center gap-4 text-sm">
-  <button className="flex items-center gap-1 text-gray-300 hover:text-blue-400">
-    <HeartIcon className="w-4 h-4"/> Add to wishlist
-  </button>
-  <button className="flex items-center gap-1 text-gray-300 hover:text-blue-400">
-    <CompareIcon className="w-4 h-4"/> Compare
-  </button>
-</div>
+            
+            {/* --- Wrapper for stacked links --- */}
+            <div className="flex flex-col">
+              {/* --- 11. CHANGED: Grid view hover link colors --- */}
+              <button className="flex items-center justify-center gap-2 w-full py-1 rounded-md font-bold text-sm text-gray-600 hover:text-blue-600 transition">
+                <HeartIcon className="w-4 h-4"/> Add to wishlist
+              </button>
+              <button className="flex items-center justify-center gap-2 w-full py-1 rounded-md font-bold text-sm text-gray-600 hover:text-blue-600 transition">
+                <CompareIcon className="w-4 h-4"/> Compare
+              </button>
+            </div>
+
           </div>
         )}
       </div>
@@ -560,10 +582,10 @@ export default function CategoryDetailPage() {
     } else {
       // This is a dynamic slug (e.g., "dell" or "hp-laptops")
       // We create an array of search terms
-      const searchTerms = slug.split('-'); // e.g., ["hp", "laptops"] or ["lenovo", "laptop"]
+      const searchTerms = slug.split('-').filter(t => t !== 'and'); // <-- THIS IS THE FIX
       
       // Combine the product's searchable fields into one string
-      const searchableProductText = (product.name + ' ' + product.category).toLowerCase();
+     const searchableProductText = (product.category.toLowerCase() + ' ' + product.name.toLowerCase());
       
       // Check if ALL search terms are present in the product text
       // This handles the "laptop" vs "laptops" mismatch
@@ -580,7 +602,7 @@ export default function CategoryDetailPage() {
     }
   });
   // --- ================================== ---
-  // ---  END OF CORRECTED LOGIC     ---
+  // ---   END OF CORRECTED LOGIC     ---
   // --- ================================== ---
 
   const sortedProducts = [...categoryProducts].sort((a, b) => {
@@ -653,17 +675,17 @@ export default function CategoryDetailPage() {
               </div>
             )}
 
-            {/* --- LOAD MORE BUTTON --- */}
-{productsToShow.length < totalProducts && (
-  <div className="flex justify-center mt-10">
-    <button
-      onClick={() => setCurrentPage(prevPage => prevPage + 1)}
-      className="bg-[#00001E] text-white font-medium py-3 px-8 rounded-md hover:bg-gray-800 transition"
-    >
-      Load More Products
-    </button>
-  </div>
-)}
+            {/* --- 12. CHANGED: "Load More" button style --- */}
+            {productsToShow.length < totalProducts && (
+              <div className="flex justify-center mt-10">
+                <button
+                  onClick={() => setCurrentPage(prevPage => prevPage + 1)}
+                  className="bg-blue-600 text-white font-medium py-3 px-8 rounded-md hover:bg-blue-700 transition"
+                >
+                  Load More Products
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

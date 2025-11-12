@@ -1,4 +1,3 @@
-// src/app/categories/page.tsx
 "use client";
 
 import React from 'react';
@@ -24,7 +23,8 @@ export default function CategoriesPage() {
             <Link
               key={category.slug}
               href={`/category/${category.slug}`}
-              className="group flex flex-col rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300 ease-in-out bg-[#00001E] border border-gray-800 hover:border-blue-500 transform hover:-translate-y-1"
+              // --- 1. CHANGED: Card background and border ---
+              className="group flex flex-col rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300 ease-in-out bg-white border border-gray-200 hover:border-blue-500 transform hover:-translate-y-1"
               aria-label={`View all ${category.name}`}
             >
               <div className="relative w-full aspect-square overflow-hidden rounded-t-lg"> 
@@ -37,19 +37,20 @@ export default function CategoriesPage() {
                 />
               </div>
               
-              {/* --- MODIFIED THIS LINE --- */}
-              <div className="p-3 flex flex-col flex-grow"> {/* Reduced padding from p-4 to p-3 */}
+              <div className="p-3 flex flex-col flex-grow">
                 
-                {/* --- MODIFIED THIS LINE --- */}
-                <h3 className="text-base font-bold text-white mb-1"> {/* Reduced size from text-lg to text-base */}
+                {/* --- 2. CHANGED: Title text color --- */}
+                <h3 className="text-base font-bold text-gray-900 mb-1">
                   {category.name}
                 </h3>
 
-                <p className="text-sm text-gray-300 leading-normal mb-2 flex-grow">
+                {/* --- 3. CHANGED: Description text color --- */}
+                <p className="text-sm text-gray-600 leading-normal mb-2 flex-grow">
                   {category.description} 
                 </p>
 
-                <div className="flex items-center text-blue-400 group-hover:text-blue-300 transition-colors duration-200 mt-auto">
+                {/* --- 4. CHANGED: Link text color --- */}
+                <div className="flex items-center text-blue-600 group-hover:text-blue-800 transition-colors duration-200 mt-auto">
                   <span className="text-xs font-medium">View Products</span>
                   <ArrowRight className="w-3 h-3 ml-1 transition-transform duration-200 group-hover:translate-x-1" />
                 </div>

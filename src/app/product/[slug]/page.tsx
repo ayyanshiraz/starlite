@@ -10,7 +10,7 @@ import { ChatButton, CustomScrollbarStyles } from '../../../components/SharedCom
 import { allProducts } from '../../../lib/products';
 import { categoriesData } from '../../../lib/data'; // --- IMPORT ADDED ---
 // Import the types from your products.ts file
-import type { Product, ProductDescription } from '../../../lib/products'; 
+import type { Product, StandardProductDescription, KeyFeatureProductDescription } from '../../../lib/products';
 
 // --- ICONS ---
 const iconProps = {
@@ -245,87 +245,125 @@ const SpecItem = ({ label, children, labelColorClass = "text-gray-900", valueCol
 
 
 // --- DESCRIPTION TAB ---
-// MODIFIED: This component now receives 'description' as a prop
-const DescriptionTab = ({ description }: { description: ProductDescription }) => (
-  <div className="text-gray-800">
-    {/* DYNAMIC DATA IS USED BELOW */}
-    <h3 className="text-2xl font-bold text-gray-900 mb-6">
-      {description.overview}
-    </h3>
+// MODIFIED: This component now handles BOTH description formats
+const DescriptionTab = ({ description }: { description: StandardProductDescription | KeyFeatureProductDescription }) => {
+  
+  // Check if the description has our NEW "keyFeatures" format
+  if ('keyFeatures' in description) {
+    // --- 1. RENDER THE NEW KEY FEATURES FORMAT ---
+    // This is for the Dell Docking Stations
+    return (
+      <div className="text-gray-800 space-y-4">
+        
+        <SpecSection title="Key Features">
+          {description.keyFeatures.map((section, index) => (
+            <div key={index} className="mb-4">
+              <p className="font-semibold text-gray-900">{section.title}:</p>
+              <ul className="list-disc list-inside ml-4 mt-1 space-y-1 text-gray-700">
+                {section.items.map((item, itemIndex) => (
+                  <li key={itemIndex}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </SpecSection>
+
+        <SpecSection title="Benefits">
+          <ul className="list-disc list-inside ml-4 space-y-1 text-gray-700">
+            {description.benefits.map((benefit, index) => (
+              <li key={index}>{benefit}</li>
+            ))}
+          </ul>
+        </SpecSection>
+
+        <p className="text-gray-700 pt-4">{description.summary}</p>
+      </div>
+    );
+
+  } else {
     
-    <SpecSection title={description.design.title}>
-      <p className="text-gray-700">{description.design.formFactor}</p>
-    </SpecSection>
+    // --- 2. RENDER THE OLD STANDARD FORMAT ---
+    // This is your existing code that works for all other products.
+    return (
+      <div className="text-gray-800">
+        <h3 className="text-2xl font-bold text-gray-900 mb-6">
+          {description.overview}
+        </h3>
+        
+        <SpecSection title={description.design.title}>
+          <p className="text-gray-700">{description.design.formFactor}</p>
+        </SpecSection>
 
-    <SpecSection 
-      title={description.performance.title} 
-      bgColorClass="bg-gradient-to-br from-[#00001E] to-[#1a1a3a]"
-      titleColorClass="text-white"
-      borderColorClass="border-gray-500"
-    >
-      <SpecItem label="Processor" labelColorClass="text-white" valueColorClass="text-gray-200">
-        {description.performance.processor}
-      </SpecItem>
-      <SpecItem label="Memory" labelColorClass="text-white" valueColorClass="text-gray-200">
-        {description.performance.memory}
-      </SpecItem>
-      <SpecItem label="Storage" labelColorClass="text-white" valueColorClass="text-gray-200">
-        {description.performance.storage}
-      </SpecItem>
-    </SpecSection>
+        <SpecSection 
+          title={description.performance.title} 
+          bgColorClass="bg-gray-100"
+          titleColorClass="text-gray-900"
+          borderColorClass="border-gray-300"
+        >
+          <SpecItem label="Processor" labelColorClass="text-gray-900" valueColorClass="text-gray-700">
+            {description.performance.processor}
+          </SpecItem>
+          <SpecItem label="Memory" labelColorClass="text-gray-900" valueColorClass="text-gray-700">
+            {description.performance.memory}
+          </SpecItem>
+          <SpecItem label="Storage" labelColorClass="text-gray-900" valueColorClass="text-gray-700">
+            {description.performance.storage}
+          </SpecItem>
+        </SpecSection>
 
-    <SpecSection 
-      title={description.display.title}
-      bgColorClass="bg-gray-100"
-      titleColorClass="text-gray-900"
-      borderColorClass="border-gray-300"
-    >
-      <SpecItem label="Screen" labelColorClass="text-gray-900" valueColorClass="text-gray-700">
-        {description.display.screen}
-      </SpecItem>
-      <SpecItem label="Graphics" labelColorClass="text-gray-900" valueColorClass="text-gray-700">
-        {description.display.graphics}
-      </SpecItem>
-    </SpecSection>
+        <SpecSection 
+          title={description.display.title}
+          bgColorClass="bg-gray-100"
+          titleColorClass="text-gray-900"
+          borderColorClass="border-gray-300"
+        >
+          <SpecItem label="Screen" labelColorClass="text-gray-900" valueColorClass="text-gray-700">
+            {description.display.screen}
+          </SpecItem>
+          <SpecItem label="Graphics" labelColorClass="text-gray-900" valueColorClass="text-gray-700">
+            {description.display.graphics}
+          </SpecItem>
+        </SpecSection>
 
-    <SpecSection 
-      title={description.connectivity.title} 
-      bgColorClass="bg-gradient-to-br from-[#00001E] to-[#1a1a3a]"
-      titleColorClass="text-white"
-      borderColorClass="border-gray-500"
-    >
-      <SpecItem label="Ports" labelColorClass="text-white" valueColorClass="text-gray-200">
-        <ul className="list-disc pl-5 space-y-1">
-          {description.connectivity.ports.map((port, i) => (
-            <li key={i}>{port}</li>
-          ))}
-        </ul>
-      </SpecItem>
-      <SpecItem label="Wireless" labelColorClass="text-white" valueColorClass="text-gray-200">
-        <ul className="list-disc pl-5 space-y-1">
-          {description.connectivity.wireless.map((item, i) => (
-            <li key={i}>{item}</li>
-          ))}
-        </ul>
-      </SpecItem>
-    </SpecSection>
+        <SpecSection 
+          title={description.connectivity.title} 
+          bgColorClass="bg-gray-100"
+          titleColorClass="text-gray-900"
+          borderColorClass="border-gray-300"
+        >
+          <SpecItem label="Ports" labelColorClass="text-gray-900" valueColorClass="text-gray-700">
+            <ul className="list-disc pl-5 space-y-1">
+              {description.connectivity.ports.map((port, i) => (
+                <li key={i}>{port}</li>
+              ))}
+            </ul>
+          </SpecItem>
+          <SpecItem label="Wireless" labelColorClass="text-gray-900" valueColorClass="text-gray-700">
+            <ul className="list-disc pl-5 space-y-1">
+              {description.connectivity.wireless.map((item, i) => (
+                <li key={i}>{item}</li>
+              ))}
+            </ul>
+          </SpecItem>
+        </SpecSection>
 
-    <SpecSection 
-      title={description.functionality.title}
-      bgColorClass="bg-gray-100"
-      titleColorClass="text-gray-900"
-      borderColorClass="border-gray-300"
-    >
-      <SpecItem label="Versatility" labelColorClass="text-gray-900" valueColorClass="text-gray-700">
-        {description.functionality.versatility}
-      </SpecItem>
-      <SpecItem label="Connectivity Options" labelColorClass="text-gray-900" valueColorClass="text-gray-700">
-        {description.functionality.connectivityOptions}
-      </SpecItem>
-    </SpecSection>
-  </div>
-);
-
+        <SpecSection 
+          title={description.functionality.title}
+          bgColorClass="bg-gray-100"
+          titleColorClass="text-gray-900"
+          borderColorClass="border-gray-300"
+        >
+          <SpecItem label="Versatility" labelColorClass="text-gray-900" valueColorClass="text-gray-700">
+            {description.functionality.versatility}
+          </SpecItem>
+          <SpecItem label="Connectivity Options" labelColorClass="text-gray-900" valueColorClass="text-gray-700">
+            {description.functionality.connectivityOptions}
+          </SpecItem>
+        </SpecSection>
+      </div>
+    );
+  }
+};
 // --- REVIEW SECTION COMPONENTS ---
 // (These components are unchanged)
 const StarRatingInput = ({ rating, setRating }: { rating: number, setRating: (rating: number) => void }) => {

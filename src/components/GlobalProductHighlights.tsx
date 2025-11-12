@@ -48,7 +48,7 @@ const ProductRow = ({ product }: { product: Partial<Product> & { alt: string } }
   <div 
     className="flex items-center gap-4 p-2 -ml-2 rounded-lg"
   >
-    <div className="relative flex-shrink-0 w-16 h-16 bg-white rounded-md p-1">
+    <div className="relative flex-shrink-0 w-16 h-16 bg-white rounded-md p-1 border border-gray-100">
       {/* --- CHANGED to next/image --- */}
       <Image
         src={product.image || '/placeholder.png'}
@@ -60,15 +60,15 @@ const ProductRow = ({ product }: { product: Partial<Product> & { alt: string } }
       />
     </div>
     <div className="flex-grow">
-      {/* --- CHANGED: Title is now a Link --- */}
+      {/* --- 1. CHANGED: Title text color to black/gray --- */}
       <Link 
         href={product.slug === '#' ? '#' : `/product/${product.slug}`}
-        className={`text-sm font-medium text-white ${product.slug === '#' ? 'cursor-default' : 'hover:text-blue-400 transition-colors'}`}
+        className={`text-sm font-medium text-gray-900 ${product.slug === '#' ? 'cursor-default' : 'hover:text-blue-600 transition-colors'}`}
       >
         {product.name}
       </Link>
       <div className="mt-2">
-        {/* --- CHANGED: "Get a Quote" is now a Link --- */}
+        {/* --- "Get a Quote" is now a Link (style remains the same) --- */}
         <Link 
           href={product.slug === '#' ? '#' : `/product/${product.slug}`}
           className={`inline-block bg-blue-600 text-white text-xs font-semibold py-1.5 px-4 rounded-md transition-all ${product.slug === '#' ? 'opacity-70 cursor-default' : 'hover:bg-blue-700'}`}
@@ -82,7 +82,6 @@ const ProductRow = ({ product }: { product: Partial<Product> & { alt: string } }
 
 // --- Animation Variants ---
 const containerVariants = {
-// ... existing code ...
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -93,7 +92,6 @@ const containerVariants = {
 };
 
 const itemVariants = {
-// ... existing code ...
   hidden: { opacity: 0, y: 30 }, // Start faded out and 30px down
   visible: {
     opacity: 1,
@@ -107,13 +105,12 @@ const itemVariants = {
 
 // --- Main Component ---
 export const GlobalProductHighlights = () => {
-// ... existing code ...
   return (
-    <div className="bg-[#00001E] border-b border-gray-700 overflow-hidden"> {/* Added overflow-hidden */}
+    // --- 2. CHANGED: Background to white and border to light gray ---
+    <div className="bg-white border-b border-gray-200 overflow-hidden">
       <div className="container mx-auto px-24 py-12">
         <motion.div 
           className="flex flex-col md:flex-row gap-24 justify-center"
-// ... existing code ...
           variants={containerVariants}
           initial="hidden"
           whileInView="visible" // Triggers animation on scroll
@@ -122,19 +119,17 @@ export const GlobalProductHighlights = () => {
           
           {/* Column 1: Featured Products */}
           <motion.div 
-// ... existing code ...
             className="w-full md:w-auto"
             variants={itemVariants}
           >
+            {/* --- 3. CHANGED: Header text color to black/gray --- */}
             <h3 
-              className="text-xl font-semibold text-white mb-1"
-// ... existing code ...
+              className="text-xl font-semibold text-gray-900 mb-1"
             >
               Featured Products
             </h3>
             <div className="w-16 h-0.5 bg-blue-600 mb-6"></div>
             <div className="flex flex-col gap-6">
-              {/* --- FIX: Removed stray "" --- */}
               {featuredProducts.map((product) => (
                 <ProductRow key={product.id} product={product} />
               ))}
@@ -143,19 +138,17 @@ export const GlobalProductHighlights = () => {
 
           {/* Column 2: Top Selling Products */}
           <motion.div 
-// ... existing code ...
             className="w-full md:w-auto"
             variants={itemVariants}
           >
+            {/* --- 4. CHANGED: Header text color to black/gray --- */}
             <h3 
-              className="text-xl font-semibold text-white mb-1"
-// ... existing code ...
+              className="text-xl font-semibold text-gray-900 mb-1"
             >
               Top Selling Products
             </h3>
             <div className="w-16 h-0.5 bg-blue-600 mb-6"></div>
             <div className="flex flex-col gap-6">
-              {/* --- FIX: Removed stray "" --- */}
               {topSellingProducts.map((product) => (
                 <ProductRow key={product.id} product={product} />
               ))}

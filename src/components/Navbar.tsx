@@ -12,7 +12,7 @@ export default function Navbar() {
     { name: 'About Us', href: '/about' },
     { name: 'Track Your Order', href: '/track-your-order' },
     { name: 'Contact Us', href: '/contact' },
-    { name: 'Shop', href: '/categories' },
+    { name: 'Shop', href: '/shop' },
     { name: 'Login', href: '/my-account' }
   ];
 
