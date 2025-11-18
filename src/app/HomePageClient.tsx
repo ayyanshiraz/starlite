@@ -684,7 +684,7 @@ const bestDealsProducts = addSlugsToProducts([
     id: 'bd2',
     brand: 'APC, UPS',
     title: 'APC Smart-UPS On-Line uninterruptible power supply (UPS) – SRT5KXLI',
-    image: '/apc/1.avif', // Placeholder, update path
+    image: '/apc/11.avif', // Placeholder, update path
   },
   {
     id: 'bd3',
