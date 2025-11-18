@@ -174,7 +174,7 @@ export default function ReturnPolicyPageClient() {
               titleClassName="text-lg font-bold text-gray-900 mb-3"
             >
               <p>
-                Damaged Shipments. If you receive a shipping carton that shows obvious damage and was. delivered from a recognized commercial carrier such as DHL, TNT, UPS or FedEx, etc., then refuse the shipment and email us immediately. If upon opening a carton you discover concealed damage, contact us right away to arrange for an inspection. <br /> <strong className="font-bold">Email: return@rikglobal.co.uk</strong>
+                Damaged Shipments. If you receive a shipping carton that shows obvious damage and was. delivered from a recognized commercial carrier such as DHL, TNT, UPS or FedEx, etc., then refuse the shipment and email us immediately. If upon opening a carton you discover concealed damage, contact us right away to arrange for an inspection.
               </p>
             </PolicySection>
           </motion.div>

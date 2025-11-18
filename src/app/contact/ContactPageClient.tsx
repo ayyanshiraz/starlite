@@ -164,7 +164,7 @@ export default function ContactPageClient() {
               <ContactInfoBox 
                 Icon={MailIcon} 
                 title="Email Us" 
-                text="sales@rikglobal.co.uk"
+                text="sales@starlightlinker.com"
                 delay={0.6} // Reduced delay
               />
               <ContactInfoBox 

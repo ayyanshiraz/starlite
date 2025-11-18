@@ -10,7 +10,7 @@ import React from 'react';
 const brands = [
   { src: '/brands/acer.png', alt: 'SEO Friendly Brand Logo 1' },
   { src: '/brands/apc.png', alt: 'SEO Friendly Brand Logo 2' },
-  { src: '/brands/asus.png', alt: 'SEO Friendly Brand Logo 3' },
+  { src: '/brands/Asus.png', alt: 'SEO Friendly Brand Logo 3' },
   { src: '/brands/Brother.png', alt: 'SEO Friendly Brand Logo 4' },
   { src: '/brands/Canon.png', alt: 'SEO Friendly Brand Logo 5' },
   { src: '/brands/Cisco.png', alt: 'SEO Friendly Brand Logo 6' },

@@ -262,4 +262,26 @@ export const productSkus: Record<string, SkuData> = {
   "switch-smart-managed-layer2-5-port": { sku: "USW-FLEX-2.5G-5 ", category: "Ubiquiti, Ubiquiti Switches " },
   "ubiquiti-unifi-dream-machine-pro-managed-gigabit-udm-pro": { sku: " UDM-PRO ", category: "Ubiquiti, Ubiquiti Switches" },
   "ubiquiti-edgerouter-6p-wired-router-gigabit-ethernet-er-6p": { sku: " ER-6P", category: " Routers, Ubiquiti, Ubiquiti Router" },
+  "avaya-1403-digital-telephone-700469927": { sku: "700469927 ", category: "Avaya" },
+  "avaya-1416-phone-700469869": { sku: "700469869 ", category: "Avaya" },
+  "avaya-1603sw-ip-phone-700458508": { sku: "700458508 ", category: "Avaya" },
+  "avaya-9404-digital-telephone-700500204": { sku: "700500204", category: "Avaya" },
+  "avaya-9408digitaltelephone700500205": { sku: "700500205 ", category: "Avaya" },
+  "avaya-9504-telset-for-ip-oico": { sku: "700508197 ", category: "Avaya" },
+  "avaya-9508-ip-phone-charcoal-grey-wired-handset-lcd": { sku: "700500207 ", category: "Avaya" },
+  "avaya-9601-700506783-sip-ip-phone": { sku: "700506783 ", category: "Avaya" },
+  "avaya-b159-analog-dect-telephone-black": { sku: "700501530 ", category: "Avaya" },
+  "avaya-h229-trimline-ip-phone-global": { sku: "700514315", category: "Avaya" },
+  "avaya-h239-corded-sip-phone-700513933": { sku: "700513933 ", category: "Avaya" },
+  "avaya-h249-corded-sip-phone-with-display": { sku: "700513934 ", category: "Avaya" },
+  "avaya-j129-ip-phone-no-power-supply": { sku: "700513638 ", category: "Avaya" },
+  "avaya-1-port-10gbase-sr-xfp-transceiver-dupe": { sku: "AA1403005-E5", category: "Avaya" },
+  "avaya-1000base-lx-sfp-network-transceiver-module-1000-mbit-s": { sku: " AA1419049-E6" , category: "Avaya" },
+  "avaya-1120e-ip-phone-graphite-no-psu-dupe": { sku: "NTYS03AFE6-AVAYA " , category: "Avaya" },
+  "avaya-1120sa-voip-phone-dupe": { sku: "1120SA " , category: "Avaya" },
+  "avaya-1140e-ip-deskphone-dupe": { sku: "1140E " , category: "Avaya" },
+  "avaya-1151b1-power-supply-dupe": { sku: "700227242" , category: "Avaya" },
+
+  
+
 };
