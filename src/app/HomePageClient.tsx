@@ -163,24 +163,23 @@ const slideVariants = {
   }
 };
 
-// Animation for text elements
+// --- UPDATED: Much Slower text animation ---
 const textChildVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.6,
-      ease: "easeOut"
-    }
+  hidden: { opacity: 0, y: 30 }, // Increased distance slightly for smoother long float
+  visible: { 
+    opacity: 1, 
+    y: 0, 
+    transition: { 
+      duration: 2.0, // Increased duration to 2 seconds
+      ease: "easeOut" 
+    } 
   }
 };
 
-// 3. The Hero Section component (Video Background, NO Dots)
+// 3. The Hero Section component
 function ModernHeroSection() {
   const [[currentSlide, direction], setSlide] = useState([0, 0]);
 
-  // --- PERMANENT GRID FIX ---
   const gridStyle: React.CSSProperties = {
     position: 'absolute',
     inset: '0',
@@ -202,7 +201,7 @@ function ModernHeroSection() {
   useEffect(() => {
     const timer = setTimeout(() => {
       changeSlide(1);
-    }, 5000);
+    }, 6000); // Increased slide timer slightly to accommodate slower text
     return () => clearTimeout(timer);
   }, [currentSlide]);
 
@@ -216,7 +215,8 @@ function ModernHeroSection() {
         loop
         muted
         playsInline
-        className="absolute inset-0 w-full h-full object-cover z-0"
+        // pointer-events-none removes the pause button interaction
+        className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none"
       >
         <source src="/herosection (1) (1).mp4" type="video/mp4" />
         Your browser does not support the video tag.
@@ -238,21 +238,20 @@ function ModernHeroSection() {
           exit="exit"
           className="absolute inset-0 w-full h-full"
         >
-          {/* --- Centered content --- */}
-          {/* FIX 1: Reduced padding on mobile (px-4) */}
           <div className="relative z-30 container mx-auto px-4 sm:px-8 h-full flex items-center justify-center text-center">
-            <div className="w-full max-w-4xl"> {/* Container for centered text */}
-
-              {/* Text Content Container */}
+            <div className="w-full max-w-4xl">
               <motion.div
                 className="w-full"
                 initial="hidden"
                 animate="visible"
                 variants={{
-                  visible: { transition: { staggerChildren: 0.1 } }
+                  visible: { 
+                    transition: { 
+                      staggerChildren: 0.6 // Increased delay between lines to 0.6s
+                    } 
+                  }
                 }}
               >
-                {/* FIX 2: Removed redundant inner 'div' that had 'px-4' */}
                 <motion.span
                   className="block text-gray-300 font-bold mb-4 text-base"
                   variants={textChildVariants}
@@ -261,11 +260,6 @@ function ModernHeroSection() {
                 </motion.span>
 
                 <motion.h1
-                  /* FIX 3: Made font size responsive.
-                    - text-4xl (36px) on mobile
-                    - md:text-6xl (60px) on tablet
-                    - lg:text-7xl (72px) on desktop
-                  */
                   className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-white mb-6 leading-tight"
                   variants={textChildVariants}
                 >
@@ -281,15 +275,14 @@ function ModernHeroSection() {
 
                 <motion.div variants={textChildVariants}>
                   <Link
-  href={slide.href}
-  className="inline-flex items-center text-lg font-semibold py-3 px-8 border-2 border-white text-white rounded-md transition-all duration-300 hover:bg-white hover:text-blue-700 hover:shadow-[0_0_15px_5px_rgba(255,255,255,0.4)] active:bg-gray-200 active:text-blue-800"
->
+                    href={slide.href}
+                    className="inline-flex items-center text-lg font-semibold py-3 px-8 border-2 border-white text-white rounded-md transition-all duration-300 hover:bg-white hover:text-blue-700 hover:shadow-[0_0_15px_5px_rgba(255,255,255,0.4)] active:bg-gray-200 active:text-blue-800"
+                  >
                     Know more
                     <ArrowRightIcon className="w-5 h-5 ml-2" />
                   </Link>
                 </motion.div>
               </motion.div>
-
             </div>
           </div>
         </motion.div>

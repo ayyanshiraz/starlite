@@ -3,7 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-// --- Icon Components ---
+// --- Icon Components (Unchanged) ---
 const iconProps = {
   xmlns: "http://www.w3.org/2000/svg",
   width: "28",
@@ -47,32 +47,57 @@ interface ContactInfoBoxProps {
   Icon: React.ElementType;
   title: string;
   text: React.ReactNode;
-  delay: number; // New prop for staggered animation
+  delay: number;
+  href?: string; // Added optional href prop
 }
 
-const ContactInfoBox: React.FC<ContactInfoBoxProps> = ({ Icon, title, text, delay }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.5, delay: delay }}
-    whileHover={{ 
+const ContactInfoBox: React.FC<ContactInfoBoxProps> = ({ Icon, title, text, delay, href }) => {
+  
+  const boxClasses = "bg-[#00001E] text-white p-4 rounded-lg flex flex-col items-center text-center shadow-lg cursor-pointer w-full h-full";
+  
+  const animationProps = {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.5, delay: delay },
+    whileHover: { 
       scale: 1.05, 
       boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-      transition: { duration: 0.2 } // Faster hover effect
-    }}
-    className="bg-[#00001E] text-white p-4 rounded-lg flex flex-col items-center text-center shadow-lg cursor-pointer"
-  >
-    <Icon className="w-8 h-8 mb-3" />
-    <h3 className="font-bold text-lg mb-1.5">{title}</h3>
-    <div className="text-xs">{text}</div>
-  </motion.div>
-);
+      transition: { duration: 0.2 }
+    }
+  };
+
+  // If href exists, render as a link (motion.a)
+  if (href) {
+    return (
+      <motion.a 
+        href={href}
+        // Open in new tab if it is not a telephone link
+        target={href.startsWith('tel:') ? undefined : "_blank"}
+        rel={href.startsWith('tel:') ? undefined : "noopener noreferrer"}
+        className={boxClasses}
+        {...animationProps}
+      >
+        <Icon className="w-8 h-8 mb-3" />
+        <h3 className="font-bold text-lg mb-1.5">{title}</h3>
+        <div className="text-xs">{text}</div>
+      </motion.a>
+    );
+  }
+
+  // Default behavior (div)
+  return (
+    <motion.div className={boxClasses} {...animationProps}>
+      <Icon className="w-8 h-8 mb-3" />
+      <h3 className="font-bold text-lg mb-1.5">{title}</h3>
+      <div className="text-xs">{text}</div>
+    </motion.div>
+  );
+};
 
 
 // --- Main Contact Page Component ---
 export default function ContactPageClient() {
   
-  // Animation variants for staggered appearance of form fields
   const formFieldVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
@@ -93,22 +118,22 @@ export default function ContactPageClient() {
           alt="Contact center agent" 
           className="absolute inset-0 w-full h-full object-cover opacity-30" 
         />
-        <div className="absolute inset-0  bg-opacity-40"></div>
+        <div className="absolute inset-0  bg-opacity-40"></div>
         
         <div className="relative z-10 h-full flex flex-col justify-center items-center text-center text-white p-4">
           <motion.h1
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }} // Reduced delay
+            transition={{ duration: 0.6, delay: 0.1 }}
             className="text-4xl md:text-5xl font-bold mb-4"
           >
-            We're Here To Help
+            We&apos;re Here To Help
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }} // Reduced delay
-            className="max-w-2xl text-lg md:text-xl text-gray-200 text-center" // Centered text
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="max-w-2xl text-lg md:text-xl text-gray-200 text-center"
           >
             For inquiries or assistance, contact us anytime. Your satisfaction is our priority, and we are here to help with any questions or needs.
           </motion.p>
@@ -122,7 +147,7 @@ export default function ContactPageClient() {
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }} // Reduced delay
+            transition={{ duration: 0.6, delay: 0.3 }}
             className="text-3xl md:text-4xl font-bold text-[#00001E] mb-4"
           >
             Contact Us
@@ -130,8 +155,8 @@ export default function ContactPageClient() {
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }} // Reduced delay
-            className="text-lg text-black max-w-xl mx-auto text-center" // Centered text and black color
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="text-lg text-black max-w-xl mx-auto text-center"
           >
             Ready to go beyond the cart? Connect with our specialists to architect your complete IT solution.
           </motion.p>
@@ -142,36 +167,46 @@ export default function ContactPageClient() {
 
           {/* --- Left Column: Info + Map --- */}
           <div className="space-y-8">
-            {/* Info Boxes Grid (already animated) */}
+            {/* Info Boxes Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              
+              {/* Address (Not Clickable) */}
               <ContactInfoBox 
                 Icon={MapPinIcon} 
                 title="Our Address" 
                 text={"1110 Summit AVE STE 7 Plano, TX 75074"}
-                delay={0.5} // Reduced delay
+                delay={0.5} 
               />
+              
+              {/* Call Us (Clickable) */}
               <ContactInfoBox 
                 Icon={PhoneIcon} 
                 title="Call Us" 
                 text={
                   <>
-                    <span className="block">24/7 Sales/Questions: +44 191 673 3012</span>
-                    
+                    <span className="block">+44 191 673 3012</span>
                   </>
                 }
-                delay={0.55} // Reduced delay
+                delay={0.55}
+                href="tel:+441916733012" 
               />
+
+              {/* Email (Clickable mailto - Optional, but recommended) */}
               <ContactInfoBox 
                 Icon={MailIcon} 
                 title="Email Us" 
                 text="sales@starlightlinker.com"
-                delay={0.6} // Reduced delay
+                delay={0.6}
+                href="mailto:sales@starlightlinker.com"
               />
+
+              {/* WhatsApp (Clickable) */}
               <ContactInfoBox 
                 Icon={WhatsAppIcon} 
                 title="WhatsApp" 
-                text="(+44) 7465746637"
-                delay={0.65} // Reduced delay
+                text="(+44) 746 574 6637"
+                delay={0.65}
+                href="https://wa.me/447465746637" 
               />
             </div>
 
@@ -179,7 +214,7 @@ export default function ContactPageClient() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.7 }} // Reduced delay
+              transition={{ duration: 0.6, delay: 0.7 }}
             >
               <div className="rounded-lg overflow-hidden shadow-lg border border-gray-200">
                 <iframe
@@ -199,7 +234,7 @@ export default function ContactPageClient() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.7 }} // Reduced delay
+            transition={{ duration: 0.6, delay: 0.7 }}
             className="bg-gray-50 p-8 rounded-lg shadow-lg border border-gray-200 h-full flex flex-col"
           >
             <h3 className="text-2xl font-bold text-gray-900 mb-6">
@@ -215,7 +250,7 @@ export default function ContactPageClient() {
               variants={{
                 visible: {
                   transition: {
-                    staggerChildren: 0.1, // Stagger children (form fields) by 0.1 seconds
+                    staggerChildren: 0.1,
                   },
                 },
               }}
