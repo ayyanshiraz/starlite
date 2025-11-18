@@ -218,7 +218,7 @@ function ModernHeroSection() {
         playsInline
         className="absolute inset-0 w-full h-full object-cover z-0"
       >
-        <source src="/herosection.mp4" type="video/mp4" />
+        <source src="/herosection (1) (1).mp4" type="video/mp4" />
         Your browser does not support the video tag.
       </video>
 
@@ -637,7 +637,7 @@ function EverythingBannerSection() {
         playsInline
         className="absolute inset-0 w-full h-full object-cover z-0 opacity-70"
       >
-        <source src="/everything-banner.mp4" type="video/mp4" />
+        <source src="/everything-banner (1).mp4" type="video/mp4" />
         Your browser does not support the video tag.
       </video>
 
@@ -691,7 +691,7 @@ const bestDealsProducts = addSlugsToProducts([
     id: 'bd2',
     brand: 'APC, UPS',
     title: 'APC Smart-UPS On-Line uninterruptible power supply (UPS) – SRT5KXLI',
-    image: '/apc/1.webp', // Placeholder, update path
+    image: '/apc/1.avif', // Placeholder, update path
   },
   {
     id: 'bd3',

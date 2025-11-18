@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-// --- FIX: Using absolute paths from src/ ---
 import { HeaderSection } from 'src/components/Header';
 import { ChatButton, CustomScrollbarStyles } from 'src/components/SharedComponents';
 import { allProducts } from 'src/lib/products';
@@ -13,7 +12,6 @@ import { productSkus } from 'src/lib/sku-data';
 import type { Product, StandardProductDescription, KeyFeatureProductDescription } from 'src/lib/products';
 import { useWishlist } from 'src/hooks/useWishlist';
 import { useCompare } from 'src/hooks/useCompare';
-// --- END FIX ---
 
 // --- ICONS ---
 const iconProps = {
@@ -147,28 +145,31 @@ const Breadcrumbs = ({ product }: { product: Product }) => (
   </nav>
 );
 
+// --- UPDATED: Product Gallery (Smaller Size) ---
 const ProductGallery = ({ product }: { product: Product }) => (
-  <div className="w-full md:w-1/2">
-    <div className="border border-gray-200 rounded-lg p-4">
+  // CHANGED: Width reduced to 2/5 (40%)
+  <div className="w-full md:w-2/5"> 
+    <div className="border border-gray-200 rounded-lg p-4 bg-white flex items-center justify-center">
       <Image
         src={product.image}
         alt={`[SEO Friendly] ${product.name}`}
-        width={500}
-        height={500}
-        className="w-full h-auto object-cover"
+        width={400} 
+        height={400}
+        // CHANGED: Added max-height and object-contain to prevent giant images
+        className="max-w-full h-auto object-contain max-h-[400px]"
       />
     </div>
   </div>
 );
 
-// --- PRODUCT INFO (UPDATED) ---
+// --- UPDATED: Product Info (Larger Width) ---
 const ProductInfo = ({ product }: { product: Product }) => {
-  // Use both hooks
   const { isInWishlist, toggleWishlist } = useWishlist(product.slug);
   const { isInCompare, toggleCompare } = useCompare(product.slug);
 
   return (
-    <div className="w-full md:w-1/2">
+    // CHANGED: Width increased to 3/5 (60%)
+    <div className="w-full md:w-3/5">
       <div className="text-sm text-blue-600 font-medium space-x-2">
         {product.category.split(',').map((cat, index) => (
           <React.Fragment key={index}>

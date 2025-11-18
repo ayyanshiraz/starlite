@@ -6371,7 +6371,7 @@ const rawProducts: Product[] = [
     id: 'bd2', 
     name: 'APC Smart-UPS On-Line uninterruptible power supply (UPS) – SRT5KXLI', 
     price: "Get a Quote", 
-    image: '/apc/1.webp', 
+    image: '/apc/1.avif', 
     category: 'UPS, APC', 
     categorySlug: 'ups', 
     slug: 'apc-smart-ups-on-line-uninterruptible-power-supply-ups-srt5kxli', 
