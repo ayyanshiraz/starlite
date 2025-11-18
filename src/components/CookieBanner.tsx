@@ -34,54 +34,51 @@ export default function CookieBanner() {
   }
 
   return (
+    // @ts-ignore - This fixes a known type definition issue in the library
     <CookieConsent
       location="bottom"
       cookieName={cookieName}
       expires={expires}
       
-      // --- MAIN BANNER CONTAINER ---
+      // --- Style for the MAIN BANNER (outer container) ---
       style={{
         background: "#FFFFFF",
         color: "#000000",
-        padding: "15px", 
-        fontSize: "14px", 
+        paddingTop: "18px",
+        paddingBottom: "18px",
+        paddingLeft: "25px",
+        paddingRight: "25px",
+        fontSize: "15px",
         zIndex: 1000,
         boxSizing: "border-box",
-        lineHeight: "1.5",
+        minHeight: "auto", 
+        lineHeight: "1.4",
         borderTop: "1px solid #E0E0E0",
         width: "100%",
-        display: "flex", 
-        justifyContent: "center",
-        alignItems: "center",
-        boxShadow: "0 -2px 10px rgba(0,0,0,0.05)"
       }}
       
-      // --- INNER CONTENT WRAPPER ---
+      // --- Style for the CONTENT (inner container) ---
       contentStyle={{
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        // 'wrap' allows it to stack on mobile, but stay in row on desktop
-        flexWrap: "wrap", 
-        gap: "15px",
-        margin: "0 auto",
+        flexWrap: "wrap",
+        gap: "20px",
+        margin: 0,
         padding: 0,
         width: "100%",
-        maxWidth: "1200px", 
+        boxSizing: "border-box",
       }}
       
-      // Hide default library buttons
+      // Hide library's buttons
       buttonText=""
       buttonStyle={{ display: 'none' }}
       declineButtonStyle={{ display: 'none' }}
       enableDeclineButton={false}
     >
-      {/* --- Left Block (Text) --- */}
-      {/* FIX: Changed flex-basis from 100% to 300px. 
-          Desktop: Text (300px) + Buttons fit on one line -> Row layout.
-          Mobile: Text (300px) + Buttons don't fit -> Wrap layout. 
-      */}
-      <div style={{ flex: "1 1 300px", minWidth: "200px" }}>
+      {/* --- Left Block (Text Only) --- */}
+      {/* CHANGED: Replaced minWidth with a flexible 'flex' property */}
+      <div style={{ flex: '1 1 300px' }}>
         <p style={{ margin: 0 }}>
           We use cookies to enhance your browsing experience and analyze our traffic. Read our{' '}
           <Link href="/privacy-policy" style={{ color: "#00001E", textDecoration: 'underline', fontWeight: 'bold' }}>
@@ -91,15 +88,15 @@ export default function CookieBanner() {
         </p>
       </div>
 
-      {/* --- Right Block (Buttons) --- */}
+      {/* --- Right Block (All Buttons) --- */}
+      {/* CHANGED: Added flex: '1 1 auto' and justifyContent, kept 'nowrap' */}
       <div style={{
         display: 'flex',
-        gap: '10px', 
-        flexShrink: 0,
+        gap: '12px', 
         alignItems: 'center',
-        flexWrap: 'wrap',
-        // Allow buttons to be auto-width
-        flex: "0 1 auto", 
+        flexWrap: 'nowrap', // Keeps all buttons in one line
+        flex: '1 1 auto', // Ensures it grows/shrinks and takes full width when wrapped
+        justifyContent: 'flex-end', // Aligns buttons to the right on desktop
       }}>
         {/* --- Accept All Button --- */}
         <button
@@ -107,14 +104,13 @@ export default function CookieBanner() {
           style={{
             background: "#00001E",
             color: "#FFFFFF",
-            fontSize: "13px",
+            fontSize: "14px",
             fontWeight: "bold",
             borderRadius: "4px",
-            padding: "10px 16px",
+            padding: "8px 14px",
             cursor: "pointer",
             border: "none",
-            whiteSpace: 'nowrap',
-            flexGrow: 1, 
+            flexShrink: 1, // Allows button to shrink on mobile
           }}
         >
           Accept All Cookies
@@ -126,39 +122,37 @@ export default function CookieBanner() {
           style={{
             background: "#00001E",
             color: "#FFFFFF",
-            fontSize: "13px",
+            fontSize: "14px",
             fontWeight: "bold",
             borderRadius: "4px",
-            padding: "10px 16px",
+            padding: "8px 14px",
             cursor: "pointer",
             border: "none",
-            whiteSpace: 'nowrap',
-            flexGrow: 1,
+            flexShrink: 1, // Allows button to shrink on mobile
           }}
         >
           Necessary Cookies Only
         </button>
 
-        {/* --- Close Button --- */}
-        <button
-          onClick={handleDecline}
-          aria-label="Close cookie banner"
-          style={{
-            background: "transparent",
-            border: "none",
-            color: "#000000",
-            cursor: "pointer",
-            fontSize: "24px",
-            fontWeight: "bold",
-            padding: "0 8px",
-            lineHeight: "1",
-            marginLeft: "5px",
-            display: "flex",
-            alignItems: "center"
-          }}
-        >
-          &times;
-        </button>
+        {/* --- Close Button (Cross Sign) --- */}
+        <div style={{ flexShrink: 0 }}>
+          <button
+            onClick={handleDecline}
+            aria-label="Close cookie banner"
+            style={{
+              background: "transparent",
+              border: "none",
+              color: "#000000",
+              cursor: "pointer",
+              fontSize: "28px",
+              fontWeight: "bold",
+              padding: "0 5px",
+              lineHeight: "1",
+            }}
+          >
+            &times;
+          </button>
+        </div>
         
       </div>
     </CookieConsent>

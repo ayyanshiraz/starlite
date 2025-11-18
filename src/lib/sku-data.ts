@@ -4,7 +4,7 @@ export interface SkuData {
 }
 
 export const productSkus: Record<string, SkuData> = {
-  "dell-14-latitude-7420-2-in-1-touchscreen-rgrw1": { sku: "RGRW1", category: "Computers & Laptops, Dell, Laptop" },
+  "dell-14-latitude-7420-2-in-1-touchscreen-rgrw0": { sku: "RGRW0", category: "Computers & Laptops, Dell, Laptop" },
   "dell-latitude-5540-15-6-intel-core-i5-1345u-yryyw": { sku: "YRYYW", category: "Dell, Dell Laptop" },
   "dell-latitude-5540-15-6-intel-core-i7-1365u-tpjj4": { sku: "TPJJ4", category: "Dell, Dell Laptop" },
   "dell-15-6-latitude-5540-notebook-x3vh2": { sku: "X3VH2", category: "Dell, Dell Laptop" },

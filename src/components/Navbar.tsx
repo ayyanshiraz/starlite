@@ -1,10 +1,10 @@
 "use client"; 
 
-import React, { useState } from 'react'; // Import useState
-import { motion, AnimatePresence } from 'framer-motion'; // Import framer-motion
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link'; 
 
 export default function Navbar() {
-  // State to manage mobile menu visibility
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navLinks = [
@@ -16,31 +16,20 @@ export default function Navbar() {
     { name: 'Login', href: '/my-account' }
   ];
 
-  // Animation variants for the mobile menu
   const menuVariants = {
-    hidden: {
-      opacity: 0,
-      y: -20,
-    },
-    visible: {
-      opacity: 1,
+    hidden: { opacity: 0, y: -20 },
+    visible: { 
+      opacity: 1, 
       y: 0,
-      transition: {
-        type: 'spring',
-        stiffness: 300,
-        damping: 30,
-      },
+      transition: { type: 'spring', stiffness: 300, damping: 30 },
     },
-    exit: {
-      opacity: 0,
-      y: -20,
-      transition: {
-        duration: 0.2
-      }
+    exit: { 
+      opacity: 0, 
+      y: -20, 
+      transition: { duration: 0.2 } 
     }
   };
 
-  // Animation variants for the hamburger/close icon lines
   const line1Variants = {
     open: { rotate: 45, y: 8 },
     closed: { rotate: 0, y: 0 }
@@ -55,40 +44,39 @@ export default function Navbar() {
   };
 
   return (
-    // Add relative positioning to the nav to act as an anchor for the absolute menu
-    <nav className="fixed top-0 left-0 right-0 z-50 h-20 bg-[#00001E] border-b border-gray-800">
+    // --- FIX: Changed z-50 to z-[100] to ensure it sits above the HeaderSection ---
+    <nav className="fixed top-0 left-0 right-0 z-[100] h-20 bg-[#00001E] border-b border-gray-800">
       <div className="container mx-auto h-full flex justify-between items-center px-8">
         
         {/* Left Side: Logo */}
         <div className="flex items-center space-x-8">
-          <a href="/" className="flex items-center">
-            <span className="text-3xl font-extrabold text-blue-600">Starlight Linkers LLC </span>
-          </a>
+          <Link href="/" className="flex items-center">
+            <span className="text-3xl font-extrabold text-blue-600">Starlight Linkers LLC</span>
+          </Link>
         </div>
 
         {/* Right Side: Nav Links (Desktop) */}
         <div className="flex items-center space-x-4">
           <div className="hidden md:flex items-center space-x-6">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.name}
                 href={link.href}
                 className="text-gray-300 font-medium hover:text-white transition-colors duration-200"
               >
                 {link.name}
-              </a>
+              </Link>
             ))}
           </div>
         </div>
         
-        {/* Mobile Menu Button (Now Functional) */}
+        {/* Mobile Menu Button */}
         <div className="md:hidden">
           <motion.button 
-            className="text-gray-300 hover:text-white w-6 h-6 relative"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} // Toggle state on click
+            className="text-gray-300 hover:text-white w-6 h-6 relative focus:outline-none"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             animate={isMobileMenuOpen ? "open" : "closed"}
           >
-            {/* Animated Hamburger/Close Icon */}
             <motion.span 
               className="block absolute h-0.5 w-full bg-current"
               style={{ top: '6px' }}
@@ -112,22 +100,22 @@ export default function Navbar() {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            className="absolute top-20 left-0 right-0 w-full bg-[#00001E] border-b border-gray-800 shadow-lg md:hidden"
+            className="absolute top-20 left-0 right-0 w-full bg-[#00001E] border-b border-gray-800 shadow-lg md:hidden max-h-[calc(100vh-5rem)] overflow-y-auto"
             variants={menuVariants}
             initial="hidden"
             animate="visible"
             exit="exit"
           >
-            <div className="flex flex-col space-y-1 px-8 py-4">
+            <div className="flex flex-col space-y-1 px-8 py-4 pb-8">
               {navLinks.map((link) => (
-                <a
+                <Link
                   key={`mobile-${link.name}`}
                   href={link.href}
-                  className="text-gray-300 font-medium hover:text-white w-full py-3 px-4 rounded-md transition-all duration-200 hover:bg-gray-800"
-                  onClick={() => setIsMobileMenuOpen(false)} // Close menu on link click
+                  className="text-gray-300 font-medium hover:text-white w-full py-3 px-4 rounded-md transition-all duration-200 hover:bg-gray-800 block"
+                  onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {link.name}
-                </a>
+                </Link>
               ))}
             </div>
           </motion.div>
