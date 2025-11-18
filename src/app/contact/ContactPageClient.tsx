@@ -156,7 +156,7 @@ export default function ContactPageClient() {
                 text={
                   <>
                     <span className="block">24/7 Sales/Questions: +44 191 673 3012</span>
-                    <span className="block">Support: (+44) 7465746637</span>
+                    
                   </>
                 }
                 delay={0.55} // Reduced delay
@@ -170,7 +170,7 @@ export default function ContactPageClient() {
               <ContactInfoBox 
                 Icon={WhatsAppIcon} 
                 title="WhatsApp" 
-                text="+971 54 201 9999"
+                text="(+44) 7465746637"
                 delay={0.65} // Reduced delay
               />
             </div>
