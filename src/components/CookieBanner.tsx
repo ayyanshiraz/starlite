@@ -39,74 +39,82 @@ export default function CookieBanner() {
       cookieName={cookieName}
       expires={expires}
       
-      // --- Style for the MAIN BANNER (outer container) ---
+      // --- MAIN BANNER CONTAINER ---
       style={{
-        background: "#FFFFFF", // Changed to white
-        color: "#000000", // Changed text color to black for contrast
-        paddingTop: "18px",
-        paddingBottom: "18px",
-        paddingLeft: "25px",
-        paddingRight: "25px",
-        fontSize: "15px",
+        background: "#FFFFFF",
+        color: "#000000",
+        padding: "15px", 
+        fontSize: "14px", 
         zIndex: 1000,
         boxSizing: "border-box",
-        minHeight: "auto", 
-        lineHeight: "1.4",
-        borderTop: "1px solid #E0E0E0", // Lighter border for white background
+        lineHeight: "1.5",
+        borderTop: "1px solid #E0E0E0",
         width: "100%",
+        display: "flex", 
+        justifyContent: "center",
+        alignItems: "center",
+        boxShadow: "0 -2px 10px rgba(0,0,0,0.05)"
       }}
       
-      // --- Style for the CONTENT (inner container) ---
+      // --- INNER CONTENT WRAPPER ---
       contentStyle={{
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        flexWrap: "wrap",
-        gap: "20px",
-        margin: 0,
+        // 'wrap' allows it to stack on mobile, but stay in row on desktop
+        flexWrap: "wrap", 
+        gap: "15px",
+        margin: "0 auto",
         padding: 0,
         width: "100%",
-        boxSizing: "border-box",
+        maxWidth: "1200px", 
       }}
       
-      // Hide library's buttons
+      // Hide default library buttons
       buttonText=""
       buttonStyle={{ display: 'none' }}
       declineButtonStyle={{ display: 'none' }}
       enableDeclineButton={false}
     >
-      {/* --- Left Block (Text Only) --- */}
-      <div style={{ flexGrow: 1, minWidth: '300px' }}>
+      {/* --- Left Block (Text) --- */}
+      {/* FIX: Changed flex-basis from 100% to 300px. 
+          Desktop: Text (300px) + Buttons fit on one line -> Row layout.
+          Mobile: Text (300px) + Buttons don't fit -> Wrap layout. 
+      */}
+      <div style={{ flex: "1 1 300px", minWidth: "200px" }}>
         <p style={{ margin: 0 }}>
           We use cookies to enhance your browsing experience and analyze our traffic. Read our{' '}
-          <Link href="/privacy-policy" style={{ color: "#00001E", textDecoration: 'underline', fontWeight: 'bold' }}> {/* Link color adjusted for white background */}
+          <Link href="/privacy-policy" style={{ color: "#00001E", textDecoration: 'underline', fontWeight: 'bold' }}>
             Privacy Policy
           </Link>
           .
         </p>
       </div>
 
-      {/* --- Right Block (All Buttons) --- */}
+      {/* --- Right Block (Buttons) --- */}
       <div style={{
         display: 'flex',
-        gap: '12px', 
+        gap: '10px', 
         flexShrink: 0,
         alignItems: 'center',
         flexWrap: 'wrap',
+        // Allow buttons to be auto-width
+        flex: "0 1 auto", 
       }}>
         {/* --- Accept All Button --- */}
         <button
           onClick={handleAccept}
           style={{
-            background: "#00001E", // Changed to requested button background color
-            color: "#FFFFFF", // Changed text color to white
-            fontSize: "14px",
+            background: "#00001E",
+            color: "#FFFFFF",
+            fontSize: "13px",
             fontWeight: "bold",
             borderRadius: "4px",
-            padding: "8px 14px",
+            padding: "10px 16px",
             cursor: "pointer",
             border: "none",
-            whiteSpace: 'nowrap'
+            whiteSpace: 'nowrap',
+            flexGrow: 1, 
           }}
         >
           Accept All Cookies
@@ -116,39 +124,41 @@ export default function CookieBanner() {
         <button
           onClick={handleDecline}
           style={{
-            background: "#00001E", // Changed to requested button background color
-            color: "#FFFFFF", // Changed text color to white
-            fontSize: "14px",
+            background: "#00001E",
+            color: "#FFFFFF",
+            fontSize: "13px",
             fontWeight: "bold",
             borderRadius: "4px",
-            padding: "8px 14px",
+            padding: "10px 16px",
             cursor: "pointer",
             border: "none",
-            whiteSpace: 'nowrap'
+            whiteSpace: 'nowrap',
+            flexGrow: 1,
           }}
         >
           Necessary Cookies Only
         </button>
 
-        {/* --- Close Button (Cross Sign) --- */}
-        <div style={{ flexShrink: 0 }}>
-          <button
-            onClick={handleDecline}
-            aria-label="Close cookie banner"
-            style={{
-              background: "transparent",
-              border: "none",
-              color: "#000000", // Changed to black for contrast against white banner
-              cursor: "pointer",
-              fontSize: "28px",
-              fontWeight: "bold",
-              padding: "0 5px",
-              lineHeight: "1",
-            }}
-          >
-            &times;
-          </button>
-        </div>
+        {/* --- Close Button --- */}
+        <button
+          onClick={handleDecline}
+          aria-label="Close cookie banner"
+          style={{
+            background: "transparent",
+            border: "none",
+            color: "#000000",
+            cursor: "pointer",
+            fontSize: "24px",
+            fontWeight: "bold",
+            padding: "0 8px",
+            lineHeight: "1",
+            marginLeft: "5px",
+            display: "flex",
+            alignItems: "center"
+          }}
+        >
+          &times;
+        </button>
         
       </div>
     </CookieConsent>

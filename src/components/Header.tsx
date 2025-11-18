@@ -4,7 +4,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-// --- FIX: Use relative path from components folder ---
 import { allProducts } from '../lib/products';
 
 // --- SVG ICON COMPONENTS ---
@@ -199,7 +198,8 @@ export function HeaderSection() {
           <div className="flex items-center gap-3 sm:gap-4 flex-shrink-0 md:order-3">
             
             {/* --- COMPARE ICON --- */}
-            <Link href="/compare" className="text-gray-700 hover:text-black hidden md:block relative">
+            {/* FIX: Removed 'hidden md:block' so it is visible on mobile */}
+            <Link href="/compare" className="text-gray-700 hover:text-black relative">
               <RepeatIcon className="w-6 h-6" />
               {compareCount > 0 && (
                 <span className="absolute -top-2 -right-2 w-5 h-5 bg-blue-600 text-white text-xs font-bold rounded-full flex items-center justify-center border-2 border-white">

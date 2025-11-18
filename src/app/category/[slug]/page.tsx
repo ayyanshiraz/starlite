@@ -1,18 +1,16 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-// --- FIX: Using absolute paths from src/ ---
 import { HeaderSection } from 'src/components/Header';
 import { ChatButton, CustomScrollbarStyles } from 'src/components/SharedComponents';
 import { categoriesData } from 'src/lib/data';
-import { allProducts, latestProducts } from 'src/lib/products';
+import { allProducts } from 'src/lib/products';
 import type { Product } from 'src/lib/products';
 import { useWishlist } from 'src/hooks/useWishlist';
 import { useCompare } from 'src/hooks/useCompare';
-// --- END FIX ---
 
 // --- ICONS ---
 const iconProps = {
@@ -54,15 +52,42 @@ const CompareIcon = ({ className = "" }) => (
   </svg>
 );
 
-const newLatestProducts = [
-  { id: "lp1", name: "Ubiquiti UniFi Switch Ultra 210W", price: 160.00, image: "/ubiquiti/12.jpg", slug: "ubiquiti-unifi-switch-ultra-210w" },
-  { id: "lp2", name: "Ubiquiti UniFi Switch Pro Max 24", price: 315.11, image: "/ubiquiti/5.jpg", slug: "ubiquiti-unifi-switch-pro-max-24" },
-  { id: "lp3", name: "Ubiquiti UniFi Switch USW-Enterprise-24-PoE", price: 570.00, image: "/ubiquiti/6.jpg", slug: "ubiquiti-unifi-switch-usw-enterprise-24-poe" },
-  { id: "lp4", name: "Ubiquiti UniFi U6+", price: 71.35, image: "/ubiquiti/7.jpg", slug: "ubiquiti-unifi-u6-plus" },
-  { id: "lp5", name: "Ubiquiti NanoBeam AC GEN2 NBE-5AC-GEN2", price: 65.21, image: "/ubiquiti/8.jpg", slug: "ubiquiti-nanobeam-ac-gen2-nbe-5ac-gen2" },
-];
+// --- HELPER: CATEGORY NORMALIZER ---
+// This cleans up the category strings so "Dell Laptop" and "Laptops" become the same thing.
+const normalizeCategoryName = (rawCategory: string, currentBrandName: string): string => {
+  if (!rawCategory) return "Other";
+
+  // 1. Split by comma and take the last part (usually the most specific)
+  const parts = rawCategory.split(',');
+  let specificPart = parts[parts.length - 1].trim();
+
+  // 2. If the specific part is just the brand name (e.g., "HP"), try the part before it
+  if (specificPart.toLowerCase() === currentBrandName.toLowerCase() && parts.length > 1) {
+    specificPart = parts[parts.length - 2].trim();
+  }
+
+  // 3. Remove the brand name from the string (e.g., "Dell Laptop" -> "Laptop")
+  // We use a Regex to replace the brand name (case insensitive)
+  const brandRegex = new RegExp(`\\b${currentBrandName}\\b`, 'gi');
+  let cleanName = specificPart.replace(brandRegex, '').trim();
+
+  // 4. Clean up any leftover punctuation or extra spaces
+  cleanName = cleanName.replace(/^[-&,]+|[-&,]+$/g, '').trim();
+
+  // 5. Standardize common variations (optional, but helps grouping)
+  if (cleanName.toLowerCase().includes('laptop') || cleanName.toLowerCase().includes('notebook')) return 'Laptops';
+  if (cleanName.toLowerCase().includes('dock')) return 'Docking Stations';
+  if (cleanName.toLowerCase().includes('workstation')) return 'Workstations';
+  if (cleanName.toLowerCase().includes('switch')) return 'Switches';
+  if (cleanName.toLowerCase().includes('server')) return 'Servers';
+
+  // 6. Fallback if empty
+  return cleanName || "Accessories";
+};
+
 
 // --- SUB-COMPONENTS ---
+
 const Breadcrumbs = ({ categoryName }: { categoryName: string }) => (
   <nav className="mb-6 text-sm text-gray-600" aria-label="Breadcrumb">
     <ol className="list-none p-0 inline-flex">
@@ -165,14 +190,20 @@ const FilterSidebar = ({
   );
 };
 
-
 const LatestProductsSidebar = () => {
+  const sidebarProducts = [
+    { id: "lp1", name: "Ubiquiti UniFi Switch Ultra 210W", price: 160.00, image: "/ubiquiti/12.jpg", slug: "ubiquiti-unifi-switch-ultra-210w" },
+    { id: "lp2", name: "Ubiquiti UniFi Switch Pro Max 24", price: 315.11, image: "/ubiquiti/5.jpg", slug: "ubiquiti-unifi-switch-pro-max-24" },
+    { id: "lp3", name: "Ubiquiti UniFi Switch USW-Enterprise-24-PoE", price: 570.00, image: "/ubiquiti/6.jpg", slug: "ubiquiti-unifi-switch-usw-enterprise-24-poe" },
+    { id: "lp4", name: "Ubiquiti UniFi U6+", price: 71.35, image: "/ubiquiti/7.jpg", slug: "ubiquiti-unifi-u6-plus" },
+    { id: "lp5", name: "Ubiquiti NanoBeam AC GEN2 NBE-5AC-GEN2", price: 65.21, image: "/ubiquiti/8.jpg", slug: "ubiquiti-nanobeam-ac-gen2-nbe-5ac-gen2" },
+  ];
+
   return (
     <div className="border border-gray-200 rounded-lg p-6">
       <h3 className="text-xl font-bold text-gray-900 mb-6">Latest Products</h3>
       <div className="space-y-6">
-        {newLatestProducts.map((product) => (
-          // Use product slug for the link
+        {sidebarProducts.map((product) => (
           <Link href={`/product/${product.slug}`} key={product.id} className="flex items-center gap-4 group">
             <div className="w-20 h-20 bg-gray-100 rounded-md shrink-0">
               <Image src={product.image} alt={product.name} width={80} height={80} className="w-full h-full object-contain"/>
@@ -188,45 +219,100 @@ const LatestProductsSidebar = () => {
   );
 };
 
-const categoryCounts = categoriesData.reduce((acc, category) => {
-  // Handle case where allProducts might be null/undefined
-  const count = allProducts ? allProducts.filter(product => product.categorySlug === category.slug).length : 0;
-  acc[category.slug] = count;
-  return acc;
-}, {} as { [key: string]: number });
-
-
-const CategoriesSidebar = () => (
-  <div className="border border-gray-200 rounded-lg overflow-hidden">
+// --- 2. FIXED & CLEAN: Dynamic Categories Sidebar ---
+const DynamicCategoriesSidebar = ({ 
+  currentCategoryName, 
+  products,
+  onSubCategoryClick,
+  activeSubCategory
+}: { 
+  currentCategoryName: string; 
+  products: Product[];
+  onSubCategoryClick: (cat: string | null) => void;
+  activeSubCategory: string | null;
+}) => {
+  
+  // CLEAN and COUNT categories
+  const subCategoryStats = useMemo(() => {
+    const stats: { [key: string]: number } = {};
     
-    <Link 
-      href="/categories" 
-      className="
-        block p-4 border-b border-gray-200 transition 
-        bg-gray-100 text-gray-800 font-medium 
-        hover:bg-[#00001E] hover:text-white
-        active:bg-[#00001E] active:text-white
-      "
-    >
-      Show All Categories
-    </Link>
-    
-    {categoriesData.map((category, index) => (
+    products.forEach(product => {
+      // Use our helper function to get the clean, merged name
+      const cleanName = normalizeCategoryName(product.category, currentCategoryName);
+      stats[cleanName] = (stats[cleanName] || 0) + 1;
+    });
+
+    // Sort alphabetically or by count (currently by count desc)
+    return Object.entries(stats).sort((a, b) => b[1] - a[1]);
+  }, [products, currentCategoryName]);
+
+  return (
+    <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden mb-8">
+      
+      {/* Top Header */}
       <Link 
-        key={category.slug}
-        href={`/category/${category.slug}`} 
-        className={`
-          block p-4 text-gray-800 transition 
-          hover:bg-[#00001E] hover:text-white
-          active:bg-[#00001E] active:text-white
-          ${index < categoriesData.length - 1 ? 'border-b border-gray-200' : ''}
-        `}
+        href="/categories" 
+        className="flex items-center gap-2 px-5 py-4 bg-gray-50 border-b border-gray-100 text-blue-600 hover:text-blue-800 transition-colors group"
       >
-        {category.name} ({categoryCounts[category.slug] || 0})
+        <ChevronLeftIcon className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+        <span className="text-sm font-semibold">Show All Categories</span>
       </Link>
-    ))}
-  </div>
-);
+
+      {/* Title Area */}
+      <div className="px-5 py-4">
+        <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+          {currentCategoryName}
+          <span className="text-gray-400 font-normal text-sm">({products.length})</span>
+        </h2>
+      </div>
+
+      {/* Professional List */}
+      <div className="flex flex-col pb-2">
+        
+        {/* "View All" Option */}
+        <button
+          onClick={() => onSubCategoryClick(null)}
+          className={`
+            group relative flex items-center justify-between px-5 py-3 text-sm transition-all
+            ${activeSubCategory === null 
+              ? 'text-blue-700 font-semibold bg-blue-50/50 border-l-4 border-blue-600' 
+              : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 border-l-4 border-transparent'
+            }
+          `}
+        >
+          <span>View All</span>
+          <span className={`text-xs py-0.5 px-2 rounded-full ${activeSubCategory === null ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500 group-hover:bg-gray-200'}`}>
+            {products.length}
+          </span>
+        </button>
+
+        {/* Merged Sub Categories */}
+        {subCategoryStats.map(([displayName, count]) => {
+          const isActive = activeSubCategory === displayName;
+
+          return (
+            <button
+              key={displayName}
+              onClick={() => onSubCategoryClick(displayName)}
+              className={`
+                group relative flex items-center justify-between px-5 py-2.5 text-sm transition-all border-t border-gray-50
+                ${isActive 
+                  ? 'text-blue-700 font-semibold bg-blue-50/50 border-l-4 border-blue-600' 
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 border-l-4 border-transparent'
+                }
+              `}
+            >
+              <span className="truncate pr-2">{displayName}</span>
+              <span className={`text-xs py-0.5 px-2 rounded-full ${isActive ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500 group-hover:bg-gray-200'}`}>
+                {count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
 
 const SortToolbar = ({ viewMode, setViewMode, setSortBy, setPerPage, totalProducts, perPage, sortBy }: {
   viewMode: 'grid' | 'list',
@@ -246,7 +332,7 @@ const SortToolbar = ({ viewMode, setViewMode, setSortBy, setPerPage, totalProduc
       </div>
       
       <span className="text-sm text-gray-600 mb-4 md:mb-0">
-        Showing {totalProducts > perPage ? perPage : totalProducts} of {totalProducts} results
+        Showing {totalProducts > 0 ? 1 : 0}–{Math.min(perPage, totalProducts)} of {totalProducts} results
       </span>
       
       <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
@@ -273,9 +359,7 @@ const SortToolbar = ({ viewMode, setViewMode, setSortBy, setPerPage, totalProduc
             <option value="12">Show 12</option>
             <option value="24">Show 24</option>
             <option value="36">Show 36</option>
-            <option value="48">Show 48</option>
-            <option value="60">Show 60</option>
-            <option value={totalProducts}>Show All ({totalProducts})</option>
+            <option value={totalProducts}>Show All</option>
           </select>
           <ChevronDownIcon className="w-4 h-4 text-gray-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none hidden sm:block" />
         </div>
@@ -285,10 +369,7 @@ const SortToolbar = ({ viewMode, setViewMode, setSortBy, setPerPage, totalProduc
   );
 };
 
-// --- 3. UPDATE PRODUCT CARD ---
 const ProductCard = ({ product, viewMode }: { product: Product, viewMode: 'grid' | 'list' }) => {
-  
-  // Use both hooks
   const { isInWishlist, toggleWishlist } = useWishlist(product.slug);
   const { isInCompare, toggleCompare } = useCompare(product.slug);
   const [isHovered, setIsHovered] = useState(false);
@@ -297,7 +378,6 @@ const ProductCard = ({ product, viewMode }: { product: Product, viewMode: 'grid'
   const priceDisplay = productPrice !== -1 ? `£${productPrice.toFixed(2)}` : 'Get a Quote';
   const productUrl = `/product/${product.slug}`; 
 
-  // --- LIST VIEW ---
   if (viewMode === 'list') {
     return (
       <div className="w-full flex flex-col md:flex-row gap-6 border border-gray-200 rounded-lg p-6 bg-white text-gray-900">
@@ -314,19 +394,16 @@ const ProductCard = ({ product, viewMode }: { product: Product, viewMode: 'grid'
           <span className="text-xs text-gray-500">{product.category}</span>
           <Link href={productUrl}><h3 className="text-lg font-bold hover:text-blue-600 transition mt-1">{product.name}</h3></Link>
           <p className="text-xl font-bold my-3">{priceDisplay}</p>
-          <p className="text-sm text-gray-600 mb-4">This is a placeholder description for the product. More details would go here.</p>
           <div className="flex items-center gap-4">
             <button className="bg-blue-600 text-white font-bold py-2 px-5 rounded-md hover:bg-blue-700 transition">
               {productPrice !== -1 ? 'Add to Cart' : 'Get a Quote'}
             </button>
-            {/* Wishlist Button */}
             <button 
               onClick={toggleWishlist}
               className={`flex items-center gap-2 text-sm font-medium transition ${isInWishlist ? 'text-red-600' : 'text-gray-600 hover:text-blue-600'}`}
             >
               <HeartIcon className="w-5 h-5" fill={isInWishlist ? "currentColor" : "none"} /> {isInWishlist ? 'Saved' : 'Add to wishlist'}
             </button>
-            {/* Compare Button */}
             <button 
               onClick={toggleCompare}
               className={`flex items-center gap-2 text-sm font-medium transition ${isInCompare ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600'}`}
@@ -339,21 +416,19 @@ const ProductCard = ({ product, viewMode }: { product: Product, viewMode: 'grid'
     );
   }
 
-  // --- GRID VIEW ---
   return (
     <div
       className="relative w-full border border-gray-200 rounded-lg group transition-all bg-white text-gray-900 shadow-sm hover:shadow-lg"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Floating Wishlist Button */}
       <button 
         onClick={toggleWishlist}
         className={`absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-full transition 
-          ${isInWishlist 
-            ? 'bg-red-100 text-red-600 hover:bg-red-200' 
-            : 'bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white'
-          }`}
+        ${isInWishlist 
+          ? 'bg-red-100 text-red-600 hover:bg-red-200' 
+          : 'bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white'
+        }`}
       >
         <HeartIcon className="w-4 h-4" fill={isInWishlist ? "currentColor" : "none"} />
       </button>
@@ -370,9 +445,8 @@ const ProductCard = ({ product, viewMode }: { product: Product, viewMode: 'grid'
       
       <div className="p-3 text-center h-[120px] flex flex-col justify-center">
         {!isHovered ? (
-          // --- DEFAULT VIEW (TEXT & PRICE) ---
           <div>
-            <span className="text-xs text-gray-500">{product.category}</span>
+            <span className="text-xs text-gray-500">{product.category.split(',')[0]}</span>
             <Link href={productUrl}>
               <h3 className="text-sm font-semibold hover:text-blue-600 transition mt-1 h-10 overflow-hidden line-clamp-2">
                 {product.name}
@@ -381,22 +455,17 @@ const ProductCard = ({ product, viewMode }: { product: Product, viewMode: 'grid'
             <p className="text-lg font-bold my-3">{priceDisplay}</p>
           </div>
         ) : (
-          // --- HOVER VIEW (BUTTONS) ---
           <div className="animate-fadeIn flex flex-col gap-2">
-            
             <button className="bg-blue-600 text-white w-full py-2 rounded-md font-bold text-sm hover:bg-blue-700 transition">
               {productPrice !== -1 ? 'Add to Cart' : 'Get a Quote'}
             </button>
-            
             <div className="flex flex-col">
-              {/* Wishlist Button (Hover) */}
               <button 
                 onClick={toggleWishlist}
                 className={`flex items-center justify-center gap-2 w-full py-1 rounded-md font-bold text-sm transition ${isInWishlist ? 'text-red-600' : 'text-gray-600 hover:text-blue-600'}`}
               >
                 <HeartIcon className="w-4 h-4" fill={isInWishlist ? "currentColor" : "none"}/> {isInWishlist ? 'Saved' : 'Add to wishlist'}
               </button>
-              {/* Compare Button (Hover) */}
               <button 
                 onClick={toggleCompare}
                 className={`flex items-center justify-center gap-2 w-full py-1 rounded-md font-bold text-sm transition ${isInCompare ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600'}`}
@@ -404,87 +473,12 @@ const ProductCard = ({ product, viewMode }: { product: Product, viewMode: 'grid'
                 <CompareIcon className="w-4 h-4"/> {isInCompare ? 'Added' : 'Compare'}
               </button>
             </div>
-
           </div>
         )}
       </div>
     </div>
   );
 };
-
-
-const getPaginationItems = (currentPage: number, totalPages: number) => {
-  if (totalPages <= 5) {
-    return Array.from({ length: totalPages }, (_, i) => i + 1);
-  }
-  const rangeWithDots: (string | number)[] = [];
-  if (currentPage <= 3) {
-    rangeWithDots.push(1, 2, 3, '...', totalPages);
-  }
-  else if (currentPage >= totalPages - 2) {
-    rangeWithDots.push(1, '...', totalPages - 2, totalPages - 1, totalPages);
-  }
-  else {
-    rangeWithDots.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
-  }
-  return rangeWithDots;
-};
-
-
-const Pagination = ({ currentPage, totalPages, onPageChange }: { currentPage: number, totalPages: number, onPageChange: (page: number) => void }) => {
-  if (totalPages <= 1) return null;
-  
-  const pages = getPaginationItems(currentPage, totalPages);
-
-  const baseButtonStyles = "w-10 h-10 flex items-center justify-center rounded-md text-sm font-medium transition-colors";
-  const arrowButtonStyles = `${baseButtonStyles} text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:hover:bg-transparent`;
-  const numberButtonStyles = `${baseButtonStyles} text-gray-700 hover:bg-gray-100`;
-  const activeButtonStyles = `${baseButtonStyles} bg-blue-600 text-white shadow-md hover:bg-blue-700`;
-  const dotsStyles = "w-10 h-10 flex items-center justify-center text-gray-500";
-
-  return (
-    <nav className="flex items-center justify-center gap-2 mt-10">
-      <button
-        onClick={() => onPageChange(currentPage - 1)}
-        disabled={currentPage === 1}
-        className={arrowButtonStyles}
-        aria-label="Go to previous page"
-      >
-        <ChevronLeftIcon className="w-5 h-5" />
-      </button>
-      
-      {pages.map((page, index) => (
-        typeof page === 'number' ? (
-          <button
-            key={page}
-            onClick={() => onPageChange(page)}
-            className={page === currentPage ? activeButtonStyles : numberButtonStyles}
-            aria-label={page === currentPage ? `Current page, page ${page}` : `Go to page ${page}`}
-          >
-            {page}
-          </button>
-        ) : (
-          <span
-            key={`dots-${index}`}
-            className={dotsStyles}
-          >
-            ...
-          </span>
-        )
-      ))}
-      
-      <button
-        onClick={() => onPageChange(currentPage + 1)}
-        disabled={currentPage === totalPages}
-        className={arrowButtonStyles}
-        aria-label="Go to next page"
-      >
-        <ChevronRightIcon className="w-5 h-5" />
-      </button>
-    </nav>
-  );
-};
-
 
 // --- MAIN CATEGORY PAGE COMPONENT ---
 export default function CategoryDetailPage() {
@@ -514,6 +508,9 @@ export default function CategoryDetailPage() {
   const [appliedMinPrice, setAppliedMinPrice] = useState(0);
   const [appliedMaxPrice, setAppliedMaxPrice] = useState(MAX_SLIDER_PRICE);
 
+  // NEW STATE for Sub-Category filtering (stores the CLEAN name)
+  const [selectedSubCategory, setSelectedSubCategory] = useState<string | null>(null);
+
   const handleFilterClick = () => {
     setAppliedMinPrice(minPrice);
     setAppliedMaxPrice(maxPrice);
@@ -521,48 +518,57 @@ export default function CategoryDetailPage() {
   };
 
   useEffect(() => {
-    // Update SEO metadata dynamically
     if (mainCategory) {
       document.title = mainCategory.seoTitle;
       const metaDesc = document.querySelector('meta[name="description"]');
-      if (metaDesc) {
-        metaDesc.setAttribute('content', mainCategory.metaDescription);
-      }
-    } else if (slug) {
-      document.title = `Shop ${categoryName} | Starlight Linkers LLC `;
-      const metaDesc = document.querySelector('meta[name="description"]');
-      if (metaDesc) {
-        metaDesc.setAttribute('content', `Browse all ${categoryName} products available at Starlight Linkers LLC . Find the best IT solutions for your business.`);
-      }
+      if (metaDesc) metaDesc.setAttribute('content', mainCategory.metaDescription);
     } else {
-      document.title = "Category | Starlight Linkers LLC ";
+      document.title = `Shop ${categoryName} | Starlight Linkers LLC `;
     }
   }, [mainCategory, slug, categoryName]);
 
-  const categoryProducts = allProducts ? allProducts.filter(product => {
-    const productPrice = typeof product.price === 'number' ? product.price : -1;
-    const priceMatch = (productPrice === -1)
-                      || (productPrice >= appliedMinPrice && productPrice <= appliedMaxPrice);
-    
-    if (!priceMatch) return false;
+  // 1. Filter products that belong to this MAIN page slug (e.g., "Dell")
+  const categoryProducts = useMemo(() => {
+    if (!allProducts) return [];
+    return allProducts.filter(product => {
+       if (mainCategory) {
+          return product.categorySlug === slug;
+       } else if (slug) { 
+          const searchTerms = slug.split('-').filter(t => t !== 'and');
+          const searchableProductText = (product.category.toLowerCase() + ' ' + product.name.toLowerCase());
+          
+          return searchTerms.every(term => {
+             if (term === 'laptop' || term === 'laptops') {
+                return searchableProductText.includes('laptop') || searchableProductText.includes('laptops');
+             }
+             return searchableProductText.includes(term);
+          });
+       }
+       return false;
+    });
+  }, [slug, mainCategory]);
 
-    if (mainCategory) {
-      return product.categorySlug === slug;
-    } else if (slug) { // Ensure slug exists before splitting
-      const searchTerms = slug.split('-').filter(t => t !== 'and');
-      const searchableProductText = (product.category.toLowerCase() + ' ' + product.name.toLowerCase());
-      
-      return searchTerms.every(term => {
-          if (term === 'laptop' || term === 'laptops') {
-            return searchableProductText.includes('laptop') || searchableProductText.includes('laptops');
+  // 2. Apply Price Filter AND Sub-Category Filter
+  const filteredProducts = useMemo(() => {
+      return categoryProducts.filter(product => {
+          // Price Check
+          const productPrice = typeof product.price === 'number' ? product.price : -1;
+          const priceMatch = (productPrice === -1) || (productPrice >= appliedMinPrice && productPrice <= appliedMaxPrice);
+          if (!priceMatch) return false;
+
+          // Sub-Category Check (Compare CLEAN names)
+          if (selectedSubCategory) {
+             const productCleanCategory = normalizeCategoryName(product.category, categoryName);
+             if (productCleanCategory !== selectedSubCategory) {
+                 return false;
+             }
           }
-          return searchableProductText.includes(term);
-      });
-    }
-    return false; // Fallback
-  }) : []; // Handle allProducts being undefined
 
-  const sortedProducts = [...categoryProducts].sort((a, b) => {
+          return true;
+      });
+  }, [categoryProducts, appliedMinPrice, appliedMaxPrice, selectedSubCategory, categoryName]);
+
+  const sortedProducts = [...filteredProducts].sort((a, b) => {
     const priceA = typeof a.price === 'number' ? a.price : Infinity;
     const priceB = typeof b.price === 'number' ? b.price : Infinity;
     
@@ -575,7 +581,6 @@ export default function CategoryDetailPage() {
   });
 
   const totalProducts = sortedProducts.length;
-  const totalPages = Math.ceil(totalProducts / perPage);
   const productsToShow = sortedProducts.slice(0, currentPage * perPage);
 
   return (
@@ -588,7 +593,18 @@ export default function CategoryDetailPage() {
         <div className="flex flex-col lg:flex-row gap-10">
 
           <aside className="w-full lg:w-1/4 space-y-8 lg:sticky top-10 self-start">
-            <CategoriesSidebar />
+            
+            {/* REPLACED: New Clean Sidebar */}
+            <DynamicCategoriesSidebar 
+               currentCategoryName={categoryName}
+               products={categoryProducts} 
+               activeSubCategory={selectedSubCategory}
+               onSubCategoryClick={(sub) => {
+                   setSelectedSubCategory(sub);
+                   setCurrentPage(1);
+               }}
+            />
+
             <FilterSidebar
               minPrice={minPrice}
               setMinPrice={setMinPrice}
@@ -623,7 +639,15 @@ export default function CategoryDetailPage() {
            {productsToShow.length === 0 && (
              <div className="text-center text-gray-500 py-16 border border-dashed rounded-lg">
                <h3 className="text-xl font-semibold">No Products Found</h3>
-               <p className="mt-2">No products were found for "{categoryName}" or match your current price filter.</p>
+               <p className="mt-2">No products found matching your current filters.</p>
+               {selectedSubCategory && (
+                   <button 
+                    onClick={() => setSelectedSubCategory(null)}
+                    className="text-blue-600 underline mt-2"
+                   >
+                       Clear Category Filter
+                   </button>
+               )}
              </div>
             )}
 
