@@ -13,13 +13,13 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   // This is your new "SEO Title" template
   title: {
-    template: '%s | Starlite LinkerSite', // %s will be replaced by the page-specific title
-    default: 'Starlite LinkerSite | The Unlimited Source for IT Products', // Default title for home
+    template: '%s | Starlight Linker LLCSite', // %s will be replaced by the page-specific title
+    default: 'Starlight Linker LLCSite | The Unlimited Source for IT Products', // Default title for home
   },
   // This is your default "Meta Description"
   description: 'The Unlimited Source for IT Products',
   // This is your default "SEO Keywords"
-  keywords: ['Starlite Linker', 'IT Products', 'Computers', 'Laptops', 'Networking', 'UK IT Supplier'],
+  keywords: ['Starlight Linker LLC', 'IT Products', 'Computers', 'Laptops', 'Networking', 'UK IT Supplier'],
 };
 // =============================
 
@@ -34,7 +34,7 @@ export default function RootLayout({
       <body className={`${inter.className} bg-white`}>
         <Navbar />
         {/* This pt-20 matches the h-20 of the new navbar */}
-        <main className="pt-20 min-h-screen">
+       <main className="pt-20 min-h-screen overflow-hidden">
           {children}
         </main>
         <BrandsSlideShow />

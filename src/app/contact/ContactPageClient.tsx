@@ -93,7 +93,7 @@ export default function ContactPageClient() {
           alt="Contact center agent" 
           className="absolute inset-0 w-full h-full object-cover opacity-30" 
         />
-        <div className="absolute inset-0  bg-opacity-40"></div>
+        <div className="absolute inset-0  bg-opacity-40"></div>
         
         <div className="relative z-10 h-full flex flex-col justify-center items-center text-center text-white p-4">
           <motion.h1
@@ -147,7 +147,7 @@ export default function ContactPageClient() {
               <ContactInfoBox 
                 Icon={MapPinIcon} 
                 title="Our Address" 
-                text="8 Jubilee Road, Whitburn, Bathgate, EH47 0AT, United Kingdom"
+                text={"1110 Summit AVE STE 7 Plano, TX 75074"}
                 delay={0.5} // Reduced delay
               />
               <ContactInfoBox 
@@ -183,7 +183,7 @@ export default function ContactPageClient() {
             >
               <div className="rounded-lg overflow-hidden shadow-lg border border-gray-200">
                 <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2246.331523363364!2d-3.619109023192257!3d55.88214607312117!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4887b9b8b15d311b%3A0x67c6993c4119d7d4!2s8%20Jubilee%20Rd%2C%20Whitburn%2C%20Bathgate%20EH47%200AT%2C%20UK!5e0!3m2!1sen!2sus!4v1730766348128!5m2!1sen!2sus"
+                  src="https://maps.google.com/maps?q=1110%20Summit%20AVE%20STE%207%20Plano,%20TX%2075074&t=m&z=14&ie=UTF8&iwloc=B&output=embed"
                   width="100%"
                   height="400"
                   style={{ border: 0 }}

@@ -78,7 +78,7 @@ export default function ReturnPolicyPageClient() {
                 now sit directly in the "max-w-7xl" container,
                 aligning them to the left of the page (same as the header).
               */}
-              <div className="container mx-auto max-w-8xl px-13">
+              <div className="container mx-auto max-w-8xl px-8">
                 <Breadcrumb items={breadcrumbItems} currentPage="Return Policy" />
               </div>
             </div>
@@ -100,7 +100,7 @@ export default function ReturnPolicyPageClient() {
           >
             <PolicySection title="Return Policy">
               <p>
-                Some of our best customer services begin after you buy from us. 100% Satisfaction is guaranteed on all in stock products! If you are not satisfied with a products performance or you have received incorrect goods you bought from Starlite Linker, we will refund the purchase price as per our return policy terms and conditions mentioned below. Make your request within 15 days of the invoice date and we will email you simple instructions for sending it back. Please be aware that any discrepancies between your order and the goods received must be flagged within 2 days of receipt of the items, failing which no return will be entertained by Starlite Linker. Please return the product immediately after receiving our email and make sure that the contents are complete and contained within the original manufacturers packaging. Note that shipping charges are not refundable.
+                Some of our best customer services begin after you buy from us. 100% Satisfaction is guaranteed on all in stock products! If you are not satisfied with a products performance or you have received incorrect goods you bought from Starlight Linkers LLC , we will refund the purchase price as per our return policy terms and conditions mentioned below. Make your request within 15 days of the invoice date and we will email you simple instructions for sending it back. Please be aware that any discrepancies between your order and the goods received must be flagged within 2 days of receipt of the items, failing which no return will be entertained by Starlight Linkers LLC . Please return the product immediately after receiving our email and make sure that the contents are complete and contained within the original manufacturers packaging. Note that shipping charges are not refundable.
               </p>
             </PolicySection>
           </motion.div>
@@ -113,7 +113,7 @@ export default function ReturnPolicyPageClient() {
           >
             <PolicySection title="Non-faulty items returns policy">
               <p>
-                Non-faulty items returns policy is on sole and absolute discretion of the Starlite Linker, Management. If we agree to accept the return for credit of unwanted products, the goods must be returned with our prior written agreement within 15 days of delivery. The Goods must be UNOPENED, with the manufacturers seal completely intact and in perfect condition. All non-faulty returns are liable to a 50% restocking fee, unless wrongly supplied by Starlite Linker. Such supplies must be returned in their original condition; accessories, manuals, software and warranties must be enclosed in their genuine packaging and be undamaged.
+                Non-faulty items returns policy is on sole and absolute discretion of the Starlight Linkers LLC , Management. If we agree to accept the return for credit of unwanted products, the goods must be returned with our prior written agreement within 15 days of delivery. The Goods must be UNOPENED, with the manufacturers seal completely intact and in perfect condition. All non-faulty returns are liable to a 50% restocking fee, unless wrongly supplied by Starlight Linkers LLC . Such supplies must be returned in their original condition; accessories, manuals, software and warranties must be enclosed in their genuine packaging and be undamaged.
               </p>
             </PolicySection>
           </motion.div>
@@ -126,7 +126,7 @@ export default function ReturnPolicyPageClient() {
           >
             <PolicySection title="Faulty items under warranty returns policy">
               <p>
-                If you encounter a fault, please raise an RMA request by agreeing to our terms and conditions below. You will need to quote our order number, the date of purchase and the serial number of the faulty items. Once Starlite Linker has confirmed that the faulty product is still under warranty, one of our engineers will try to resolve your problem over the phone or via remote access. If the problem persists, an RMA number will be issued, and you will need to follow our standard RMA procedure. Once the item has been returned, we will test it and fix the problem. If the item cannot be repaired, Starlite Linker will send out a replacement of the goods. Replacement hardware may be either new or equivalent to new and be or with equivalent specifications.
+                If you encounter a fault, please raise an RMA request by agreeing to our terms and conditions below. You will need to quote our order number, the date of purchase and the serial number of the faulty items. Once Starlight Linkers LLC  has confirmed that the faulty product is still under warranty, one of our engineers will try to resolve your problem over the phone or via remote access. If the problem persists, an RMA number will be issued, and you will need to follow our standard RMA procedure. Once the item has been returned, we will test it and fix the problem. If the item cannot be repaired, Starlight Linkers LLC  will send out a replacement of the goods. Replacement hardware may be either new or equivalent to new and be or with equivalent specifications.
               </p>
             </PolicySection>
           </motion.div>
@@ -186,7 +186,7 @@ export default function ReturnPolicyPageClient() {
             variants={fadeInUp}
           >
             <PolicySection 
-              title="Starlite Linker Reserves the right to charge 50% Restocking Fee:"
+              title="Starlight Linkers LLC  Reserves the right to charge 50% Restocking Fee:"
               titleClassName="text-lg font-bold text-center text-white mb-4"
               className="bg-[#00001E] p-8 rounded-lg"
               contentClassName="text-white text-center"

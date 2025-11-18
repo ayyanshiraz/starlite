@@ -14,7 +14,7 @@ export default function CategoriesPage() {
     <main className="bg-white min-h-screen">
       <HeaderSection />
 
-      <div className="container mx-auto px-32 py-10"> 
+     <div className="container mx-auto px-8 lg:px-32 py-10">
         <h1 className="text-4xl font-bold text-gray-900 mb-8">All Categories</h1>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 animate-fadeIn">

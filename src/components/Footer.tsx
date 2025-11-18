@@ -44,6 +44,13 @@ const AddressIcon = () => (
   </svg>
 );
 
+// --- NEW: Clock Icon ---
+const ClockIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-blue-400 mr-3 flex-shrink-0">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+  </svg>
+);
+// --- END: New Icon ---
 
 const FacebookIcon = () => (
   <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z" /></svg>
@@ -69,8 +76,6 @@ const ChevronRightIcon = () => (
 
 
 export default function Footer() {
-  // --- MODIFICATION START ---
-  // Updated links to point to the correct category slugs and pages
   const findItFastLinks = [
     { name: "Computers & Laptops", href: "/category/computers-and-laptops" },
     { name: "Accessories", href: "/category/accessories" },
@@ -79,19 +84,18 @@ export default function Footer() {
     { name: "Workstations", href: "/category/workstations" },
     { name: "Routers", href: "/category/routers" },
     { name: "UPS", href: "/category/ups" },
-    { name: "Brands", href: "/store-directory" } // Changed this to point to your Store Directory
+    { name: "Brands", href: "/store-directory" }
   ];
 
   const aboutLinks = [
     { name: "Home", href: "/" },
-    { name: "Shop", href: "/categories" }, // Changed /shop to /categories
+    { name: "Shop", href: "/shop" },
     { name: "About Us", href: "/about" },
     { name: "Wishlist", href: "/wishlist" },
     { name: "Compare", href: "/compare" },
     { name: "Store Directory", href: "/store-directory" },
     { name: "Contact Us", href: "/contact" }
   ];
-  // --- MODIFICATION END ---
 
   const customerCareLinks = [
     { name: "My Account", href: "/my-account" },
@@ -104,7 +108,7 @@ export default function Footer() {
   return (
     <footer className="bg-[#00001E] border-t border-gray-800 text-gray-300">
       {/* --- Main Footer Section --- */}
-      <div className="container mx-auto pl-20 pr-6 py-16">
+     <div className="container mx-auto px-8 lg:pl-20 lg:pr-6 py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           
           {/* Column 1: Logo, Contact, Social */}
@@ -112,7 +116,7 @@ export default function Footer() {
             <div className="flex items-center mb-6">
               <RikLogoDots />
               <div>
-                <span className="text-2xl font-extrabold text-blue-400">Starlite Linker</span>
+                <span className="text-2xl font-extrabold text-blue-400">Starlight Linkers LLC </span>
                 <span className="text-sm text-gray-500 block">LIMITED</span>
               </div>
             </div>
@@ -120,13 +124,23 @@ export default function Footer() {
             <div className="mb-6 space-y-3">
               <div className="flex items-start">
                 <AddressIcon />
-                {/* --- FIX: Removed stray '*' --- */}
-                <p className="text-sm">58 Jubilee Road Whitburn Bathgate EH47 0AT United Kingdom</p>
+                <p className="text-sm">1110 Summit AVE STE 7 Plano, TX 75074</p>
               </div>
               <div className="flex items-center">
                 <PhoneIcon />
                 <p className="text-sm">+44191 673 3012</p>
               </div>
+              
+              {/* --- NEW: Opening Hours --- */}
+              <div className="flex items-start">
+                <ClockIcon />
+                <div>
+                  <p className="text-sm font-semibold text-white">Opening Hours</p>
+                  <p className="text-sm text-gray-400">Monday to Friday: 9am-6pm</p>
+                </div>
+              </div>
+              {/* --- END: Opening Hours --- */}
+
             </div>
 
             <div className="flex space-x-4 text-gray-300">
@@ -136,7 +150,6 @@ export default function Footer() {
               <a href="#" className="hover:text-white"><YouTubeIcon /></a>
               <a href="#" className="hover:text-white"><RssIcon /></a>
             </div>
-            {/* Removed the payment icons div */}
           </div>
 
           {/* Column 2: Quick Links */}
@@ -160,7 +173,6 @@ export default function Footer() {
               {findItFastLinks.map((link) => (
                 <li key={link.name}>
                   <a href={link.href} className="text-sm hover:text-white flex items-center pr-2 pl-0">
-                    {/* --- FIX: Removed stray 'CSS' --- */}
                     <ChevronRightIcon /> {link.name}
                   </a>
                 </li>
@@ -187,10 +199,9 @@ export default function Footer() {
 
       {/* --- Bottom Bar --- */}
       <div className="bg-black/50 py-6">
-        <div className="container mx-auto pl-20 pr-6 flex flex-col md:flex-row justify-center items-center text-sm">
-          {/* --- FIX: Removed stray '*' --- */}
+       <div className="container mx-auto px-8 lg:pl-20 lg:pr-6 flex flex-col md:flex-row justify-center items-center text-sm">
           <p className="text-white mb-4 md:mb-0">
-            ©2025 Starlite Linker - All Rights Reserved.
+            ©2025 Starlight Linkers LLC  - All Rights Reserved.
           </p>
         </div>
       </div>

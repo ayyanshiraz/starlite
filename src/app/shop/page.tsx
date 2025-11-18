@@ -5,15 +5,15 @@ import ShopPageClient from './ShopPageClient'; // Import our new client componen
 // [SEO Friendly]
 export const metadata: Metadata = {
   // seo title
-  title: 'Shop All Products | Starlite Linker',
+  title: 'Shop All Products | Starlight Linkers LLC ',
   // meta description
-  description: 'Browse and shop all IT products available at Starlite Linker. Find computers, laptops, networking gear, accessories, and more from top brands.',
+  description: 'Browse and shop all IT products available at Starlight Linkers LLC . Find computers, laptops, networking gear, accessories, and more from top brands.',
   // seo keywords
-  keywords: ['shop', 'all products', 'IT products', 'Starlite Linker shop', 'buy computers', 'networking equipment'],
+  keywords: ['shop', 'all products', 'IT products', 'Starlight Linkers LLC  shop', 'buy computers', 'networking equipment'],
 };
 // slug is /shop (from folder structure)
 // focus key phrase: Shop All Products
-// img alt text: A grid of various IT products available at Starlite Linker shop
+// img alt text: A grid of various IT products available at Starlight Linkers LLC  shop
 // ========================================
 
 

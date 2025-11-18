@@ -4,8 +4,8 @@ import ReturnPolicyPageClient from './ReturnPolicyPageClient'; // Import our new
 // ===== METADATA (SERVER COMPONENT) =====
 export const metadata: Metadata = {
   title: 'Return Policy',
-  description: 'View the Starlite Linker return policy. Learn about returns for non-faulty items, faulty items under warranty, and our RMA process.',
-  keywords: ['Starlite Linker return policy', 'RMA process', 'return faulty items', 'restocking fee'],
+  description: 'View the Starlight Linkers LLC  return policy. Learn about returns for non-faulty items, faulty items under warranty, and our RMA process.',
+  keywords: ['Starlight Linkers LLC  return policy', 'RMA process', 'return faulty items', 'restocking fee'],
 };
 // ========================================
 

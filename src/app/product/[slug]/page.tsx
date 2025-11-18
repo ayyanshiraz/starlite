@@ -1,16 +1,19 @@
-// src/app/product/[slug]/page.tsx
 "use client";
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { HeaderSection } from '../../../components/Header';
-import { ChatButton, CustomScrollbarStyles } from '../../../components/SharedComponents';
-import { allProducts } from '../../../lib/products';
-import { categoriesData } from '../../../lib/data'; // --- IMPORT ADDED ---
-// Import the types from your products.ts file
-import type { Product, StandardProductDescription, KeyFeatureProductDescription } from '../../../lib/products';
+// --- FIX: Using absolute paths from src/ ---
+import { HeaderSection } from 'src/components/Header';
+import { ChatButton, CustomScrollbarStyles } from 'src/components/SharedComponents';
+import { allProducts } from 'src/lib/products';
+import { categoriesData } from 'src/lib/data';
+import { productSkus } from 'src/lib/sku-data'; 
+import type { Product, StandardProductDescription, KeyFeatureProductDescription } from 'src/lib/products';
+import { useWishlist } from 'src/hooks/useWishlist';
+import { useCompare } from 'src/hooks/useCompare';
+// --- END FIX ---
 
 // --- ICONS ---
 const iconProps = {
@@ -24,9 +27,13 @@ const iconProps = {
   strokeLinecap: "round",
   strokeLinejoin: "round",
 } as const;
-const HeartIcon = ({ className = "" }) => (
-  <svg {...iconProps} className={className}><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+
+const HeartIcon = ({ className = "", fill = "none" }) => (
+  <svg {...iconProps} fill={fill} className={className}>
+    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+  </svg>
 );
+
 const ChevronRightIcon = ({ className = "" }) => (
   <svg {...iconProps} className={className}><path d="m9 18 6-6-6-6"></path></svg>
 );
@@ -55,31 +62,28 @@ const StarIcon = ({ className = "" }) => (
   </svg>
 );
 
-// --- MOCK DATA FOR THIS PAGE ---
+// --- MOCK DATA ---
 const latestProductsSidebarData = [
-  { id: "lp1", name: "Ubiquiti UniFi Switch Ultra 210W", price: 160.00, image: "/placeholder-images/switch-ultra-210w.jpg", slug: "ubiquiti-unifi-switch-ultra-210w" },
-  { id: "lp2", name: "Ubiquiti UniFi Switch Pro Max 24", price: 315.11, image: "/placeholder-images/switch-pro-max-24.jpg", slug: "ubiquiti-unifi-switch-pro-max-24" },
-  { id: "lp3", name: "Ubiquiti UniFi Switch USW-Enterprise-24-PoE", price: 570.00, image: "/placeholder-images/switch-enterprise-24-poe.jpg", slug: "ubiquiti-unifi-switch-usw-enterprise-24-poe" },
-  { id: "lp4", name: "Ubiquiti UniFi U6+", price: 71.35, image: "/placeholder-images/unifi-u6-plus.jpg", slug: "ubiquiti-unifi-u6-plus" },
-  { id: "lp5", name: "Ubiquiti NanoBeam AC GEN2 NBE-5AC-GEN2", price: 65.21, image: "/placeholder-images/nanobeam-ac-gen2.jpg", slug: "ubiquiti-nanobeam-ac-gen2-nbe-5ac-gen2" },
+  { id: "lp1", name: "Ubiquiti UniFi Switch Ultra 210W", price: "Get a Qoute", image: "/ubiquiti/12.jpg", slug: "ubiquiti-unifi-switch-ultra-210w" },
+  { id: "lp2", name: "Ubiquiti UniFi Switch Pro Max 24", price:"Get a Qoute", image: "/ubiquiti/5.jpg", slug: "ubiquiti-unifi-switch-pro-max-24" },
+  { id: "lp3", name: "Ubiquiti UniFi Switch USW-Enterprise-24-PoE", price: "Get a Qoute", image: "/ubiquiti/6.jpg", slug: "ubiquiti-unifi-switch-usw-enterprise-24-poe" },
+  { id: "lp4", name: "Ubiquiti UniFi U6+", price: "Get a Qoute", image: "/ubiquiti/7.jpg", slug: "ubiquiti-unifi-u6-plus" },
+  { id: "lp5", name: "Ubiquiti NanoBeam AC GEN2 NBE-5AC-GEN2", price: "Get a Qoute", image: "/ubiquiti/8.jpg", slug: "ubiquiti-nanobeam-ac-gen2-nbe-5ac-gen2" },
 ];
 
-// --- Calculate Category Counts ---
 const categoryCounts = categoriesData.reduce((acc, category) => {
-  const count = allProducts.filter(product => product.categorySlug === category.slug).length;
+  const count = allProducts ? allProducts.filter(product => product.categorySlug === category.slug).length : 0;
   acc[category.slug] = count;
   return acc;
 }, {} as { [key: string]: number });
 
 
 // --- LEFT SIDEBAR SUB-COMPONENTS ---
-
-// --- THIS IS THE UPDATED DYNAMIC COMPONENT ---
 const CategoriesSidebar = () => (
   <div className="border border-[#00001E] rounded-lg overflow-hidden">
     <Link 
       href="/categories" 
-      className="block p-4 border-b border-gray-200 transition bg-[#00001E] text-white font-medium hover:bg-gray-800"
+      className="block p-4 border-b border-gray-200 transition bg-[#00001E] text-white font-medium hover:bg-gray-800 active:bg-gray-800"
     >
       Show All Categories
     </Link>
@@ -90,25 +94,13 @@ const CategoriesSidebar = () => (
         href={`/category/${category.slug}`} 
         className={`
           block p-4 text-gray-800 transition hover:bg-[#00001E] hover:text-white
+          active:bg-[#00001E] active:text-white 
           ${index < categoriesData.length - 1 ? 'border-b border-gray-200' : ''}
         `}
       >
         {category.name} ({categoryCounts[category.slug] || 0})
       </Link>
     ))}
-  </div>
-);
-// --- END OF UPDATED COMPONENT ---
-
-const AdSidebar = () => (
-  <div className="rounded-lg overflow-hidden border border-gray-200">
-    <Image
-      src="https://via.placeholder.com/300x400.png?text=Ad+Placeholder"
-      alt="Advertisement"
-      width={300}
-      height={400}
-      className="w-full h-auto"
-    />
   </div>
 );
 
@@ -130,11 +122,9 @@ const LatestProductsSidebar = () => (
     </div>
   </div>
 );
-// --- END LEFT SIDEBAR ---
 
 // --- MAIN CONTENT SUB-COMPONENTS ---
 
-// MODIFIED: This component now receives the full product object to get category info
 const Breadcrumbs = ({ product }: { product: Product }) => (
   <nav className="mb-6 text-sm text-gray-600" aria-label="Breadcrumb">
     <ol className="list-none p-0 inline-flex">
@@ -145,16 +135,13 @@ const Breadcrumbs = ({ product }: { product: Product }) => (
         <ChevronRightIcon className="w-4 h-4" />
       </li>
       <li className="flex items-center">
-        {/* DYNAMIC LINK: Uses data from the product object */}
         <Link href={`/category/${product.categorySlug}`} className="hover:underline">
-          {/* This splits "Laptops, HP" and shows just "Laptops" */}
           {product.category.split(',')[0]} 
         </Link>
       </li>
       <li className="flex items-center mx-2">
         <ChevronRightIcon className="w-4 h-4" />
       </li>
-      {/* DYNAMIC NAME */}
       <li className="text-gray-900 font-medium truncate max-w-[200px] md:max-w-none">{product.name}</li>
     </ol>
   </nav>
@@ -165,54 +152,77 @@ const ProductGallery = ({ product }: { product: Product }) => (
     <div className="border border-gray-200 rounded-lg p-4">
       <Image
         src={product.image}
-        alt={product.name}
+        alt={`[SEO Friendly] ${product.name}`}
         width={500}
         height={500}
         className="w-full h-auto object-cover"
       />
     </div>
-    {/* Add thumbnail gallery here if needed */}
   </div>
 );
 
-// MODIFIED: This component now receives the full product object
-const ProductInfo = ({ product }: { product: Product }) => (
-  <div className="w-full md:w-1/2">
-    <div className="text-sm text-blue-600 font-medium space-x-2">
-      {/* DYNAMIC CATEGORY LINKS */}
-      {product.category.split(',').map((cat, index) => (
-        <React.Fragment key={index}>
-          <Link href={`/category/${product.categorySlug}`} className="hover:underline">
-            {cat.trim()}
-          </Link>
-          {index < product.category.split(',').length - 1 && <span>,</span>}
-        </React.Fragment>
-      ))}
+// --- PRODUCT INFO (UPDATED) ---
+const ProductInfo = ({ product }: { product: Product }) => {
+  // Use both hooks
+  const { isInWishlist, toggleWishlist } = useWishlist(product.slug);
+  const { isInCompare, toggleCompare } = useCompare(product.slug);
+
+  return (
+    <div className="w-full md:w-1/2">
+      <div className="text-sm text-blue-600 font-medium space-x-2">
+        {product.category.split(',').map((cat, index) => (
+          <React.Fragment key={index}>
+            <Link href={`/category/${product.categorySlug}`} className="hover:underline">
+              {cat.trim()}
+            </Link>
+            {index < product.category.split(',').length - 1 && <span>,</span>}
+          </React.Fragment>
+        ))}
+      </div>
+      <h1 className="text-3xl font-bold text-gray-900 mt-2 mb-4">{product.name}</h1>
+      
+      <div className="flex items-center gap-6 mb-6">
+        {/* Wishlist Button */}
+        <button 
+          onClick={toggleWishlist} 
+          className={`flex items-center gap-2 text-sm transition ${
+            isInWishlist 
+              ? 'text-red-600 hover:text-red-700' 
+              : 'text-gray-700 hover:text-blue-600'
+          }`}
+        >
+          <HeartIcon 
+            className="w-5 h-5" 
+            fill={isInWishlist ? "currentColor" : "none"} 
+          />
+          {isInWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'}
+        </button>
+
+        {/* Compare Button */}
+        <button 
+          onClick={toggleCompare}
+          className={`flex items-center gap-2 text-sm transition ${
+            isInCompare
+              ? 'text-blue-600 hover:text-blue-700'
+              : 'text-gray-700 hover:text-blue-600'
+          }`}
+        >
+          <CompareIcon className="w-5 h-5" /> 
+          {isInCompare ? 'Added to Compare' : 'Add to Compare'}
+        </button>
+      </div>
+      
+      <div className="flex items-center gap-3">
+        <a href="#" className="px-5 py-2 bg-blue-600 text-white font-bold rounded-md hover:bg-blue-700 transition">
+          Get a quote
+        </a>
+      </div>
     </div>
-    <h1 className="text-3xl font-bold text-gray-900 mt-2 mb-4">{product.name}</h1>
-    
-    <div className="flex items-center gap-6 mb-6">
-  <button className="flex items-center gap-2 text-sm text-gray-700 hover:text-blue-600 transition">
-    <HeartIcon className="w-5 h-5" /> Add to wishlist
-  </button>
-  <button className="flex items-center gap-2 text-sm text-gray-700 hover:text-blue-600 transition">
-    <CompareIcon className="w-5 h-5" /> Compare
-  </button>
-</div>
-    
-    <div className="flex items-center gap-3">
-      <button className="px-5 py-2 border border-gray-300 rounded-md text-gray-800 font-medium hover:bg-gray-100 transition">
-        Compare
-      </button>
-      <button className="px-5 py-2 bg-blue-600 text-white font-bold rounded-md hover:bg-blue-700 transition">
-        Get a quote
-      </button>
-    </div>
-  </div>
-);
+  );
+};
+
 
 // --- SPEC HELPER COMPONENTS ---
-// (These are unchanged)
 const SpecSection = ({ 
   title, 
   children, 
@@ -245,16 +255,11 @@ const SpecItem = ({ label, children, labelColorClass = "text-gray-900", valueCol
 
 
 // --- DESCRIPTION TAB ---
-// MODIFIED: This component now handles BOTH description formats
 const DescriptionTab = ({ description }: { description: StandardProductDescription | KeyFeatureProductDescription }) => {
   
-  // Check if the description has our NEW "keyFeatures" format
   if ('keyFeatures' in description) {
-    // --- 1. RENDER THE NEW KEY FEATURES FORMAT ---
-    // This is for the Dell Docking Stations
     return (
       <div className="text-gray-800 space-y-4">
-        
         <SpecSection title="Key Features">
           {description.keyFeatures.map((section, index) => (
             <div key={index} className="mb-4">
@@ -281,9 +286,6 @@ const DescriptionTab = ({ description }: { description: StandardProductDescripti
     );
 
   } else {
-    
-    // --- 2. RENDER THE OLD STANDARD FORMAT ---
-    // This is your existing code that works for all other products.
     return (
       <div className="text-gray-800">
         <h3 className="text-2xl font-bold text-gray-900 mb-6">
@@ -364,8 +366,8 @@ const DescriptionTab = ({ description }: { description: StandardProductDescripti
     );
   }
 };
+
 // --- REVIEW SECTION COMPONENTS ---
-// (These components are unchanged)
 const StarRatingInput = ({ rating, setRating }: { rating: number, setRating: (rating: number) => void }) => {
   const [hoverRating, setHoverRating] = useState(0);
   return (
@@ -426,15 +428,13 @@ const ReviewForm = ({ productName }: { productName: string }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, you would submit this data to your backend
     console.log({ rating, review, name, email, saveInfo });
-    alert('Review submitted! (Check console for data)');
   };
 
   return (
     <div>
       <h3 className="text-lg font-medium text-gray-800 mb-1">
-        Be the first to review “{productName}”
+        Be the first to review {productName}
       </h3>
       
       <form onSubmit={handleSubmit} className="space-y-5 mt-6">
@@ -521,15 +521,14 @@ const ReviewsTab = ({ productName }: { productName: string }) => (
     </div>
   </div>
 );
-// --- END REVIEW SECTION ---
 
 // --- MAIN PAGE COMPONENT ---
 export default function ProductDetailPage() {
   const params = useParams();
   const slug = params.slug as string;
 
-  // Find the product dynamically based on the slug from the URL
-  const product = allProducts.find(p => p.slug === slug);
+  const product = allProducts ? allProducts.find(p => p.slug === slug) : undefined;
+  const skuData = productSkus ? productSkus[slug] : undefined; 
 
   const [activeTab, setActiveTab] = useState<'description' | 'reviews'>('description');
 
@@ -537,11 +536,10 @@ export default function ProductDetailPage() {
     if (product) {
       document.title = product.name;
     } else {
-      document.title = "Product Not Found | Starlite Linker";
+      document.title = "Product Not Found | Starlight Linkers LLC ";
     }
   }, [product, slug]);
 
-  // This is the "Product Not Found" page. It is correct.
   if (!product) {
     return (
       <main className="bg-white min-h-screen">
@@ -561,8 +559,6 @@ export default function ProductDetailPage() {
     );
   }
 
-  // This is a safety check for products you have not written a description for.
-  // It uses the placeholder description from products.ts
   if (!product.description) {
      return (
        <main className="bg-white min-h-screen">
@@ -582,27 +578,23 @@ export default function ProductDetailPage() {
     );
   }
 
-  // --- This is the main product page render ---
   return (
     <main className="bg-white min-h-screen">
       <HeaderSection />
 
       <div className="container mx-auto px-8 py-10">
-        {/* MODIFIED: Pass the full product object */}
         <Breadcrumbs product={product} />
         
         <div className="flex flex-col lg:flex-row gap-10">
 
           <aside className="w-full lg:w-72 flex-shrink-0 space-y-8 lg:sticky top-10 self-start">
             <CategoriesSidebar />
-            <AdSidebar />
             <LatestProductsSidebar />
           </aside>
 
           {/* Main Content */}
           <div className="w-full flex-1 min-w-0">
             
-            {/* These components are now dynamic */}
             <div className="flex flex-col md:flex-row gap-8 mb-10">
               <ProductGallery product={product} />
               <ProductInfo product={product} />
@@ -612,7 +604,6 @@ export default function ProductDetailPage() {
             <div>
               <div className="border-b border-gray-200 mb-6">
                 <nav className="flex gap-6 -mb-px">
-                  {/* --- THIS IS THE FIXED BLOCK --- */}
                   <button
                     onClick={() => setActiveTab('description')}
                     className={`py-3 px-1 font-medium text-lg ${
@@ -633,17 +624,22 @@ export default function ProductDetailPage() {
                   >
                     Reviews
                   </button>
-                  {/* --- END OF FIXED BLOCK --- */}
                 </nav>
               </div>
               
               <div>
-                {/* --- THIS IS THE MAIN FIX ---
-                    We now pass the product's specific description to the DescriptionTab
-                */}
-                {activeTab === 'description' && <DescriptionTab description={product.description} />}
+                {activeTab === 'description' && (
+                  <>
+                    <DescriptionTab description={product.description} />
+                    
+                    <div className="mt-8 pt-6 border-t border-gray-200 text-sm text-gray-500">
+                      <span className="font-bold text-gray-900">SKU:</span> {skuData?.sku || 'N/A'}
+                      <span className="mx-3 text-gray-300">/</span>
+                      <span className="font-bold text-gray-900">Category:</span> {skuData?.category || product.category}
+                    </div>
+                  </>
+                )}
                 
-                {/* This part remains the same */}
                 {activeTab === 'reviews' && <ReviewsTab productName={product.name} />}
               </div>
             </div>

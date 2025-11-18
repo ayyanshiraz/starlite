@@ -62,7 +62,7 @@ export default function Navbar() {
         {/* Left Side: Logo */}
         <div className="flex items-center space-x-8">
           <a href="/" className="flex items-center">
-            <span className="text-3xl font-extrabold text-blue-600">Starlite Linker</span>
+            <span className="text-3xl font-extrabold text-blue-600">Starlight Linkers LLC </span>
           </a>
         </div>
 

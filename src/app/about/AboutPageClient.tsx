@@ -151,19 +151,19 @@ export default function AboutPageClient() {
           variants={shape2Variants}
           className="absolute -bottom-1/4 -right-1/4 w-1/2 aspect-square"
         />
-         <motion.div
+          <motion.div
           variants={shape3Variants}
           className="absolute -top-1/4 -right-1/4 w-1/2 aspect-square"
           style={{ clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)' }} // CSS Triangle
         />
 
         {/* Hero Text Content */}
-        <div className="relative z-10 text-center p-4">
+        <div className="relative z-10 text-center p-4 flex flex-col items-center justify-center w-full"> {/* ADDED flex, flex-col, items-center, justify-center, w-full */}
           <motion.h1
             variants={titleVariants}
             className="text-5xl md:text-7xl font-extrabold mb-6"
           >
-            About Starlite Linker
+            About Starlight <br /> Linkers LLC
           </motion.h1>
           <motion.p
             variants={subtitleVariants}
@@ -196,10 +196,10 @@ export default function AboutPageClient() {
               Who We Are
             </h2>
             <p className="text-lg text-gray-600 mb-4 leading-relaxed">
-              Starlite Linker is an all-in-one stop shop for your business IT requirements. In this changing era, all businesses are solely depending on tech. In a time where the race is fast and competition is high, the entrepreneurial puzzle gets resolved by Starlite Linker. As your trusted IT provider partner, we delve deep into your IT requirements and provide you with the best vision through our well-informed, free consultation.
+              Starlight Linkers LLC  is an all-in-one stop shop for your business IT requirements. In this changing era, all businesses are solely depending on tech. In a time where the race is fast and competition is high, the entrepreneurial puzzle gets resolved by Starlight Linkers LLC . As your trusted IT provider partner, we delve deep into your IT requirements and provide you with the best vision through our well-informed, free consultation.
             </p>
             <p className="text-lg text-gray-600 leading-relaxed">
-              We assist you in your business productivity by implementing tech with well-driven, meaningful results. We are the providers for the IT infrastructures you use during your work and ensure the best performability from it. The IP phone, laptop, and workstation you work on, the networking equipment which assures the smooth ability of your workflow, data storage, and its security are all made sure by the high-quality equipment provided by Starlite Linker to enhance your business revenue.
+              We assist you in your business productivity by implementing tech with well-driven, meaningful results. We are the providers for the IT infrastructures you use during your work and ensure the best performability from it. The IP phone, laptop, and workstation you work on, the networking equipment which assures the smooth ability of your workflow, data storage, and its security are all made sure by the high-quality equipment provided by Starlight Linkers LLC  to enhance your business revenue.
             </p>
           </motion.div>
           {/* IMAGE (Second for mobile, order-first for desktop) */}
@@ -212,7 +212,7 @@ export default function AboutPageClient() {
           >
             <img 
               src="/about1.webp" 
-              alt="Starlite LinkerTeam" 
+              alt="Starlight Linkers LLC Team" 
               className="w-full h-full object-cover" 
             />
           </motion.div>
@@ -232,7 +232,7 @@ export default function AboutPageClient() {
               What we really do?
             </h2>
             <p className="text-lg text-gray-600 leading-relaxed">
-              Starlite Linker provides comprehensive IT solutions, including expert consultation, hardware procurement, and logistics. We streamline your tech needs to enhance productivity, ensuring reliable performance and secure delivery.
+              Starlight Linkers LLC  provides comprehensive IT solutions, including expert consultation, hardware procurement, and logistics. We streamline your tech needs to enhance productivity, ensuring reliable performance and secure delivery.
             </p>
           </motion.div>
           {/* IMAGE (Second for mobile and desktop) */}
@@ -265,7 +265,7 @@ export default function AboutPageClient() {
               Our Vision
             </h2>
             <p className="text-lg text-gray-600 leading-relaxed">
-              At Starlite Linker, our vision is to empower businesses with cutting-edge IT solutions that drive innovation and efficiency. We strive to be the trusted partner that simplifies technology, enabling our clients to focus on their core objectives and achieve sustained success in a rapidly evolving digital landscape.
+              At Starlight Linkers LLC , our vision is to empower businesses with cutting-edge IT solutions that drive innovation and efficiency. We strive to be the trusted partner that simplifies technology, enabling our clients to focus on their core objectives and achieve sustained success in a rapidly evolving digital landscape.
             </p>
           </motion.div>
           {/* IMAGE (Second for mobile, order-first for desktop) */}
@@ -298,7 +298,7 @@ export default function AboutPageClient() {
               History of the Company
             </h2>
             <p className="text-lg text-gray-600 leading-relaxed">
-              Starlite Linker began as a consultancy dedicated to 
+              Starlight Linkers LLC  began as a consultancy dedicated to 
               simplifying IT solutions for businesses. We quickly 
               expanded to offer comprehensive hardware procurement 
               and logistics services. Our commitment to innovation and 
@@ -335,7 +335,7 @@ export default function AboutPageClient() {
               Cooperate with Us!
             </h2>
             <p className="text-lg text-gray-600 leading-relaxed">
-              Partner with Starlite Linker to streamline your IT 
+              Partner with Starlight Linkers LLC  to streamline your IT 
               needs and drive business success. Our expert solutions, 
               reliable hardware, and exceptional service ensure your 
               technology supports your goals. Lets work together to 

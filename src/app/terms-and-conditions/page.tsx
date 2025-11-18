@@ -6,10 +6,10 @@ import TermsAndConditionsPageClient from './TermsAndConditionsPageClient'; // Im
 export const metadata: Metadata = {
   // SEO Title
   title: 'Terms and Conditions', 
-  // Meta Description (Focus Key Phrase: Starlite Linker Terms and Conditions)
-  description: 'Read the Starlite Linker Terms and Conditions. By placing an order, you consent and agree to these business policies, warranty, and return rules.',
+  // Meta Description (Focus Key Phrase: Starlight Linkers LLC  Terms and Conditions)
+  description: 'Read the Starlight Linkers LLC  Terms and Conditions. By placing an order, you consent and agree to these business policies, warranty, and return rules.',
   // SEO Keywords
-  keywords: ['Starlite Linkerterms and conditions', 'business policies', 'payment terms', 'warranty', 'returns policy', 'RMA'],
+  keywords: ['Starlight Linkers LLC terms and conditions', 'business policies', 'payment terms', 'warranty', 'returns policy', 'RMA'],
 };
 // ========================================
 

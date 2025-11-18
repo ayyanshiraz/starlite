@@ -53,7 +53,7 @@ export const BrandsSlideShow = () => {
         {/* This outer div clips the content. 
           The 'relative' and 'overflow-hidden' are important.
         */}
-        <div className="relative w-full h-28">
+        <div className="relative w-full h-28 overflow-hidden">
           <div className="absolute top-0 left-0 flex items-center animate-scroll">
             
             {/* We duplicate the brands array to create the seamless loop */}

@@ -89,7 +89,7 @@ export default function PrivacyPolicyPageClient() {
                 now sit directly in the "max-w-7xl" container,
                 aligning them to the left of the page (same as the header).
               */}
-              <div className="container mx-auto max-w-8xl px-13">
+             <div className="container mx-auto max-w-8xl px-8">
                 <Breadcrumb items={breadcrumbItems} currentPage="Privacy Policy" />
               </div>
             </div>
@@ -101,15 +101,15 @@ export default function PrivacyPolicyPageClient() {
       <section className="container mx-auto max-w-7xl px-4 pb-16 md:pb-24">
         <div className="max-w-4xl mx-auto">
           
-          <PolicySection title="Starlite Linker - Privacy Policy">
+          <PolicySection title="Starlight Linkers LLC  - Privacy Policy">
             <p>
-              At Starlite Linker we take our customers and suppliers privacy seriously, therefore this privacy policy document outlines which personal data and information we gather from you and from people who visit our website and how we use it.
+              At Starlight Linkers LLC  we take our customers and suppliers privacy seriously, therefore this privacy policy document outlines which personal data and information we gather from you and from people who visit our website and how we use it.
             </p>
           </PolicySection>
 
           <PolicySection title="Who are we?">
             <p>
-              Starlite Linker is a registered company (Company Registration # SC818387) and VAT # GB 476913747 with our registered office address at 58 Jubilee Road Whitburn Bathgate EH47 0AT United Kingdom.
+              Starlight Linkers LLC  is a registered company (Company Registration # SC818387) and VAT # GB 476913747 with our registered office address at 58 Jubilee Road Whitburn Bathgate EH47 0AT United Kingdom.
             </p>
           </PolicySection>
 

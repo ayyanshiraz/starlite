@@ -88,7 +88,7 @@ export default function TermsAndConditionsPageClient() {
           now sit directly in the "max-w-7xl" container,
           aligning them to the left of the page (same as the header).
         */}
-        <div className="container mx-auto max-w-8xl px-13">
+       <div className="container mx-auto max-w-8xl px-8">
           <Breadcrumb items={breadcrumbItems} currentPage="Terms and Conditions" />
         </div>
       </div>
@@ -108,7 +108,7 @@ export default function TermsAndConditionsPageClient() {
             viewport={{ once: true, amount: 0.2 }}
             variants={fadeInUp}
           >
-            Any agreement for the purchase of goods from Starlite Linker and the Customer shall be subject to these Business Policies, Terms and Conditions. By placing an order, customer consents to and agrees to abide by any and all of the following Terms and Conditions.
+            Any agreement for the purchase of goods from Starlight Linkers LLC  and the Customer shall be subject to these Business Policies, Terms and Conditions. By placing an order, customer consents to and agrees to abide by any and all of the following Terms and Conditions.
           </motion.p>
 
           <PolicySection title="PRICES">
@@ -119,37 +119,37 @@ export default function TermsAndConditionsPageClient() {
 
           <PolicySection title="WARRANTY">
             <p>
-              Starlite Linkermakes no warranty of any kind with respect to the information posted on this website. While Starlite Linkermakes every effort to ensure the accuracy of the data, this website could include typographical errors and technical inaccuracies. In addition, photos may not represent actual products.
+              Starlight Linkers LLC makes no warranty of any kind with respect to the information posted on this website. While Starlight Linkers LLC makes every effort to ensure the accuracy of the data, this website could include typographical errors and technical inaccuracies. In addition, photos may not represent actual products.
             </p>
           </PolicySection>
 
           <PolicySection title="Manufacturer Warranties">
             <p>
-              Manufacturer warranties apply to your purchase. Starlite Linker, disclaims all other warranties including but not limited to warranties of merchantability and fitness for a particular purpose.
+              Manufacturer warranties apply to your purchase. Starlight Linkers LLC , disclaims all other warranties including but not limited to warranties of merchantability and fitness for a particular purpose.
             </p>
           </PolicySection>
 
           <PolicySection title="Liabilities">
             <p>
-              In no event shall Starlite Linkerbe liable for any damages caused by any product or failure of such product to perform, whether or not advised of the possibility of such damage and regardless of the theory of liability pursuant to which such damages may be sought.
+              In no event shall Starlight Linkers LLC be liable for any damages caused by any product or failure of such product to perform, whether or not advised of the possibility of such damage and regardless of the theory of liability pursuant to which such damages may be sought.
             </p>
           </PolicySection>
 
           <PolicySection title="Returns">
             <p>
-              The Customer agrees to follow the Starlite LinkerPolicy to request a Return Merchandise Authorization Number (RMA#) from Starlite Linkerbefore attempting to return any products. See Returning a Product for further details and to initiate return process.
+              The Customer agrees to follow the Starlight Linkers LLC Policy to request a Return Merchandise Authorization Number (RMA#) from Starlight Linkers LLC before attempting to return any products. See Returning a Product for further details and to initiate return process.
             </p>
           </PolicySection>
 
           <PolicySection title="Claims">
             <p>
-              If a Customer makes any claims against Starlite Linker, the Customer agrees that the venue for such claims will be London, UK.
+              If a Customer makes any claims against Starlight Linkers LLC , the Customer agrees that the venue for such claims will be London, UK.
             </p>
           </PolicySection>
 
           <PolicySection title="Customer Credit Card Charges">
             <p>
-              If necessary, the Customer authorizes Starlite Linkerto charge their Credit Card for any Restocking, Over good, or other charges, in addition to the cost of the products to include shipping charges for any product returned.
+              If necessary, the Customer authorizes Starlight Linkers LLC to charge their Credit Card for any Restocking, Over good, or other charges, in addition to the cost of the products to include shipping charges for any product returned.
             </p>
           </PolicySection>
 

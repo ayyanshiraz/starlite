@@ -29,7 +29,7 @@ export default function TrackYourOrderPageClient() {
                 now sit directly in the "max-w-7xl" container,
                 aligning them to the left of the page (same as the header).
               */}
-              <div className="container mx-auto max-w-8xl px-13">
+             <div className="container mx-auto max-w-8xl px-8">
                 <Breadcrumb items={breadcrumbItems} currentPage="Track Your Order" />
               </div>
             </div>

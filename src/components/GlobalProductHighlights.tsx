@@ -38,7 +38,7 @@ const featuredProducts = [
 const topSellingProducts = [
   findProduct('dell-15-6-latitude-5540-notebook-x3vh2', 'Dell 15.6" Latitude 5540', '/computerandlaptops/dell/dell4.png'),
   findProduct('ubiquiti-networks-ua-sk-eu-security-access-control-system-white', 'Ubiquiti Access Control', '/ubiquiti/2.jpg'),
-  findProduct('hp-laserjet-pro-m501dn-j8h61a-bgj', 'HP LaserJet Pro M501dn', '/hp/2.webp'), // This one will use the fallback
+  findProduct('hp-laserjet-pro-m501dn-j8h61a-bgj', 'HP LaserJet Pro M501dn', '/hp-printers/3.jpg'), // This one will use the fallback
 ];
 // --- END NEW DATA LOGIC ---
 
@@ -108,7 +108,7 @@ export const GlobalProductHighlights = () => {
   return (
     // --- 2. CHANGED: Background to white and border to light gray ---
     <div className="bg-white border-b border-gray-200 overflow-hidden">
-      <div className="container mx-auto px-24 py-12">
+      <div className="container mx-auto px-8 lg:px-24 py-12">
         <motion.div 
           className="flex flex-col md:flex-row gap-24 justify-center"
           variants={containerVariants}

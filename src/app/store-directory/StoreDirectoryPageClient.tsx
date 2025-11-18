@@ -191,7 +191,7 @@ export default function StoreDirectoryPageClient() {
                 now sit directly in the "max-w-7xl" container,
                 aligning them to the left of the page (same as the header).
               */}
-              <div className="container mx-auto max-w-8xl px-13">
+             <div className="container mx-auto max-w-8xl px-8">
                 <Breadcrumb items={breadcrumbItems} currentPage="Store Directory" />
               </div>
             </div>

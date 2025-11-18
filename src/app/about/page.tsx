@@ -3,9 +3,9 @@ import AboutPageClient from './AboutPageClient'; // Import our new client compon
 
 // ===== METADATA (SERVER COMPONENT) =====
 export const metadata: Metadata = {
-  title: 'About Starlite Linker', // This becomes "About Starlite Linker| Starlite LinkerSite"
-  description: 'Learn about Starlite Linker, who we are, our vision, and how we provide comprehensive IT solutions, hardware procurement, and logistics.',
-  keywords: ['About Starlite Linker', 'Starlite Linkerhistory', 'IT solutions', 'company vision', 'IT procurement'],
+  title: 'About Starlight Linkers LLC ', // This becomes "About Starlight Linkers LLC | Starlight Linkers LLC Site"
+  description: 'Learn about Starlight Linkers LLC , who we are, our vision, and how we provide comprehensive IT solutions, hardware procurement, and logistics.',
+  keywords: ['About Starlight Linkers LLC ', 'Starlight Linkers LLC history', 'IT solutions', 'company vision', 'IT procurement'],
 };
 // ========================================
 

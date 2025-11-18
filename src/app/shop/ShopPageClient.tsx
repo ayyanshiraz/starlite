@@ -3,15 +3,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-// --- FIX: Reverted to correct relative import paths ---
 import { HeaderSection } from '../../components/Header';
 import { ChatButton, CustomScrollbarStyles } from '../../components/SharedComponents';
-import { allProducts } from '../../lib/products';
-import type { Product } from '../../lib/products';
-// --- END FIX ---
+import { allProducts, type Product } from '../../lib/products';
+import { useWishlist } from '../../hooks/useWishlist';
+import { useCompare } from '../../hooks/useCompare';
 
 // --- ICONS ---
-// (Copied from your existing category page for consistency)
 const iconProps = {
   xmlns: "http://www.w3.org/2000/svg",
   width: "24",
@@ -23,14 +21,23 @@ const iconProps = {
   strokeLinecap: "round",
   strokeLinejoin: "round",
 } as const;
+
 const GridIcon = ({ className = "" }) => (
   <svg {...iconProps} className={className}><rect width="7" height="7" x="3" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="14" rx="1"></rect><rect width="7" height="7" x="3" y="14" rx="1"></rect></svg>
 );
 const ListIcon = ({ className = "" }) => (
   <svg {...iconProps} className={className}><line x1="8" x2="21" y1="6" y2="6"></line><line x1="8" x2="21" y1="12" y2="12"></line><line x1="8" x2="21" y1="18" y2="18"></line><line x1="3" x2="3.01" y1="6" y2="6"></line><line x1="3" x2="3.01" y1="12" y2="12"></line><line x1="3" x2="3.01" y1="18" y2="18"></line></svg>
 );
-const HeartIcon = ({ className = "" }) => (
-  <svg {...iconProps} className={className}><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+const HeartIcon = ({ className = "", fill = "none" }) => (
+  <svg {...iconProps} fill={fill} className={className}><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+);
+const CompareIcon = ({ className = "" }) => (
+  <svg {...iconProps} className={className}>
+    <path d="M8 3L4 7l4 4"/>
+    <path d="M4 7h16"/>
+    <path d="M16 21l4-4-4-4"/>
+    <path d="M20 17H4"/>
+  </svg>
 );
 const ChevronDownIcon = ({ className = "" }) => (
   <svg {...iconProps} className={className}><path d="m6 9 6 6 6-6"></path></svg>
@@ -44,8 +51,6 @@ const ChevronRightIcon = ({ className = "" }) => (
 
 // --- HELPER TYPE ---
 type CategoryCount = [string, number];
-
-// --- MAX PRICE CONSTANT ---
 const MAX_SLIDER_PRICE = 2500;
 
 // --- SUB-COMPONENTS ---
@@ -216,13 +221,16 @@ const SortToolbar = ({ viewMode, setViewMode, setSortBy, totalProducts, sortBy }
           </select>
           <ChevronDownIcon className="w-4 h-4 text-gray-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
         </div>
-        
       </div>
     </div>
   );
 };
 
+// --- SHOP PRODUCT CARD ---
 const ShopProductCard = ({ product, viewMode }: { product: Product, viewMode: 'grid' | 'list' }) => {
+  const { isInWishlist, toggleWishlist } = useWishlist(product.slug);
+  const { isInCompare, toggleCompare } = useCompare(product.slug);
+
   const productPrice = typeof product.price === 'number' ? product.price : -1;
   const priceDisplay = productPrice !== -1 ? `£${productPrice.toFixed(2)}` : 'Get a Quote';
   const productUrl = `/product/${product.slug}`;
@@ -245,12 +253,23 @@ const ShopProductCard = ({ product, viewMode }: { product: Product, viewMode: 'g
           <Link href={productUrl}><h3 className="text-lg font-bold hover:text-blue-600 transition mt-1">{product.name}</h3></Link>
           <p className="text-xl font-bold my-3 text-gray-900">{priceDisplay}</p>
           <p className="text-sm text-gray-600 mb-4">This is a placeholder description for the product. More details would go here.</p>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-4">
             <button className="bg-blue-600 text-white font-bold py-2 px-5 rounded-md hover:bg-blue-700 transition">
               {productPrice !== -1 ? 'Add to Cart' : 'Get a Quote'}
             </button>
-            <button className="flex items-center gap-2 text-sm text-gray-700 font-medium hover:text-blue-600">
-              <HeartIcon className="w-5 h-5" /> Add to wishlist
+            <button 
+              onClick={toggleWishlist}
+              className={`flex items-center gap-2 text-sm font-medium transition ${isInWishlist ? 'text-red-600' : 'text-gray-700 hover:text-blue-600'}`}
+            >
+              <HeartIcon className="w-5 h-5" fill={isInWishlist ? "currentColor" : "none"} /> 
+              {isInWishlist ? 'Saved' : 'Add to wishlist'}
+            </button>
+            <button 
+              onClick={toggleCompare}
+              className={`flex items-center gap-2 text-sm font-medium transition ${isInCompare ? 'text-blue-600' : 'text-gray-700 hover:text-blue-600'}`}
+            >
+              <CompareIcon className="w-5 h-5" /> 
+              {isInCompare ? 'Added' : 'Compare'}
             </button>
           </div>
         </div>
@@ -258,10 +277,9 @@ const ShopProductCard = ({ product, viewMode }: { product: Product, viewMode: 'g
     );
   }
 
-  // --- GRID VIEW (Matching demo screenshot) ---
+  // --- GRID VIEW ---
   return (
-    <div className="relative w-full border border-gray-200 rounded-lg group transition-all bg-white text-gray-900">
-      
+    <div className="relative w-full border border-gray-200 rounded-lg group transition-all bg-white text-gray-900 flex flex-col">
       <Link href={productUrl} className="block w-full h-48 bg-white p-3 rounded-t-lg">
         <Image 
           src={product.image} 
@@ -272,53 +290,77 @@ const ShopProductCard = ({ product, viewMode }: { product: Product, viewMode: 'g
         />
       </Link>
       
-      <div className="p-4 text-left">
+      <div className="p-4 text-left flex flex-col flex-grow">
         <span className="text-xs text-gray-500">{product.category.split(',')[0]}</span>
-        <Link href={productUrl}>
-          <h3 className="text-sm font-semibold text-gray-900 hover:text-blue-600 transition mt-1 h-10 overflow-hidden">
+        <Link href={productUrl} className="flex-grow">
+          <h3 className="text-sm font-semibold text-gray-900 hover:text-blue-600 transition mt-1 h-10 overflow-hidden line-clamp-2">
             {product.name}
           </h3>
         </Link>
         <p className="text-lg font-bold text-gray-900 my-2">{priceDisplay}</p>
-        <button className="flex items-center justify-center gap-2 w-full py-2 rounded-md font-medium text-sm text-gray-700 hover:text-blue-600 transition border border-gray-300 hover:border-blue-500">
-          <HeartIcon className="w-4 h-4"/> Add to wishlist
-        </button>
+        
+        {/* --- ACTION BUTTONS --- */}
+        <div className="mt-auto space-y-2">
+          {productPrice === -1 && (
+             <button className="w-full text-center bg-blue-600 text-white font-semibold py-2.5 rounded-md text-sm transition-all duration-300 hover:bg-blue-700 hover:shadow-md">
+                Get a Quote
+             </button>
+          )}
+
+          <div className="flex justify-between items-center pt-1 gap-2">
+            {/* Wishlist Button */}
+            <button
+              onClick={toggleWishlist}
+              className={`flex-1 flex items-center justify-center gap-1.5 text-sm transition-colors border rounded-md py-2 ${isInWishlist ? 'text-red-600 font-medium border-red-200 bg-red-50' : 'text-gray-500 border-gray-300 hover:text-blue-600 hover:border-blue-500'}`}
+              title="Add to Wishlist"
+            >
+              <HeartIcon className="w-4 h-4" fill={isInWishlist ? "currentColor" : "none"} />
+              <span className="hidden sm:inline">{isInWishlist ? 'Saved' : 'Save'}</span>
+            </button>
+
+            {/* Compare Button */}
+            <button
+              onClick={toggleCompare}
+              className={`flex-1 flex items-center justify-center gap-1.5 text-sm transition-colors border rounded-md py-2 ${isInCompare ? 'text-blue-600 font-medium border-blue-200 bg-blue-50' : 'text-gray-500 border-gray-300 hover:text-blue-600 hover:border-blue-500'}`}
+              title="Add to Compare"
+            >
+              <CompareIcon className="w-4 h-4" />
+              <span className="hidden sm:inline">{isInCompare ? 'Added' : 'Compare'}</span>
+            </button>
+          </div>
+        </div>
+
       </div>
     </div>
   );
 };
 
-
 // --- MAIN SHOP PAGE CLIENT COMPONENT ---
 export default function ShopPageClient() {
 
-  // --- Page State ---
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortBy, setSortBy] = useState('default');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  // --- Price Filter State ---
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(MAX_SLIDER_PRICE);
   const [appliedMinPrice, setAppliedMinPrice] = useState(0);
   const [appliedMaxPrice, setAppliedMaxPrice] = useState(MAX_SLIDER_PRICE);
 
-  // --- Dynamic Category State ---
   const [allCategories, setAllCategories] = useState<CategoryCount[]>([]);
 
-  // --- Generate Category List on Mount ---
   useEffect(() => {
     const categoryMap = new Map<string, number>();
-    allProducts.forEach(product => {
-      // We split "Laptops, HP" into ["Laptops", "HP"]
-      const categories = product.category.split(',').map(c => c.trim());
-      categories.forEach(cat => {
-        if (cat) { // Ensure category is not an empty string
-          categoryMap.set(cat, (categoryMap.get(cat) || 0) + 1);
-        }
-      });
-    });
-    // Sort categories alphabetically by name
+    if (allProducts) {
+        allProducts.forEach(product => {
+        const categories = product.category.split(',').map(c => c.trim());
+        categories.forEach(cat => {
+            if (cat) {
+            categoryMap.set(cat, (categoryMap.get(cat) || 0) + 1);
+            }
+        });
+        });
+    }
     const sortedCategories = Array.from(categoryMap.entries()).sort((a, b) => a[0].localeCompare(b[0]));
     setAllCategories(sortedCategories);
   }, []);
@@ -332,19 +374,18 @@ export default function ShopPageClient() {
     setSelectedCategory(category);
   };
 
-  // --- Memoized Product Filtering & Sorting ---
   const filteredProducts = useMemo(() => {
+    if (!allProducts) return [];
     return allProducts.filter(product => {
       // 1. Price Filter
       const productPrice = typeof product.price === 'number' ? product.price : -1;
-      const priceMatch = (productPrice === -1) // Always show "Get a Quote" items
+      const priceMatch = (productPrice === -1) 
                          || (productPrice >= appliedMinPrice && productPrice <= appliedMaxPrice);
       
       if (!priceMatch) return false;
 
       // 2. Category Filter
       if (selectedCategory) {
-        // Check if "Laptops, HP" includes "Laptops"
         const productCategories = product.category.split(',').map(c => c.trim());
         if (!productCategories.includes(selectedCategory)) {
           return false;
@@ -371,7 +412,6 @@ export default function ShopPageClient() {
 
   const totalProducts = sortedProducts.length;
 
-  // --- Render ---
   return (
     <main className="bg-white min-h-screen">
       <HeaderSection />
@@ -381,7 +421,6 @@ export default function ShopPageClient() {
         
         <div className="flex flex-col lg:flex-row gap-10">
 
-          {/* --- LEFT SIDEBAR --- */}
           <aside className="w-full lg:w-1/4 space-y-8 lg:sticky top-10 self-start">
             <ShopCategoriesSidebar
               categories={allCategories}
@@ -398,7 +437,6 @@ export default function ShopPageClient() {
             />
           </aside>
 
-          {/* --- RIGHT CONTENT --- */}
           <div className="w-full lg:w-3/4">
             
             <h1 className="text-4xl font-bold text-gray-900 mb-6">
@@ -415,8 +453,9 @@ export default function ShopPageClient() {
 
             {sortedProducts.length > 0 ? (
               <div className={`grid ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'} gap-6`}>
-                {sortedProducts.map((product) => (
-                  <ShopProductCard key={product.id} product={product} viewMode={viewMode} />
+                {sortedProducts.map((product, index) => (
+                  // --- FIX: Added index to key to prevent duplicate key errors ---
+                  <ShopProductCard key={`${product.id}-${index}`} product={product} viewMode={viewMode} />
                 ))}
               </div>
             ) : (

@@ -1,10 +1,17 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+"use client";
+
+import React, { useState, useEffect, useCallback, useMemo } from 'react'; // Added useMemo
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import { allProducts } from '../lib/products';
+import { allProducts, type Product } from '../lib/products'; // Added Product type
+import { useWishlist } from '../hooks/useWishlist';
+import { useCompare } from '../hooks/useCompare';
+
+// --- IMPORTS ---
+// ... (rest of your imports)
 
 // --- IMPORTS ---
 import { HeaderSection } from '../components/Header';
@@ -31,8 +38,9 @@ const ArrowRightIcon = ({ className = "" }) => (
   </svg>
 );
 
-const HeartIcon = ({ className = "" }) => (
-  <svg {...iconProps} className={`w-5 h-5 ${className}`}>
+// --- REPLACE HeartIcon WITH THIS ---
+const HeartIcon = ({ className = "", fill = "none" }) => (
+  <svg {...iconProps} fill={fill} className={`w-5 h-5 ${className}`}>
     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
   </svg>
 );
@@ -70,10 +78,10 @@ const generateSlug = (name: string) => {
   if (!name) return '';
   return name
     .toLowerCase()
-    .replace(/ & /g, '-and-')      // Replace " & " with "-and-"
-    .replace(/[^\w\s-]/g, '')      // Remove special chars except word, space, hyphen
-    .replace(/[\s_-]+/g, '-')      // Replace spaces and underscores with a hyphen
-    .replace(/^-+|-+$/g, '');      // Trim hyphens from start/end
+    .replace(/ & /g, '-and-')     // Replace " & " with "-and-"
+    .replace(/[^\w\s-]/g, '')       // Remove special chars except word, space, hyphen
+    .replace(/[\s_-]+/g, '-')       // Replace spaces and underscores with a hyphen
+    .replace(/^-+|-+$/g, '');       // Trim hyphens from start/end
 };
 
 // --- NEW: Function to add slugs to mock data ---
@@ -81,7 +89,7 @@ const addSlugsToProducts = (products: any[]) => {
   return products.map(p => {
     // Try to find a matching product in the master list from lib/products.ts
     const masterProduct = allProducts.find(master => master.name === p.title);
-    
+
     if (masterProduct && masterProduct.slug) {
       return { ...p, slug: masterProduct.slug };
     } else {
@@ -103,7 +111,7 @@ const sliderData = [
     description: 'Explore premium laptops tailored for every need. Performance style and value await.',
     img: '/about.jpg',
     alt: 'Two women working on a laptop in a stylized window',
-    href: '/categories/laptops'
+    href: '/category/computers-and-laptops'
   },
   {
     id: 'printers',
@@ -112,7 +120,7 @@ const sliderData = [
     description: 'Experience crisp clear and vibrant print quality with ease.',
     img: '/images/hero-printer.png',
     alt: 'Epson Printer',
-    href: '/categories/printers'
+    href: '/category/printers'
   },
   {
     id: 'routers',
@@ -121,7 +129,7 @@ const sliderData = [
     description: 'Future-proof your network with advanced next-generation router technology.',
     img: '/images/hero-router.png',
     alt: 'Gaming Router',
-    href: '/categories/networking'
+    href: '/category/routers'
   },
   {
     id: 'switches',
@@ -130,7 +138,7 @@ const sliderData = [
     description: 'Experience unmatched performance with Ciscos high-speed switch technology.',
     img: '/images/hero-switch.png',
     alt: 'Network Switches',
-    href: '/categories/networking'
+    href: '/category/switches'
   }
 ];
 
@@ -180,7 +188,6 @@ function ModernHeroSection() {
     backgroundImage: 'linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px)',
     backgroundSize: '4rem 4rem'
   };
-  // --- END OF FIX ---
 
   const changeSlide = (newDirection: number) => {
     let newSlideIndex = currentSlide + newDirection;
@@ -195,7 +202,7 @@ function ModernHeroSection() {
   useEffect(() => {
     const timer = setTimeout(() => {
       changeSlide(1);
-    }, 5000); // This is for the hero section
+    }, 5000);
     return () => clearTimeout(timer);
   }, [currentSlide]);
 
@@ -232,7 +239,8 @@ function ModernHeroSection() {
           className="absolute inset-0 w-full h-full"
         >
           {/* --- Centered content --- */}
-          <div className="relative z-30 container mx-auto px-8 h-full flex items-center justify-center text-center">
+          {/* FIX 1: Reduced padding on mobile (px-4) */}
+          <div className="relative z-30 container mx-auto px-4 sm:px-8 h-full flex items-center justify-center text-center">
             <div className="w-full max-w-4xl"> {/* Container for centered text */}
 
               {/* Text Content Container */}
@@ -244,42 +252,42 @@ function ModernHeroSection() {
                   visible: { transition: { staggerChildren: 0.1 } }
                 }}
               >
-                <div className="px-4">
-                  <motion.span
-                    // --- UPDATED: Added font-bold ---
-                    className="block text-gray-300 font-bold mb-4 text-base"
-                    variants={textChildVariants}
-                  >
-                    {slide.preTitle}
-                  </motion.span>
+                {/* FIX 2: Removed redundant inner 'div' that had 'px-4' */}
+                <motion.span
+                  className="block text-gray-300 font-bold mb-4 text-base"
+                  variants={textChildVariants}
+                >
+                  {slide.preTitle}
+                </motion.span>
 
-                  <motion.h1
-                    // --- Title style (Kept) ---
-                    className="text-6xl lg:text-7xl font-extrabold text-white mb-6 leading-tight"
-                    variants={textChildVariants}
-                  >
-                    {slide.title}
-                  </motion.h1>
+                <motion.h1
+                  /* FIX 3: Made font size responsive.
+                    - text-4xl (36px) on mobile
+                    - md:text-6xl (60px) on tablet
+                    - lg:text-7xl (72px) on desktop
+                  */
+                  className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-white mb-6 leading-tight"
+                  variants={textChildVariants}
+                >
+                  {slide.title}
+                </motion.h1>
 
-                  <motion.p
-                    // --- UPDATED: Added font-bold ---
-                    className="text-base text-gray-300 font-bold mb-10 mx-auto max-w-xl"
-                    variants={textChildVariants}
-                  >
-                    {slide.description}
-                  </motion.p>
+                <motion.p
+                  className="text-base text-gray-300 font-bold mb-10 mx-auto max-w-xl"
+                  variants={textChildVariants}
+                >
+                  {slide.description}
+                </motion.p>
 
-                  {/* --- Button style (Kept) --- */}
-                  <motion.div variants={textChildVariants}>
-                    <Link
-                      href={slide.href}
-                      className="inline-flex items-center text-lg font-semibold py-3 px-8 border-2 border-white text-white rounded-md transition-all duration-300 hover:bg-white hover:text-blue-700 hover:shadow-[0_0_15px_5px_rgba(255,255,255,0.4)]"
-                    >
-                      Know more
-                      <ArrowRightIcon className="w-5 h-5 ml-2" />
-                    </Link>
-                  </motion.div>
-                </div>
+                <motion.div variants={textChildVariants}>
+                  <Link
+  href={slide.href}
+  className="inline-flex items-center text-lg font-semibold py-3 px-8 border-2 border-white text-white rounded-md transition-all duration-300 hover:bg-white hover:text-blue-700 hover:shadow-[0_0_15px_5px_rgba(255,255,255,0.4)] active:bg-gray-200 active:text-blue-800"
+>
+                    Know more
+                    <ArrowRightIcon className="w-5 h-5 ml-2" />
+                  </Link>
+                </motion.div>
               </motion.div>
 
             </div>
@@ -301,7 +309,7 @@ function DealsSection() {
       title3: 'ON THE LAPTOPS',
       image: '/deal.webp',
       alt: 'Laptops on sale with new design',
-      href: '/shop/laptops',
+      href: '/category/computers-and-laptops',
       bgColor: 'bg-blue-50'
     },
     {
@@ -311,7 +319,7 @@ function DealsSection() {
       title3: 'UP TO 10%',
       image: '/deal1.webp',
       alt: 'Printers and more',
-      href: '/shop/all-deals',
+      href: '/category/printers',
       bgColor: 'bg-indigo-50'
     },
     {
@@ -321,7 +329,7 @@ function DealsSection() {
       title3: 'PRODUCTS',
       image: '/deal3.webp',
       alt: 'Hottest networking products',
-      href: '/shop/networking',
+      href: '/category/switches',
       bgColor: 'bg-gray-100'
     }
   ];
@@ -355,7 +363,7 @@ function DealsSection() {
       whileInView="visible"
       viewport={{ once: true, amount: 0.3 }} // Triggers when 30% is in view
     >
-      <div className="container mx-auto px-24">
+      <div className="container mx-auto px-8 lg:px-24">
         {/* This grid container applies the stagger animation */}
         <motion.div
           className="grid grid-cols-1 md:grid-cols-3 gap-8"
@@ -425,14 +433,14 @@ const featuredProducts = addSlugsToProducts([
 // --- "Top Rated" products list ---
 // --- UPDATED: Added slug field to all products ---
 const topRatedProducts = addSlugsToProducts([
-  { id: 'tr1', brand: 'Ubiquiti Switches', title: 'Ubiquiti UniFi Switch Ultra 210W', image: '/ubiquiti/4.jpg', price: 160.00 },
-  { id: 'tr2', brand: 'Ubiquiti Switches', title: 'Ubiquiti UniFi Switch Pro Max 24', image: '/ubiquiti/5.jpg', price: 315.11 },
-  { id: 'tr3', brand: 'Ubiquiti Switches', title: 'Ubiquiti UniFi Switch USW-Enterprise-24-PoE', image: '/ubiquiti/6.jpg', price: 570.00 },
+  { id: 'switch-smart-managed-layer2-5-port', brand: 'Ubiquiti Switches', title: 'Switch smart managed Layer2 5 Port', image: '/ubiquiti/4.avif', price: 160.00 },
+  { id: 'ubiquiti-unifi-dream-machine-pro-managed-gigabit-udm-pro', brand: 'Ubiquiti Switches', title: 'Ubiquiti UniFi Dream Machine Pro Managed Gigabit (UDM-Pro)', image: '/ubiquiti/5.png', price: 315.11 },
+  { id: 'ubiquiti-edgerouter-6p-wired-router-gigabit-ethernet-er-6p', brand: 'Ubiquiti Switches', title: 'Ubiquiti EdgeRouter 6P wired router Gigabit Ethernet – ER-6P', image: '/ubiquiti/6.png', price: 570.00 },
   { id: 'tr4', brand: 'Access Point', title: 'Ubiquiti UniFi U6+', image: '/ubiquiti/7.jpg', price: 71.35 },
   { id: 'tr5', brand: 'Ubiquiti Access Point', title: 'Ubiquiti NanoBeam AC GEN2 NBE-5AC-GEN2', image: '/ubiquiti/8.jpg', price: 120.00 },
-  { id: 'tr6', brand: 'Lenovo Laptop', title: 'Lenovo 14″ Privacy Screen Filter ? Blue Light Reduction, Nano Technology, Heat & Humidity Resistant', image: '/computerandlaptops/lenovo/l2.png', price: 45.00 },
-  { id: 'tr7', brand: 'Lenovo Laptop', title: 'Lenovo 14″ Privacy Screen Filter (16:10) for X1 Yoga', image: '/computerandlaptops/lenovo/l3.png', price: 42.00 },
-  { id: 'tr8', brand: 'Lenovo Laptop', title: 'Lenovo Privacy Screen Filter – For 33.8 cm (13.3″) Widescreen LCD 2 in 1 Notebook – 16:10', image: '/computerandlaptops/lenovo/l7.png', price: 42.00 },
+  { id: 'tr6', brand: 'Lenovo Laptop', title: 'Lenovo 14″ Privacy Screen Filter ? Blue Light Reduction, Nano Technology, Heat & Humidity Resistant', image: '/computerandlaptops/lenovo2/3.jpg', price: 45.00 },
+  { id: 'tr7', brand: 'Lenovo Laptop', title: 'Lenovo 14″ Privacy Screen Filter (16:10) for X1 Yoga', image: '/computerandlaptops/lenovo2/4.jpg', price: 42.00 },
+  { id: 'tr8', brand: 'Lenovo Laptop', title: 'Lenovo Privacy Screen Filter – For 33.8 cm (13.3″) Widescreen LCD 2 in 1 Notebook – 16:10', image: '/computerandlaptops/lenovo2/13.jpg', price: 42.00 },
 ]);
 // --- End of Mock Data ---
 
@@ -453,61 +461,37 @@ const TabButton = ({ title, isActive, onClick }: { title: string, isActive: bool
 
 // Helper component for Product Cards
 function ProductCard({ product }: { product: any }) {
+  const { isInWishlist, toggleWishlist } = useWishlist(product.slug);
+  const { isInCompare, toggleCompare } = useCompare(product.slug);
+
   return (
     <motion.div
-      // --- 1. CHANGED: border-gray-700 to border-gray-200 and bg-[#00001E] to bg-white ---
       className="group relative border border-gray-200 bg-white rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg flex flex-col z-0"
-      whileHover={{
-        y: -8,
-        scale: 1.03,
-        zIndex: 40,
-        // Made transition faster
-        transition: { duration: 0.1, ease: "easeOut" }
-      }}
+      whileHover={{ y: -8, scale: 1.03, zIndex: 40, transition: { duration: 0.1, ease: "easeOut" } }}
     >
-      {/* --- CHANGE: Converted <a> to <Link> and used product.slug --- */}
       <Link href={`/product/${product.slug}`} className="block relative w-full h-36 bg-white p-4">
-        <Image
-          src={product.image}
-          alt={product.title}
-          layout="fill"
-          objectFit="contain"
-        />
+        <Image src={product.image} alt={product.title} layout="fill" objectFit="contain" />
       </Link>
-
-      {/* Restructured card content to match BestDealsSection */}
-      {/* --- 2. CHANGED: bg-[#00001E] to bg-white --- */}
       <div className="p-4 bg-white flex flex-col grow">
-        {/* --- 3. CHANGED: text-gray-400 to text-gray-500 --- */}
         <span className="block text-xs text-gray-500 mb-1">{product.brand}</span>
-        {/* --- CHANGE: Converted <a> to <Link> and used product.slug --- */}
         <Link href={`/product/${product.slug}`} className="flex-grow">
-          {/* --- 4. CHANGED: text-white to text-gray-900 and hover:text-blue-400 to hover:text-blue-600 --- */}
-          <h3 className="text-sm font-semibold text-gray-900 mb-3 h-10 line-clamp-2 group-hover:text-blue-600 transition-colors">
-            {product.title}
-          </h3>
+          <h3 className="text-sm font-semibold text-gray-900 mb-3 h-10 line-clamp-2 group-hover:text-blue-600 transition-colors">{product.title}</h3>
         </Link>
-
-        {/* NEW Action Area (replaces old text and button) */}
-        {/* --- 5. CHANGED: border-gray-700 to border-gray-200 --- */}
-        <div className="mt-auto pt-4 border-t border-gray-200"> {/* Border for separation */}
-          <a
-            href="#" // This should ideally be a quote link
-            className="block w-full text-center bg-blue-600 text-white font-semibold py-2.5 rounded-md text-sm transition-all duration-300 hover:bg-blue-700 hover:shadow-md"
-          >
-            Get a Quote
-          </a>
-          {/* --- 6. CHANGED: text-gray-400 to text-gray-600 and hover:text-blue-400 to hover:text-blue-600 --- */}
-          <button className="flex items-center gap-1.5 text-gray-600 hover:text-blue-600 transition-colors w-full justify-center mt-3">
-            <HeartIcon className="w-4 h-4" />
-            <span className="text-sm font-medium">Add to Wishlist</span>
-          </button>
+        <div className="mt-auto pt-4 border-t border-gray-200">
+          <a href="#" className="block w-full text-center bg-blue-600 text-white font-semibold py-2.5 rounded-md text-sm transition-all duration-300 hover:bg-blue-700 hover:shadow-md">Get a Quote</a>
+          <div className="flex justify-between items-center pt-3">
+            <button onClick={toggleWishlist} className={`flex items-center gap-1.5 text-sm transition-colors ${isInWishlist ? 'text-red-600 font-medium' : 'text-gray-500 hover:text-blue-600'}`}>
+              <HeartIcon className="w-4 h-4" fill={isInWishlist ? "currentColor" : "none"} /><span>{isInWishlist ? 'Saved' : 'Save'}</span>
+            </button>
+            <button onClick={toggleCompare} className={`flex items-center gap-1.5 text-sm transition-colors ${isInCompare ? 'text-blue-600 font-medium' : 'text-gray-500 hover:text-blue-600'}`}>
+              <CompareIcon className="w-4 h-4" /><span>{isInCompare ? 'Added' : 'Compare'}</span>
+            </button>
+          </div>
         </div>
       </div>
     </motion.div>
   );
 }
-
 
 // ---
 // --- !!! ATTENTION !!!
@@ -517,41 +501,65 @@ function ProductCard({ product }: { product: any }) {
 function FeaturedProductsSection() {
   const [activeTab, setActiveTab] = useState('featured');
 
-  // Determine which products to display based on the active tab
+  // --- MOBILE DETECTION STATE ---
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile(); // Check immediately
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Determine which products to display
   let displayedProducts;
   if (activeTab === 'featured') {
     displayedProducts = featuredProducts;
   } else if (activeTab === 'top-rated') {
     displayedProducts = topRatedProducts;
   } else {
-    // Fallback in case activeTab is somehow invalid
     displayedProducts = featuredProducts;
   }
 
-  // --- Animation Variants for the Section ---
+  // --- ANIMATION VARIANTS ---
+  // --- 1. MODIFIED: Changed y: 50 to x: -100 and y: 0 to x: 0 ---
   const sectionSlideInVariants = {
-    hidden: { opacity: 0, x: -300 }, // Start further off-screen to the left
+    hidden: { opacity: 0, x: -100 }, // Slide from left
     visible: {
       opacity: 1,
-      x: 0,
-      transition: { duration: 1.2, ease: "easeOut" } // Increased duration
+      x: 0, // Slide to original position
+      transition: { duration: 1.2, ease: "easeOut" }
     }
   };
-  // --- End Animation Variants ---
+
+  // --- FIX FOR MOBILE VISIBILITY ---
+  // On Mobile: We force 'initial="visible"' so it renders with opacity: 1 immediately.
+  // On Desktop: We use 'initial="hidden"' and wait for 'whileInView'.
+  const motionProps = isMobile
+    ? {
+      initial: "visible",   // <--- Force visible immediately
+      animate: "visible",   // <--- Ensure it stays visible
+      variants: sectionSlideInVariants
+    }
+    : {
+      initial: "hidden",
+      whileInView: "visible",
+      // --- 2. MODIFIED: Changed once: true to once: false ---
+      viewport: { once: false, amount: 0.2 }, // Animate every time
+      variants: sectionSlideInVariants
+    };
 
   return (
     <motion.section
-      className="pt-16 pb-16 bg-white overflow-hidden" // Added pb-16 for bottom padding
-      variants={sectionSlideInVariants}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: false, amount: 0.2 }} // Triggers animation every time
+      className="pt-16 pb-16 bg-white overflow-hidden"
+      // Spread the conditional props here
+      {...motionProps}
     >
       <div className="container mx-auto px-8">
         {/* Tab Navigation */}
-        <nav
-          className="flex justify-center gap-8 mb-10"
-        >
+        <nav className="flex justify-center gap-8 mb-10">
           <TabButton
             title="Featured"
             isActive={activeTab === 'featured'}
@@ -565,33 +573,30 @@ function FeaturedProductsSection() {
         </nav>
 
         {/* Main Content Grid */}
-        <div
-          className="grid grid-cols-1 lg:grid-cols-5 gap-6"
-        >
-          {/* --- UPDATED: This is the square image box --- */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+
+          {/* --- Special Offer Box (Square on all devices) --- */}
           <Link
             href={`/product/${specialOffer.slug}`}
-            // This class makes it a square on large screens
             className="group lg:col-span-1 border border-blue-500 rounded-lg shadow-sm
-                       relative w-full h-64 lg:h-auto lg:aspect-square overflow-hidden"
+                       relative w-full aspect-square overflow-hidden"
           >
             <Image
-              src={specialOffer.image} // This line adds your image
+              src={specialOffer.image}
               alt={specialOffer.title}
               layout="fill"
-              objectFit="cover" // This makes it fill the box
+              objectFit="cover"
               className="transition-transform duration-300 group-hover:scale-105"
             />
           </Link>
-          {/* --- END OF IMAGE BOX --- */}
-
 
           {/* Products Grid (Right) */}
           <AnimatePresence mode="wait">
             <motion.div
-              key={activeTab} // This forces re-animation on tab change
+              key={activeTab}
               className="lg:col-span-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6"
-              initial={{ opacity: 0 }} // Simple fade in
+              // Keep internal animation simple
+              initial={{ opacity: 0 }}
               animate={{ opacity: 1, transition: { duration: 0.5 } }}
               exit={{ opacity: 0, transition: { duration: 0.3 } }}
             >
@@ -623,9 +628,8 @@ function EverythingBannerSection() {
   };
 
   return (
-    <section className="relative w-full h-[250px] text-white overflow-hidden bg-black"> {/* --- UPDATED: Decreased height to h-[250px] --- */}
+    <section className="relative w-full h-[250px] text-white overflow-hidden bg-black">
       {/* --- Video Background --- */}
-      {/* NOTE: You must add a video to /public/videos/everything-banner.mp4 or update the path */}
       <video
         autoPlay
         loop
@@ -643,24 +647,30 @@ function EverythingBannerSection() {
       {/* --- Grid Overlay --- */}
       <div style={gridStyle}></div>
 
-      {/* --- Content (Re-added with right alignment) --- */}
-      <div className="relative z-20 container mx-auto px-8 h-full flex justify-end items-center">
+      {/* --- Content --- */}
+      {/* FIX: Removed 'container mx-auto' so it can go full width. Added flex centering. */}
+      <div className="relative z-20 w-full h-full flex justify-center items-center px-4">
         <motion.div
-          className="max-w-2xl text-right" // --- UPDATED: max-w-4xl to max-w-2xl ---
+          // FIX:
+          // 1. Changed 'max-w-2xl' to 'max-w-[90%] xl:max-w-[80%]' to act like full width.
+          // 2. This gives the text room to spread out into 3 lines on desktop.
+          className="w-full max-w-[95%] xl:max-w-[85%] text-center"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.5 }}
           variants={{
-            hidden: { opacity: 0, x: 50 }, // Animate from the right
+            hidden: { opacity: 0, y: 20 },
             visible: {
               opacity: 1,
-              x: 0,
-              transition: { duration: 0.9, ease: "easeOut" } // Slightly longer duration
+              y: 0,
+              transition: { duration: 0.9, ease: "easeOut" }
             }
           }}
         >
-          <p className="text-xl md:text-2xl font-semibold text-gray-100 leading-snug"> {/* --- UPDATED: text-3xl md:text-4xl to text-xl md:text-2xl --- */}
-            Starlite Linker empowers businesses by simplifying IT procurement with a wide range of cost-effective hardware, complemented by expert consultation and 24/7 support to craft tailored, complete technology solutions. They act as a trusted partner, guiding companies from product selection to comprehensive implementation.          </p>
+          {/* FIX: Adjusted font sizes for better balance on wide screens */}
+          <p className="text-sm sm:text-lg md:text-xl lg:text-2xl font-semibold text-gray-100 leading-relaxed">
+            Starlight Linkers LLC  empowers businesses by simplifying IT procurement with a wide range of cost-effective hardware, complemented by expert consultation and 24/7 support to craft tailored, complete technology solutions. They act as a trusted partner, guiding companies from product selection to comprehensive implementation.
+          </p>
         </motion.div>
       </div>
     </section>
@@ -728,7 +738,7 @@ const bestDealsProducts = addSlugsToProducts([
   {
     id: 'bd10',
     brand: 'Brother',
-    title: 'Brother RJ-4250WB Rugged Mobile Label & Receipt Printer – RJ4250WBZ1',
+    title: 'Brother ADS-2400N Desktop Document Scanner',
     image: '/brother/3.jpg',
   },
 ]);
@@ -743,19 +753,56 @@ const bestDealsCategories = [
   { id: 'server', title: 'Server' },
   { id: 'remote-maintenance-module', title: 'Remote Maintenance Module' },
 ];
+// --- CARD 2: BEST DEALS ITEM (Updated) ---
+// --- CARD 2: BEST DEALS ITEM (Updated) ---
+const BestDealItem = ({ product }: { product: any }) => {
+  const { isInWishlist, toggleWishlist } = useWishlist(product.slug);
+  const { isInCompare, toggleCompare } = useCompare(product.slug); // 1. Add Compare hook
+
+  return (
+    <div className="group bg-white rounded-lg border border-gray-200 hover:border-blue-600 transition-all duration-300 overflow-hidden flex flex-col shadow-sm hover:shadow-xl">
+      <Link href={`/product/${product.slug}`} className="block relative w-full h-32 bg-white p-4 overflow-hidden">
+        <Image src={product.image} alt={product.title} layout="fill" objectFit="contain" className="group-hover:scale-105 transition-transform duration-300 ease-in-out" />
+      </Link>
+      <div className="p-4 flex flex-col flex-grow bg-white">
+        <span className="block text-xs font-medium text-gray-500 mb-1">{product.brand}</span>
+        <Link href={`/product/${product.slug}`} className="flex-grow">
+          <h3 className="text-sm font-semibold text-gray-900 mb-3 h-10 line-clamp-2 group-hover:text-blue-600 transition-colors">{product.title}</h3>
+        </Link>
+        <div className="mt-auto pt-4 border-t border-gray-200">
+          <a href="#" className="block w-full text-center bg-blue-600 text-white font-semibold py-2.5 rounded-md text-sm transition-all duration-300 hover:bg-blue-700 hover:shadow-md">Get a Quote</a>
+          
+          {/* 2. Add the buttons in a flex container */}
+          <div className="flex justify-between items-center pt-3">
+            <button 
+              onClick={toggleWishlist} 
+              className={`flex items-center gap-1 text-sm font-medium ${isInWishlist ? 'text-red-600' : 'text-gray-600 hover:text-blue-600'}`}
+            >
+              <HeartIcon className="w-4 h-4" fill={isInWishlist ? "currentColor" : "none"} /> {isInWishlist ? 'Saved' : 'Save'}
+            </button>
+            <button 
+              onClick={toggleCompare} 
+              className={`flex items-center gap-1 text-sm font-medium ${isInCompare ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600'}`}
+            >
+              <CompareIcon className="w-4 h-4" /> {isInCompare ? 'Added' : 'Compare'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 function BestDealsSection() {
   const [activeCategory, setActiveCategory] = useState('all');
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => { const checkMobile = () => { setIsMobile(window.innerWidth < 768); }; checkMobile(); window.addEventListener('resize', checkMobile); return () => window.removeEventListener('resize', checkMobile); }, []);
 
   // --- START: MODIFIED FILTER LOGIC ---
-  // Get all matching products first
-  const allFilteredProducts = (() => {
-    // "Best Deals" tab uses the curated 'bestDealsProducts' list
+  const allFilteredProducts = useMemo(() => {
     if (activeCategory === 'all') {
       return bestDealsProducts;
     }
-
-    // All other tabs filter from the master 'allProducts' list
     const allProductsFormatted = allProducts.map(p => ({
       id: p.id,
       slug: p.slug,
@@ -763,136 +810,92 @@ function BestDealsSection() {
       title: p.name,
       brand: p.category,
     }));
-
     if (activeCategory === 'lenovo-laptop') {
-      // Special filter for Lenovo Laptops
       return allProductsFormatted.filter(product => {
         const searchableText = (product.brand.toLowerCase() + ' ' + product.title.toLowerCase());
-        return searchableText.includes('lenovo') && 
-               (searchableText.includes('laptop') || searchableText.includes('thinkpad'));
+        return searchableText.includes('lenovo') &&
+          (searchableText.includes('laptop') || searchableText.includes('laptops'));
       });
     }
-
-    // Basic filtering for other categories
-    const searchTerm = activeCategory.replace('-', ' ');
+    const searchTerms = activeCategory.split('-');
     return allProductsFormatted.filter(product => {
-      const searchableText = (product.title.toLowerCase() + ' ' + product.brand.toLowerCase());
-      return searchableText.includes(searchTerm);
+      const searchableText = (product.title.toLowerCase() + ' ' + product.brand.toLowerCase())
+        .replace(/&/g, '');
+      return searchTerms.every(term => searchableText.includes(term));
     });
-    
-  })();
+  }, [activeCategory]); // Rerun logic when activeCategory changes
 
-  // Now, limit the products if we are on the Lenovo tab
-  const productsToShow = activeCategory === 'lenovo-laptop'
-    ? allFilteredProducts.slice(0, 5)
-    : allFilteredProducts;
-  // --- END: MODIFIED FILTER LOGIC ---
+  const productsToShow = activeCategory === 'all'
+    ? allFilteredProducts
+    : allFilteredProducts.slice(0, 5);
 
-  // Variant for the entire section "stomp"
   const sectionStompVariant = {
     hidden: { opacity: 0, scale: 0.95 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      transition: {
-        duration: 0.4,
-        ease: "easeOut"
-      }
-    }
+    visible: { opacity: 1, scale: 1, transition: { duration: 0.4, ease: "easeOut" } }
   };
+
+  const currentCategory = bestDealsCategories.find(c => c.id === activeCategory);
+  const showViewAllButton =
+    currentCategory &&
+    activeCategory !== 'all' &&
+    allFilteredProducts.length > 5;
+
+  const motionProps = isMobile
+    ? { initial: "visible", animate: "visible", variants: sectionStompVariant }
+    : { variants: sectionStompVariant, initial: "hidden", whileInView: "visible", viewport: { once: true, amount: 0.2 } };
 
   return (
     <motion.section
       className="py-16 bg-white"
-      key={activeCategory}
-      variants={sectionStompVariant}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: false, amount: 0.2 }}
+      {...motionProps}
     >
-      <div className="container mx-auto px-24"> {/* Increased horizontal padding */}
-        {/* Category Tabs (styled for white background) */}
+      <div className="container mx-auto px-8 lg:px-24">
+        {/* Category Tabs */}
         <div className="flex justify-center flex-wrap gap-x-6 gap-y-2 mb-8">
           {bestDealsCategories.map((category) => (
-            <button
+            <motion.button
               key={category.id}
               onClick={() => setActiveCategory(category.id)}
-              className={`pb-2 text-sm font-medium transition-colors duration-300
+              className={`relative pb-2 text-sm font-medium transition-colors duration-300
                 ${activeCategory === category.id
-                  ? 'text-blue-600 border-b-2 border-blue-600' // Active tab color
-                  : 'text-gray-700 hover:text-blue-600' // Inactive tab color
+                  ? 'text-blue-600'
+                  : 'text-gray-700 hover:text-blue-600'
                 }`}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
               {category.title}
-            </button>
-          ))}
-        </div>
-
-        <div
-          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6"
-        >
-         {productsToShow.map((product) => (
-            // --- 1. CHANGED: bg-[#00001E] to bg-white, border-gray-700 to border-gray-200, hover:border-blue-700 to hover:border-blue-600 ---
-            <div
-              key={product.id}
-              className="group bg-white rounded-lg border border-gray-200 hover:border-blue-600 transition-all duration-300 overflow-hidden flex flex-col shadow-sm hover:shadow-xl"
-            >
-              
-              {/* --- CHANGE: Converted <a> to <Link> and used product.slug --- */}
-              <Link href={`/product/${product.slug}`} className="block relative w-full h-32 bg-white p-4 overflow-hidden">
-                <Image
-                  src={product.image}
-                  alt={product.title}
-                  layout="fill"
-                  objectFit="contain"
-                  className="group-hover:scale-105 transition-transform duration-300 ease-in-out"
+              {activeCategory === category.id && (
+                <motion.div
+                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"
+                  layoutId="best-deals-underline"
+                  transition={{ type: 'spring', stiffness: 300, damping: 25 }}
                 />
-              </Link>
-
-              {/* --- 2. CHANGED: bg-[#00001E] to bg-white --- */}
-              <div className="p-4 flex flex-col flex-grow bg-white"> {/* Content background is WHITE */}
-                {/* --- 3. CHANGED: text-blue-400 to text-gray-500 --- */}
-                <span className="block text-xs font-medium text-gray-500 mb-1">{product.brand}</span>
-                {/* --- CHANGE: Converted <a> to <Link> and used product.slug --- */}
-                <Link href={`/product/${product.slug}`} className="flex-grow">
-                  {/* --- 4. CHANGED: text-white to text-gray-900, hover:text-blue-400 to hover:text-blue-600 --- */}
-                  <h3 className="text-sm font-semibold text-gray-900 mb-3 h-10 line-clamp-2 group-hover:text-blue-600 transition-colors">
-                    {product.title}
-                  </h3>
-                </Link>
-
-                {/* --- NEW Action Area --- */}
-                {/* --- 5. CHANGED: border-gray-700 to border-gray-200 --- */}
-                <div className="mt-auto pt-4 border-t border-gray-200"> {/* Border is LIGHT */}
-                  <a
-                    href="#" // This should ideally be a quote link
-                    className="block w-full text-center bg-blue-600 text-white font-semibold py-2.5 rounded-md text-sm transition-all duration-300 hover:bg-blue-700 hover:shadow-md"
-                  >
-                    Get a Quote
-                  </a>
-                  {/* --- 6. CHANGED: text-gray-400 to text-gray-600, hover:text-blue-400 to hover:text-blue-600 --- */}
-                  <button className="flex items-center gap-1.5 text-gray-600 hover:text-blue-600 transition-colors w-full justify-center mt-3">
-                    <HeartIcon className="w-4 h-4" />
-                    <span className="text-sm font-medium">Add to Wishlist</span>
-                  </button>
-                </div>
-              </div>
-            </div>
+              )}
+            </motion.button>
           ))}
         </div>
-        {/* --- START: PASTE THE NEW "VIEW ALL" BUTTON CODE HERE --- */}
-        {activeCategory === 'lenovo-laptop' && allFilteredProducts.length > 5 && (
+
+        {/* Product Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+          {productsToShow.map((product) => (
+            // This now uses the correct component
+            <BestDealItem key={product.id} product={product} />
+          ))}
+        </div>
+
+        {/* Dynamic "View All" Button */}
+        {showViewAllButton && (
           <div className="flex justify-center mt-10">
             <Link
-              href="/category/lenovo-laptop"
-              className="inline-flex items-center text-lg font-semibold py-3 px-8 border-2 border-blue-600 text-blue-600 rounded-md transition-all duration-300 hover:bg-blue-600 hover:text-white hover:shadow-lg group"
+              href={`/category/${currentCategory.id}`}
+              className="inline-flex items-center text-lg font-semibold py-3 px-8 bg-blue-600 text-white rounded-md transition-all duration-300 hover:bg-blue-700 hover:shadow-blue-glow group"
             >
-              View All Lenovo Laptops
+              View All {currentCategory.title}
               <ArrowRightIcon className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
         )}
-        {/* --- END: NEW "VIEW ALL" BUTTON --- */}
       </div>
     </motion.section>
   );
@@ -934,45 +937,24 @@ const allBestSellers = addSlugsToProducts([
 
 // --- START: BEST SELLER PRODUCT CARD (White Card) ---
 function BestSellerProductCard({ product }: { product: any }) {
-
-  const cardClasses = `
-    relative isolate border border-gray-200 rounded-lg overflow-hidden bg-white 
-    transition-all duration-300 ease-in-out shadow-md
-  `;
+  const { isInWishlist, toggleWishlist } = useWishlist(product.slug);
+  const { isInCompare, toggleCompare } = useCompare(product.slug);
 
   return (
-    <div className={cardClasses}>
-      {/* --- CHANGE: Converted <a> to <Link> and used product.slug --- */}
+    <div className="relative isolate border border-gray-200 rounded-lg overflow-hidden bg-white transition-all duration-300 ease-in-out shadow-md">
       <Link href={`/product/${product.slug}`} className="block relative w-full h-52 bg-white p-4">
-        <Image
-          src={product.image}
-          alt={`${product.title} [SEO Friendly]`}
-          layout="fill"
-          objectFit="contain"
-          className="transition-transform duration-300 group-hover:scale-105"
-        />
+        <Image src={product.image} alt={product.title} layout="fill" objectFit="contain" className="transition-transform duration-300 group-hover:scale-105" />
       </Link>
-      {/* Content container changed to 'bg-white' */}
       <div className="p-3 bg-white">
         <span className="block text-xs text-gray-500 mb-1">{product.brand}</span>
-        {/* --- CHANGE: Converted <a> to <Link> and used product.slug --- */}
-        <Link href={`/product/${product.slug}`}>
-          <h3 className="text-sm font-semibold text-gray-900 mb-2 h-10 line-clamp-2 transition-colors group-hover:text-blue-600">
-            {product.title}
-          </h3>
-        </Link>
-
-        <a
-          href="#" // This should ideally be a quote link
-          className="block w-full text-center bg-blue-600 text-white font-semibold py-2.5 rounded-md text-sm transition-all duration-300 hover:bg-blue-700 hover:shadow-md mt-2"
-        >
-          Get a Quote
-        </a>
-
-        <div className="flex justify-center items-center mt-3">
-          <button className="flex items-center gap-1.5 text-gray-600 hover:text-blue-600 transition-colors">
-            <HeartIcon className="w-4 h-4" />
-            <span className="text-sm font-medium">Add to Wishlist</span>
+        <Link href={`/product/${product.slug}`}><h3 className="text-sm font-semibold text-gray-900 mb-2 h-10 line-clamp-2 transition-colors group-hover:text-blue-600">{product.title}</h3></Link>
+        <a href="#" className="block w-full text-center bg-blue-600 text-white font-semibold py-2.5 rounded-md text-sm transition-all duration-300 hover:bg-blue-700 hover:shadow-md mt-2">Get a Quote</a>
+        <div className="flex justify-between items-center mt-3 px-1">
+          <button onClick={toggleWishlist} className={`flex items-center gap-1.5 text-sm font-medium ${isInWishlist ? 'text-red-600' : 'text-gray-600 hover:text-blue-600'}`}>
+            <HeartIcon className="w-4 h-4" fill={isInWishlist ? "currentColor" : "none"} /> {isInWishlist ? 'Saved' : 'Save'}
+          </button>
+          <button onClick={toggleCompare} className={`flex items-center gap-1.5 text-sm font-medium ${isInCompare ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600'}`}>
+            <CompareIcon className="w-4 h-4" /> {isInCompare ? 'Added' : 'Compare'}
           </button>
         </div>
       </div>
@@ -985,81 +967,217 @@ function BestSellerProductCard({ product }: { product: any }) {
 const carouselVariants = {
   initial: (direction: number) => ({
     x: direction === 0 ? 0 : (direction > 0 ? '100%' : '-100%'),
-    opacity: 0,
+    // opacity: 0, // <-- REMOVED
     transition: { type: "tween", ease: "easeInOut", duration: 0.7 }
   }),
   animate: {
     x: 0,
-    opacity: 1,
+    // opacity: 1, // <-- REMOVED
     zIndex: 1,
     transition: { type: "tween", ease: "easeInOut", duration: 0.7 } // Smooth
   },
   exit: (direction: number) => ({
     x: direction > 0 ? '-100%' : '100%',
-    opacity: 0,
+    // opacity: 0, // <-- REMOVED
     zIndex: 0,
     transition: { type: "tween", ease: "easeInOut", duration: 0.7 } // Smooth
   })
 };
-
 // --- START: NEW BEST SELLERS SECTION ---
+// --- THIS ENTIRE FUNCTION IS REPLACED ---
 function BestSellersSection() {
   const [activeTab, setActiveTab] = useState('best-sellers');
-
   const [[page, direction], setPage] = useState([0, 0]);
+  const [isHovered, setIsHovered] = useState(false);
 
-  let activeProductList = allBestSellers;
-  if (activeTab !== 'best-sellers') {
-    const filtered = allBestSellers.filter(p =>
-      p.brand.toLowerCase().includes(activeTab.replace('-', ' ')) ||
-      p.title.toLowerCase().includes(activeTab.replace('-', ' '))
-    );
-    activeProductList = filtered.length > 0 ? filtered : allBestSellers;
-  }
-
-  const numPages = activeProductList.length;
-  const centerIndex = page; 
-
-  const paginate = (newDirection: number) => {
-    let newIndex = page + newDirection;
-    if (newIndex < 0) {
-      newIndex = numPages - 1; // Loop to last
-    } else if (newIndex >= numPages) {
-      newIndex = 0; // Loop to first
-    }
-    setPage([newIndex, newDirection]);
+  // --- FIX: Define a type for the formatted product ---
+  type FormattedProduct = {
+    id: string;
+    slug: string;
+    image: string;
+    title: string;
+    brand: string;
+    price: number | string;
   };
 
-  // Auto-scroll removed
+  // --- Mobile Detection ---
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768); // 768px is 'md' breakpoint
+    };
+    checkMobile(); // Check on mount
+    window.addEventListener('resize', checkMobile); // Check on resize
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  // --- END: Mobile Detection ---
+
+  // --- START: MODIFIED FILTER LOGIC (Optimized) ---
+  // --- FIX: Add useMemo and add types ---
+  const allProductsFormatted: FormattedProduct[] = useMemo(() => {
+    return allProducts.map((p: Product) => ({ // <-- Added Product type
+      id: p.id,
+      slug: p.slug,
+      image: p.image,
+      title: p.name,
+      brand: p.category, // brand field now holds the category string
+      price: p.price,
+    }));
+  }, [allProducts]); // FIX: Dependency array was empty, now correctly depends on allProducts
+
+  // FIX: Wrapped all filtering logic in useMemo for performance
+  const activeProductList = useMemo(() => {
+    // 2. Handle which list to show based on the active tab
+    if (activeTab === 'best-sellers') {
+      // This tab uses the curated list
+      return allBestSellers;
+    }
+
+    if (activeTab === 'workstations') {
+      return allProductsFormatted.filter((product: FormattedProduct) => {
+        const brandText = product.brand.toLowerCase();
+        return brandText.includes('workstation');
+      });
+    }
+
+    if (activeTab === 'ups') {
+      return allProductsFormatted.filter((product: FormattedProduct) => {
+        const brandText = product.brand.toLowerCase();
+        return brandText.includes('ups');
+      });
+    }
+
+    if (activeTab === 'ubiquiti-switches') {
+      // --- THIS IS THE FIX ---
+      // We check the category for "ubiquiti" AND the title for "switch"
+      return allProductsFormatted.filter((product: FormattedProduct) => {
+        const brandText = product.brand.toLowerCase();
+        const titleText = product.title.toLowerCase();
+
+        const isUbiquiti = brandText.includes('ubiquiti');
+        const isSwitch = brandText.includes('switch') || titleText.includes('switch');
+
+        return isUbiquiti && isSwitch;
+      });
+      // --- END OF FIX ---
+    }
+
+    // Fallback to best-sellers
+    return allBestSellers;
+  }, [activeTab, allProductsFormatted, allBestSellers]); // Dependencies
+  // --- END: MODIFIED FILTER LOGIC ---
+
+  const numPages = activeProductList.length;
+  const centerIndex = page;
+
+  const paginate = useCallback((newDirection: number) => {
+    setPage(prev => {
+      // --- FIX: Check for numPages being 0 ---
+      if (numPages === 0) return [0, newDirection];
+      const [currentPage, _] = prev;
+      let newIndex = currentPage + newDirection;
+      if (newIndex < 0) {
+        newIndex = numPages - 1; // Loop to last
+      } else if (newIndex >= numPages) {
+        newIndex = 0; // Loop to first
+      }
+      return [newIndex, newDirection];
+    });
+  }, [numPages]);
+
+  // --- Auto-scroll ---
+  useEffect(() => {
+    if (isHovered || numPages <= 1) return; // Don't auto-scroll if hovered or only one page
+    const timer = setInterval(() => {
+      paginate(1);
+    }, 2000);
+    return () => clearInterval(timer);
+  }, [isHovered, paginate, numPages]); // Added numPages dependency
+  // --- END: Auto-scroll ---
+
+  const sectionFadeInUp = {
+    hidden: { opacity: 0, y: 50 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.7, ease: "easeOut" }
+    }
+  };
+
+  // --- FIX: Reset pagination if numPages changes (e.g., on tab switch) ---
+  useEffect(() => {
+    setPage([0, 0]);
+  }, [activeTab]);
 
   if (numPages === 0) {
     return (
-      // --- 1. CHANGED: Background to white and text to dark ---
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-24 text-center text-gray-700">
-          No products found for this category.
+      <motion.section
+        className="py-16 bg-white"
+        variants={sectionFadeInUp}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+      >
+        <div className="container mx-auto px-4 sm:px-8 lg:px-24">
+          {/* Category Tabs (still show them) */}
+          <div className="flex justify-center flex-wrap gap-x-6 gap-y-2 mb-10">
+            {bestSellersTabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => {
+                  setActiveTab(tab.id);
+                  // setPage([0, 0]); // Not needed here, handled by useEffect
+                }}
+                className={`py-2 px-5 rounded-md text-lg font-semibold transition-colors duration-300
+                  ${activeTab === tab.id
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+              >
+                {tab.title}
+              </button>
+            ))}
+          </div>
+          <div className="text-center text-gray-700 py-10" style={{ minHeight: '420px' }}>
+            No products found for this category.
+          </div>
         </div>
-      </section>
+      </motion.section>
     );
   }
 
-  let displayProducts: (typeof allBestSellers[0] | null)[] = [];
-  if (numPages === 1) {
-    displayProducts = [null, activeProductList[0], null];
+  // --- Conditional Product Display Logic ---
+  let productsToRender: (FormattedProduct | typeof allBestSellers[0] | null)[] = [];
+
+  if (isMobile) {
+    if (numPages > 0) {
+      productsToRender = [activeProductList[centerIndex]];
+    }
   } else {
-    const leftIndex = (centerIndex - 1 + numPages) % numPages;
-    const rightIndex = (centerIndex + 1) % numPages;
-    displayProducts = [
-      activeProductList[leftIndex],
-      activeProductList[centerIndex],
-      activeProductList[rightIndex]
-    ];
+    if (numPages === 1) {
+      productsToRender = [null, activeProductList[0], null];
+    } else if (numPages === 2) {
+      // --- FIX: Handle case with only 2 products ---
+      if (centerIndex === 0) {
+        productsToRender = [null, activeProductList[0], activeProductList[1]];
+      } else { // centerIndex is 1
+        productsToRender = [activeProductList[0], activeProductList[1], null];
+      }
+    } else { // 3 or more products
+      const leftIndex = (centerIndex - 1 + numPages) % numPages;
+      const rightIndex = (centerIndex + 1 + numPages) % numPages;
+      productsToRender = [
+        activeProductList[leftIndex],
+        activeProductList[centerIndex],
+        activeProductList[rightIndex]
+      ];
+    }
   }
+  // --- END: Conditional Logic ---
 
   return (
-    // --- 2. CHANGED: Background to white ---
     <section className="py-16 bg-white">
-      <div className="container mx-auto px-24">
+      <div className="container mx-auto px-4 sm:px-8 lg:px-24">
         {/* Category Tabs */}
         <div className="flex justify-center flex-wrap gap-x-6 gap-y-2 mb-10">
           {bestSellersTabs.map((tab) => (
@@ -1067,9 +1185,8 @@ function BestSellersSection() {
               key={tab.id}
               onClick={() => {
                 setActiveTab(tab.id);
-                setPage([0, 0]); // Reset slider on tab change
+                // setPage([0, 0]); // Removed, handled by useEffect
               }}
-              // --- 3. CHANGED: Inactive tab styles for white background ---
               className={`py-2 px-5 rounded-md text-lg font-semibold transition-colors duration-300
                 ${activeTab === tab.id
                   ? 'bg-blue-600 text-white'
@@ -1081,46 +1198,58 @@ function BestSellersSection() {
           ))}
         </div>
 
-        <div className="relative">
-          <div className="relative overflow-hidden">
-            <AnimatePresence custom={direction} mode="wait">
+        <div
+          className="relative"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
+          <div className="relative overflow-hidden" style={{ minHeight: '420px' }}>
+            <AnimatePresence initial={false} custom={direction}>
               <motion.div
-                key={page} 
+                key={page}
                 custom={direction}
-                variants={carouselVariants} 
+                variants={carouselVariants}
                 initial="initial"
                 animate="animate"
                 exit="exit"
-                className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6"
+                className={isMobile
+                  ? "absolute w-full flex justify-center"
+                  : "absolute w-full grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6"
+                }
               >
-                {displayProducts.map((product: any, index: number) => (
+                {productsToRender.map((product: any, index: number) => (
                   product ? (
-                    <BestSellerProductCard
-                      key={product.id + '-' + centerIndex} 
-                      product={product}
-                    />
+                    <div
+                      key={product.id + '-' + centerIndex}
+                      // --- FIX: Changed max-w-xs (320px) to max-w-[16rem] (256px) ---
+                      // This makes the card narrower.
+                      className={isMobile ? "w-full max-w-[16rem]" : ""}
+                    >
+                      <BestSellerProductCard
+                        product={product}
+                      />
+                    </div>
                   ) : (
-                    <div key={index} /> // Empty placeholder
+                    <div key={index} />
                   )
                 ))}
               </motion.div>
             </AnimatePresence>
           </div>
 
-          {/* Carousel Buttons */}
+          {/* Buttons (No changes needed, they will now sit in the empty space) */}
           {numPages > 1 && (
             <>
-              {/* --- 4. CHANGED: Arrow button styles for white background --- */}
               <button
                 onClick={() => paginate(-1)}
-                className="absolute top-1/2 left-[-3rem] -translate-y-1/2 z-30 bg-gray-100 hover:bg-blue-600 text-gray-900 hover:text-white p-2 rounded-full shadow-lg transition-all"
+                className="absolute top-1/2 left-0 md:left-[-3rem] -translate-y-1/2 z-30 bg-gray-100 hover:bg-blue-600 text-gray-900 hover:text-white p-2 rounded-full shadow-lg transition-all"
                 aria-label="Previous slide"
               >
                 <ChevronLeftIcon className="w-6 h-6" />
               </button>
               <button
                 onClick={() => paginate(1)}
-                className="absolute top-1/2 right-[-3rem] -translate-y-1/2 z-30 bg-gray-100 hover:bg-blue-600 text-gray-900 hover:text-white p-2 rounded-full shadow-lg transition-all"
+                className="absolute top-1/2 right-0 md:right-[-3rem] -translate-y-1/2 z-30 bg-gray-100 hover:bg-blue-600 text-gray-900 hover:text-white p-2 rounded-full shadow-lg transition-all"
                 aria-label="Next slide"
               >
                 <ChevronRightIcon className="w-6 h-6" />
@@ -1139,11 +1268,11 @@ function BigDealsBannerSection() {
 
   return (
     <section className="py-12 bg-gray-50">
-      <div className="container mx-auto px-24">
+      <div className="container mx-auto px-8 lg:px-24">
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <a 
-            href="/shop" 
-            className="block relative w-full" 
+          <a
+            href="/shop"
+            className="block relative w-full"
             style={{ paddingBottom: '15%' }} // <-- CHANGED from '20%' to '15%' for a shorter banner
           >
             <Image
@@ -1152,7 +1281,7 @@ function BigDealsBannerSection() {
               layout="fill"
               objectFit="cover" // Use 'cover' to fill the space
               className="w-full h-full"
-              priority 
+              priority
             />
           </a>
         </div>
@@ -1167,82 +1296,60 @@ function BigDealsBannerSection() {
 // --- UPDATED: Added slug field to all products ---
 const recentlyAddedProducts = addSlugsToProducts([
   // Page 1
-  { id: 'ra1', brand: 'Ubiquiti Switches', title: 'Ubiquiti UniFi Switch Ultra 210W', price: '£160.00', image: '/ubiquiti/12.jpg' },
-  { id: 'ra2', brand: 'Ubiquiti Switches', title: 'Ubiquiti UniFi Switch Pro Max 24', price: '£315.11', image: '/ubiquiti/13.jpg' },
-  { id: 'ra3', brand: 'Ubiquiti Switches', title: 'Ubiquiti UniFi Switch USW-Enterprise-24-PoE', price: '£570.00', image: '/ubiquiti/14.jpg' },
+  { id: 'switch-smart-managed-layer2-5-port', brand: 'Ubiquiti Switches', title: 'Switch smart managed Layer2 5 Port', price: '£160.00', image: '/ubiquiti/4.avif' },
+  { id: 'ubiquiti-unifi-dream-machine-pro-managed-gigabit-udm-pro', brand: 'Ubiquiti Switches', title: 'Ubiquiti UniFi Dream Machine Pro Managed Gigabit (UDM-Pro)', price: '£315.11', image: '/ubiquiti/5.png' },
+  { id: 'ubiquiti-edgerouter-6p-wired-router-gigabit-ethernet-er-6p', brand: 'Ubiquiti Switches', title: 'Ubiquiti EdgeRouter 6P wired router Gigabit Ethernet – ER-6P', price: '£570.00', image: '/ubiquiti/6.png' },
   { id: 'ra4', brand: 'Access Point', title: 'Ubiquiti UniFi U6+', price: '£71.35', image: '/ubiquiti/7.jpg' },
   // Page 2
   { id: 'ra5', brand: 'Ubiquiti Access Point', title: 'Ubiquiti NanoBeam AC GEN2 NBE-5AC-GEN2', price: '£65.21', image: '/ubiquiti/15.jpg' },
-  { id: 'ra6', brand: 'Lenovo Laptop', title: 'Lenovo 14″ Privacy Screen Filter ? Blue Light Reduction, Nano Technology, Heat & Humidity Resistant', price: '£44.90', image: '/computerandlaptops/lenovo/l2.png' },
-  { id: 'ra7', brand: 'Lenovo Laptop', title: 'Lenovo 14″ Privacy Screen Filter (16:10) for X1 Yoga Gen6 ? Anti-Glare, Blue Light Reduction, 3M Nanolouvre Tech', price: '£46.02', image: '/computerandlaptops/lenovo/l3.png' },
-  { id: 'ra8', brand: 'Lenovo Laptop', title: 'Lenovo Privacy Screen Filter – For 33.8 cm (13.3″) Widescreen LCD 2 in 1 Notebook – 16:10', price: '£44.90', image: '/computerandlaptops/lenovo/l7.png' },
+  { id: 'ra6', brand: 'Lenovo Laptop', title: 'Lenovo 14″ Privacy Screen Filter ? Blue Light Reduction, Nano Technology, Heat & Humidity Resistant', price: '£44.90', image: '/computerandlaptops/lenovo2/3.jpg' },
+  { id: 'ra7', brand: 'Lenovo Laptop', title: 'Lenovo 14″ Privacy Screen Filter (16:10) for X1 Yoga Gen6 ? Anti-Glare, Blue Light Reduction, 3M Nanolouvre Tech', price: '£46.02', image: '/computerandlaptops/lenovo2/4.jpg' },
+  { id: 'ra8', brand: 'Lenovo Laptop', title: 'Lenovo Privacy Screen Filter – For 33.8 cm (13.3″) Widescreen LCD 2 in 1 Notebook – 16:10', price: '£44.90', image: '/computerandlaptops/lenovo2/13.jpg' },
   // Page 3
-  { id: 'ra9', brand: 'Lenovo Laptop', title: 'Lenovo ThinkPad P16v Gen 2 16″ Mobile Workstation ? Intel Core Ultra 9, 32GB RAM, 1TB SSD, NVIDIA RTX 3000 Ada, WUXGA Display, Windows 11 Pro', price: '£540.24', image: '/computerandlaptops/lenovo/l45.png' },
-  { id: 'ra10', brand: 'Lenovo Laptop', title: 'Lenovo ThinkPad P1 Gen 7 16″ Laptop ? Intel Core Ultra 9, 32GB RAM, 1TB SSD, NVIDIA RTX 2000, WQXGA Display, Windows 11 Pro', price: '£1,441.53', image: '/computerandlaptops/lenovo/l35.png' },
-  { id: 'ra11', brand: 'Lenovo Laptop', title: 'ThinkPad Series 14 WUXGA R5-7530U | Powerful Laptop | AMD', price: '£1,275.20', image: '/computerandlaptops/lenovo/l77.png' },
-  { id: 'ra12', brand: 'Lenovo Laptop', title: 'Lenovo ThinkPad P14s Gen 5 Mobile Workstation – 14.5″ WQXGA, Intel Core Ultra 9, 32GB RAM, 1TB SSD, Intel Arc Graphics, Windows 11 Pro', price: '£1,164.32', image: '/computerandlaptops/lenovo/l41.png' },
+  { id: 'ra9', brand: 'Lenovo Laptop', title: 'Lenovo ThinkPad P16v Gen 2 16″ Mobile Workstation ? Intel Core Ultra 9, 32GB RAM, 1TB SSD, NVIDIA RTX 3000 Ada, WUXGA Display, Windows 11 Pro', price: '£540.24', image: '/computerandlaptops/lenovo2/13.jpg' },
+  { id: 'ra10', brand: 'Lenovo Laptop', title: 'Lenovo ThinkPad P1 Gen 7 16″ Laptop ? Intel Core Ultra 9, 32GB RAM, 1TB SSD, NVIDIA RTX 2000, WQXGA Display, Windows 11 Pro', price: '£1,441.53', image: '/computerandlaptops/lenovo2/16.jpg' },
+  { id: 'ra11', brand: 'Lenovo Laptop', title: 'ThinkPad Series 14 WUXGA R5-7530U | Powerful Laptop | AMD', price: '£1,275.20', image: '/computerandlaptops/lenovo2/2.jpg' },
+  { id: 'ra12', brand: 'Lenovo Laptop', title: 'Lenovo ThinkPad P14s Gen 5 Mobile Workstation – 14.5″ WQXGA, Intel Core Ultra 9, 32GB RAM, 1TB SSD, Intel Arc Graphics, Windows 11 Pro', price: '£1,164.32', image: '/computerandlaptops/lenovo2/19.jpg' },
   // Page 4
-  { id: 'ra13', brand: 'Lenovo Laptop', title: 'Lenovo ThinkPad P14s Gen 5 14.5″ Mobile Workstation – Intel Core Ultra 7, 32GB RAM, 1TB SSD, NVIDIA RTX 500, WUXGA Display – Windows 11 Pro', price: '£1,242.55', image: '/computerandlaptops/lenovo/l14.png' },
-  { id: 'ra14', brand: 'Lenovo Laptop', title: 'ThinkPad P16V1 R9-P7940HS | High-Performance Laptop with 32GB RAM, 1TB SSD, NVIDIA RTX 2000 | Windows 11 Pro', price: '£1,529.79', image: '/computerandlaptops/lenovo/l14.png' },
-  { id: 'ra15', brand: 'Lenovo Laptop', title: 'ThinkPad L16 G1 AMD R7P-7735U 16-inch Laptop | 32GB RAM, 1TB SSD, NVIDIA RTX A1000 ? High Performance & Reliability', price: '£1,289.02', image: '/computerandlaptops/lenovo/l14.png' },
-  { id: 'ra16', brand: 'Lenovo Laptop', title: 'Lenovo ThinkPad P14s Gen 5 – Ultra-Portable Rugged Workstation | 64GB RAM, RTX 500 Ada, 1TB SSD', price: '£1,378.82', image: '/computerandlZ/lenovo/l14.png' },
+  { id: 'ra13', brand: 'Lenovo Laptop', title: 'Lenovo ThinkPad P14s Gen 5 14.5″ Mobile Workstation – Intel Core Ultra 7, 32GB RAM, 1TB SSD, NVIDIA RTX 500, WUXGA Display – Windows 11 Pro', price: '£1,242.55', image: '/computerandlaptops/lenovo2/12.jpg' },
+  { id: 'ra14', brand: 'Lenovo Laptop', title: 'ThinkPad P16V1 R9-P7940HS | High-Performance Laptop with 32GB RAM, 1TB SSD, NVIDIA RTX 2000 | Windows 11 Pro', price: '£1,529.79', image: '/computerandlaptops/lenovo2/12.jpg' },
+  { id: 'ra15', brand: 'Lenovo Laptop', title: 'ThinkPad L16 G1 AMD R7P-7735U 16-inch Laptop | 32GB RAM, 1TB SSD, NVIDIA RTX A1000 ? High Performance & Reliability', price: '£1,289.02', image: '/computerandlaptops/lenovo2/12.jpg' },
+  { id: 'ra16', brand: 'Lenovo Laptop', title: 'Lenovo ThinkPad P14s Gen 5 – Ultra-Portable Rugged Workstation | 64GB RAM, RTX 500 Ada, 1TB SSD', price: '£1,378.82', image: '/computerandlaptops/lenovo2/12.jpg' },
   // Page 5
   { id: 'ra17', brand: 'Lenovo Laptop', title: 'Lenovo ThinkBook 16 G6 IRL – 16-inch Laptop with Intel Core i5, 8GB RAM, 256GB SSD, and 1920×1200 Display', price: '£1,984.64', image: '/computerandlaptops/lenovo/l18.jpg' },
   { id: 'ra18', brand: 'Lenovo Laptop', title: 'Lenovo ThinkPad X9-14 Gen 1 (21QA001KUK) 14″ WUXGA Laptop – Intel Core Ultra 7, 32GB RAM, 512GB SSD, Windows 11 Pro – Grey', price: '£2,128.16', image: '/computerandlaptops/lenovo/l18.jpg' },
   { id: 'ra19', brand: 'Lenovo Laptop', title: 'Lenovo ThinkPad T14s Gen 6 14″ Touchscreen Rugged Laptop – Qualcomm Snapdragon X Elite, 32GB RAM, 512GB SSD, WUXGA Display, Windows 11 Pro', price: '£895.30', image: '/computerandlaptops/lenovo/l18.jpg' },
   // --- FIX: Corrected duplicate ID ---
-  { id: 'ra20', brand: 'Lenovo Laptop', title: 'Lenovo ThinkPad T14s Gen 6 14″ Rugged Copilot+ Laptop – Qualcomm Snapdragon X Plus, 16GB RAM, 512GB SSD, WUXGA Display, Windows 11 Pro', price: '£895.30', image: '/computerandlaptops/lenovo/l52.png' },
+  { id: 'ra20', brand: 'Lenovo Laptop', title: 'Lenovo ThinkPad T14s Gen 6 14″ Rugged Copilot+ Laptop – Qualcomm Snapdragon X Plus, 16GB RAM, 512GB SSD, WUXGA Display, Windows 11 Pro', price: '£895.30', image: '/computerandlaptops/lenovo2/20.jpg' },
 ]);
 
 
 // --- 2. New Product Card Component ---
 function RecentlyAddedProductCard({ product }: { product: any }) {
+  const { isInWishlist, toggleWishlist } = useWishlist(product.slug);
+  const { isInCompare, toggleCompare } = useCompare(product.slug);
+
   return (
     <div className="bg-white border border-gray-200 rounded-lg overflow-hidden transition-all duration-300 hover:border-blue-500 hover:shadow-lg">
       <div className="p-4">
         <span className="block text-sm text-gray-500 mb-1">{product.brand}</span>
-        {/* --- CHANGE: Converted <a> to <Link> and used product.slug --- */}
         <Link href={`/product/${product.slug}`} className="block">
-          <h3 className="text-md font-semibold text-blue-600 mb-3 h-12 line-clamp-2">
-            {product.title}
-          </h3>
+          <h3 className="text-md font-semibold text-blue-600 mb-3 h-12 line-clamp-2">{product.title}</h3>
         </Link>
-        
-        {/* --- CHANGE: Converted <a> to <Link> and used product.slug --- */}
         <Link href={`/product/${product.slug}`} className="block relative w-full h-48 mb-4">
-          <Image
-            src={product.image}
-            alt={`${product.title} [SEO Friendly]`}
-            layout="fill"
-            objectFit="contain"
-          />
+          <Image src={product.image} alt={product.title} layout="fill" objectFit="contain" />
         </Link>
-
-        {/* --- CHANGE: Replaced price with "Get a Quote" button --- */}
         <div className="mb-4">
-          <a 
-            href="#" // Placeholder link for quote
-            className="inline-block bg-blue-600 text-white text-sm font-semibold py-2 px-5 rounded-md transition-all hover:bg-blue-700"
-          >
-            Get a Quote
-          </a>
+          <a href="#" className="inline-block bg-blue-600 text-white text-sm font-semibold py-2 px-5 rounded-md transition-all hover:bg-blue-700">Get a Quote</a>
         </div>
-
         <div className="flex justify-between items-center">
-          <button className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors">
-            <HeartIcon className="w-5 h-5" />
-            <span className="text-sm font-medium">Add to wishlist</span>
-          </button>
-          
-          {/* --- CHANGE: Converted <a> to <Link> and used product.slug --- */}
-          <Link 
-            href={`/product/${product.slug}`} // Link to product page
-            className="flex items-center justify-center w-9 h-9 bg-gray-200 rounded-full transition-all hover:bg-blue-600 group"
-          >
-            <ArrowRightIcon className="w-5 h-5 text-gray-700 transition-all group-hover:text-white" />
-          </Link>
+           <button onClick={toggleWishlist} className={`flex items-center gap-2 transition-colors ${isInWishlist ? 'text-red-600' : 'text-gray-600 hover:text-blue-600'}`}>
+             <HeartIcon className="w-5 h-5" fill={isInWishlist ? "currentColor" : "none"} /> <span className="text-sm font-medium">{isInWishlist ? 'Saved' : 'Add to wishlist'}</span>
+           </button>
+           <button onClick={toggleCompare} className={`flex items-center gap-2 transition-colors ${isInCompare ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600'}`}>
+             <CompareIcon className="w-5 h-5" /> <span className="text-sm font-medium">{isInCompare ? 'Added' : 'Compare'}</span>
+           </button>
         </div>
-        
       </div>
     </div>
   );
@@ -1276,36 +1383,103 @@ const carouselSlideVariants = {
 // --- 4. Main Recently Added Section Component ---
 function RecentlyAddedSection() {
   const [[page, direction], setPage] = useState([0, 0]);
+  const [isHovered, setIsHovered] = useState(false);
 
-  // Chunk products into pages of 4
+  // --- NEW: State for responsive chunking ---
+  const [chunkSize, setChunkSize] = useState(4); // Default to desktop
+
+  // --- NEW: useEffect to check window width and set chunk size ---
+  useEffect(() => {
+    const updateChunkSize = () => {
+      const width = window.innerWidth;
+      if (width < 768) { // Mobile (md breakpoint)
+        setChunkSize(1);
+      } else if (width < 1024) { // Tablet (lg breakpoint)
+        setChunkSize(2);
+      } else { // Desktop
+        setChunkSize(4);
+      }
+    };
+
+    updateChunkSize(); // Check on mount
+    window.addEventListener('resize', updateChunkSize); // Re-check on resize
+
+    // Cleanup listener
+    return () => window.removeEventListener('resize', updateChunkSize);
+  }, []); // Empty array ensures this runs only on client mount
+
+
+  // --- UPDATED: Chunk products based on responsive chunkSize ---
   const productsByPage = [];
-  const chunkSize = 4;
   for (let i = 0; i < recentlyAddedProducts.length; i += chunkSize) {
     productsByPage.push(recentlyAddedProducts.slice(i, i + chunkSize));
   }
   const numPages = productsByPage.length;
 
-  const paginate = (newDirection: number) => {
-    let newPage = page + newDirection;
-    if (newPage < 0) {
-      newPage = numPages - 1;
-    } else if (newPage >= numPages) {
-      newPage = 0;
+  const paginate = useCallback((newDirection: number) => {
+    setPage(prev => {
+      // Prevent errors if numPages is 0
+      if (numPages === 0) return [0, 0];
+
+      const [currentPage, _] = prev;
+      let newPage = currentPage + newDirection;
+
+      if (newPage < 0) {
+        newPage = numPages - 1; // Loop to end
+      } else if (newPage >= numPages) {
+        newPage = 0; // Loop to start
+      }
+      return [newPage, newDirection];
+    });
+  }, [numPages]); // numPages is now dynamic
+
+  // --- Auto-scroll ---
+  useEffect(() => {
+    if (isHovered || numPages <= 1) return; // Don't scroll if hovering or only 1 page
+
+    const timer = setInterval(() => {
+      paginate(1);
+    }, 5000);
+
+    return () => clearInterval(timer);
+  }, [isHovered, paginate, numPages]);
+  // --- END: Auto-scroll ---
+
+  // --- NEW: Handle page index being out of bounds on resize ---
+  useEffect(() => {
+    if (page >= numPages) {
+      setPage([Math.max(0, numPages - 1), 0]); // Go to the new last page
     }
-    setPage([newPage, newDirection]);
-  };
+  }, [page, numPages]);
+  // --- END: Handle resize ---
+
+  // --- NEW: Handle case where no products exist ---
+  if (productsByPage.length === 0) {
+    return (
+      <section className="pt-8 pb-16 bg-white">
+        <div className="container mx-auto px-8 lg:px-24">
+          <div className="relative mb-8">
+            <h2 className="text-3xl font-bold text-gray-900">Recently Added</h2>
+            <div className="absolute -bottom-2 left-0 w-20 h-1 bg-blue-600 rounded-full"></div>
+          </div>
+          <p className="text-gray-600">No recently added products.</p>
+        </div>
+      </section>
+    );
+  }
+  // --- END: Handle no products ---
 
   return (
     <section className="pt-8 pb-16 bg-white">
-      <div className="container mx-auto px-24">
-        
+      <div className="container mx-auto px-8 lg:px-24">
+
         {/* Section Header */}
         <div className="flex justify-between items-center mb-8">
           <div className="relative">
             <h2 className="text-3xl font-bold text-gray-900">Recently Added</h2>
             <div className="absolute -bottom-2 left-0 w-20 h-1 bg-blue-600 rounded-full"></div>
           </div>
-          
+
           {/* Navigation Arrows */}
           <div className="flex gap-2">
             <button
@@ -1326,17 +1500,23 @@ function RecentlyAddedSection() {
         </div>
 
         {/* Carousel */}
-        <div className="relative overflow-hidden" style={{ minHeight: '440px' }}>
+        <div
+          className="relative overflow-hidden"
+          style={{ minHeight: '440px' }}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
           <AnimatePresence initial={false} custom={direction}>
             <motion.div
-              key={page}
+              key={page} // Key changes when page index changes
               custom={direction}
-              variants={carouselSlideVariants} // This will now use the new smooth animation
+              variants={carouselSlideVariants}
               initial="initial"
               animate="animate"
               exit="exit"
               className="absolute w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
             >
+              {/* This now renders 1, 2, or 4 products */}
               {productsByPage[page].map((product) => (
                 <RecentlyAddedProductCard key={product.id} product={product} />
               ))}
@@ -1377,7 +1557,7 @@ export default function HomePageClient() {
       <BestDealsSection />
       {/* NEW: BestSellersSection added after BestDeals */}
       <BestSellersSection />
-      
+
       {/* --- ALL NEW SECTIONS ADDED BELOW --- */}
 
       <BigDealsBannerSection />

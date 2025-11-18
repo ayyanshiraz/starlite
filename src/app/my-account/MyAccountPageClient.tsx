@@ -90,7 +90,7 @@ export default function MyAccountPageClient() {
         {/* Welcome Text */}
         <div className="flex flex-col items-center mb-8 text-center">
           <h2 className="text-3xl font-bold text-gray-900 mt-4">
-            Welcome to Starlite Linker
+            Welcome to Starlight Linkers LLC 
           </h2>
           <p className="text-lg text-gray-600 mt-2">
             Please login or create an account to continue
@@ -366,5 +366,22 @@ const SignUpForm = () => {
         </button>
       </div>
     </form>
+  );
+};
+
+// --- Footer Component ---
+// (Assuming this is rendered below MyAccountPageClient in a parent layout)
+const Footer = () => {
+  return (
+    <div className="mt-12 text-center py-8"> {/* Removed bg-[#00001E] */}
+      <h3 className="text-2xl font-bold text-gray-900 mb-6">Our Trusted Brands</h3>
+      {/* Brand logos would go here */}
+      <div className="flex justify-center items-center space-x-8">
+        {/* Placeholder for brand logos */}
+        <span className="text-gray-500">Brand 1</span>
+        <span className="text-gray-500">Brand 2</span>
+        <span className="text-gray-500">Brand 3</span>
+      </div>
+    </div>
   );
 };
