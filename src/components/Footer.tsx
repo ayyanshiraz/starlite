@@ -121,7 +121,6 @@ export default function Footer() {
               <RikLogoDots />
               <div>
                 <span className="text-2xl font-extrabold text-blue-400">Starlight Linkers LLC </span>
-                <span className="text-sm text-gray-500 block">LIMITED</span>
               </div>
             </div>
 
