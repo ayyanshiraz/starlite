@@ -151,7 +151,7 @@ export default function Footer() {
               <a href="#" className="hover:text-white"><PinterestIcon /></a>
               <a href="#" className="hover:text-white"><InstagramIcon /></a>
               <a href="#" className="hover:text-white"><YouTubeIcon /></a>
-              <a href="#" className="hover:text-white"><WhatsAppIcon /></a>
+              <a href="https://wa.me/447465746637" className="hover:text-white"><WhatsAppIcon /></a>
               <a href="#" className="hover:text-white"><RssIcon /></a>
             </div>
           </div>
