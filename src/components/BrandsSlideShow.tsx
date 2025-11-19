@@ -41,7 +41,7 @@ export const BrandsSlideShow = () => {
           display: flex;
           width: max-content;
           /* I've increased the time to 60s to account for 13 logos */
-          animation: scroll 60s linear infinite;
+          animation: scroll 40s linear infinite;
         }
         
       `}</style>

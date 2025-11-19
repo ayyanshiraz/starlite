@@ -3,9 +3,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { HeaderSection } from 'src/components/Header';
-import { ChatButton, CustomScrollbarStyles } from 'src/components/SharedComponents';
-import { allProducts, Product, StandardProductDescription, KeyFeatureProductDescription } from 'src/lib/products';
+import { HeaderSection } from '../../components/Header';
+import { ChatButton, CustomScrollbarStyles } from '../../components/SharedComponents';
+import { allProducts, Product, KeyFeatureProductDescription } from '../../lib/products';
 
 // --- ICONS ---
 const iconProps = {
@@ -39,6 +39,20 @@ const CompareIcon = ({ className = "" }) => (
 const ChevronRightIcon = ({ className = "" }) => (
   <svg {...iconProps} className={className}><path d="m9 18 6-6-6-6"></path></svg>
 );
+
+// --- HELPER: Extract Description ---
+const getProductDescription = (product: Product) => {
+  if (!product.description) return "No description available.";
+  // Check if it's the KeyFeature type
+  if ('summary' in product.description) {
+    return product.description.summary;
+  }
+  // Check if it's the Standard type
+  if ('overview' in product.description) {
+    return product.description.overview;
+  }
+  return "";
+};
 
 // --- END ICONS ---
 
@@ -180,48 +194,53 @@ export default function ComparePage() {
                   {/* Header Info */}
                   <div className="flex flex-col items-center mb-6 text-center">
                     <Link href={`/product/${product.slug}`} className="block mb-3">
-                      <Image 
-                        src={product.image} 
-                        alt={`[SEO Friendly] ${product.name}`} 
-                        width={160} 
-                        height={160} 
-                        className="object-contain w-40 h-40" 
-                      />
+                      <div className="relative w-40 h-40">
+                          <Image 
+                            src={product.image} 
+                            alt={`[SEO Friendly] ${product.name}`} 
+                            fill
+                            className="object-contain" 
+                          />
+                      </div>
                     </Link>
                     <Link href={`/product/${product.slug}`}>
                       <h3 className="text-lg font-bold text-blue-600 hover:underline mb-1">{product.name}</h3>
                     </Link>
-                    <span className="text-xl font-bold text-gray-900">
+                    <span className="text-xl font-bold text-gray-900 mb-3">
                       {typeof product.price === 'number' ? `£${product.price.toFixed(2)}` : 'Get a Quote'}
                     </span>
+                    {/* --- ADDED: Description for Mobile --- */}
+                    <p className="text-sm text-gray-600 line-clamp-3">
+                        {getProductDescription(product)}
+                    </p>
                   </div>
 
                   {/* Specs List */}
                   <div className="space-y-3 border-t border-gray-100 pt-4">
                     <div className="flex justify-between items-start">
-                       <span className="text-xs uppercase tracking-wide font-semibold text-gray-500 mt-1">Category</span>
-                       <span className="text-sm font-medium text-gray-900 text-right max-w-[60%]">{product.category.split(',')[0]}</span>
+                        <span className="text-xs uppercase tracking-wide font-semibold text-gray-500 mt-1">Category</span>
+                        <span className="text-sm font-medium text-gray-900 text-right max-w-[60%]">{product.category.split(',')[0]}</span>
                     </div>
 
                     {/* Dynamic Features Loop */}
                     {allFeatureLabels.map((label) => {
-                       const desc = product.description as KeyFeatureProductDescription;
-                       const feature = (desc?.keyFeatures || []).find(f => f.title === label);
-                       
-                       return (
-                        <div key={label} className="flex justify-between items-start border-t border-gray-50 pt-2">
-                          <span className="text-xs uppercase tracking-wide font-semibold text-gray-500 mt-1">{label}</span>
-                          <div className="text-sm text-gray-700 text-right max-w-[60%]">
-                            {feature ? (
-                              <ul className="list-none">
-                                {feature.items.map((item, i) => <li key={i}>{item}</li>)}
-                              </ul>
-                            ) : (
-                              <span className="text-gray-300 italic">-</span>
-                            )}
-                          </div>
-                        </div>
-                       );
+                        const desc = product.description as KeyFeatureProductDescription;
+                        const feature = (desc?.keyFeatures || []).find(f => f.title === label);
+                        
+                        return (
+                         <div key={label} className="flex justify-between items-start border-t border-gray-50 pt-2">
+                           <span className="text-xs uppercase tracking-wide font-semibold text-gray-500 mt-1">{label}</span>
+                           <div className="text-sm text-gray-700 text-right max-w-[60%]">
+                             {feature ? (
+                               <ul className="list-none">
+                                 {feature.items.map((item, i) => <li key={i}>{item}</li>)}
+                               </ul>
+                             ) : (
+                               <span className="text-gray-300 italic">-</span>
+                             )}
+                           </div>
+                         </div>
+                        );
                     })}
                   </div>
                 </div>
@@ -249,7 +268,7 @@ export default function ComparePage() {
                       <TrashIcon className="w-4 h-4" />
                     </button>
                     <Link href={`/product/${product.slug}`} className="block">
-                      <div className="relative h-36 mb-3">
+                      <div className="relative h-36 mb-3 w-full">
                           <Image 
                             src={product.image} 
                             alt={`[SEO Friendly] ${product.name}`} 
@@ -274,6 +293,13 @@ export default function ComparePage() {
                   <span className="text-lg font-bold text-gray-900">{typeof p.price === 'number' ? `£${p.price.toFixed(2)}` : 'Get a Quote'}</span>
                 ))} />
                 
+                {/* --- ADDED: Description Row for Desktop --- */}
+                <DesktopCompareRow label="Description" productValues={compareProducts.map(p => (
+                  <span className="text-sm text-gray-600 block text-left line-clamp-4" title={getProductDescription(p)}>
+                    {getProductDescription(p)}
+                  </span>
+                ))} />
+
                 <DesktopCompareRow label="Category" productValues={compareProducts.map(p => (
                   <span className="text-sm text-gray-700">{p.category.split(',')[0]}</span>
                 ))} />
