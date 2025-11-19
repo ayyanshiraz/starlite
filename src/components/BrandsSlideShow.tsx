@@ -25,13 +25,9 @@ const brands = [
 
 export const BrandsSlideShow = () => {
   return (
-    <section className="bg-white py-16 text-black overflow-hidden border-t border-gray-200">
+    <section className="bg-white py-10 md:py-16 text-black overflow-hidden border-t border-gray-200">
       
-      {/* This <style jsx> block contains the animation logic, 
-        just like your demo code. 
-        I have corrected the animation to use translateX(-50%) 
-        for a perfect, seamless loop.
-      */}
+      {/* This <style jsx> block contains the animation logic. */}
       <style jsx>{`
         @keyframes scroll {
           from { transform: translateX(0); }
@@ -40,34 +36,36 @@ export const BrandsSlideShow = () => {
         .animate-scroll {
           display: flex;
           width: max-content;
-          /* I've increased the time to 60s to account for 13 logos */
           animation: scroll 40s linear infinite;
         }
-        
+        /* On mobile, we can speed it up slightly or keep it the same. 
+           Since the track is shorter due to smaller items, 40s might feel slower, which is good. */
       `}</style>
 
       <div className="container mx-auto text-center">
-        {/* Title without apostrophes, as requested */}
-        <h2 className="text-3xl font-bold mb-12">Our Trusted Brands</h2>
+        {/* Title responsive text size */}
+        <h2 className="text-2xl md:text-3xl font-bold mb-8 md:mb-12">Our Trusted Brands</h2>
         
-        {/* This outer div clips the content. 
-          The 'relative' and 'overflow-hidden' are important.
-        */}
-        <div className="relative w-full h-28 overflow-hidden">
-          <div className="absolute top-0 left-0 flex items-center animate-scroll">
+        {/* Container height responsive: h-20 on mobile, h-28 on desktop */}
+        <div className="relative w-full h-20 md:h-28 overflow-hidden">
+          <div className="absolute top-0 left-0 flex items-center animate-scroll h-full">
             
-            {/* We duplicate the brands array to create the seamless loop */}
             {[...brands, ...brands].map((brand, index) => (
               <div 
                 key={index} 
-                className="flex-shrink-0 w-48 mx-8 h-full flex items-center justify-center"
-                title={brand.alt} // Good for accessibility
+                // RESPONSIVE FIX: 
+                // Mobile: w-32 (128px) and mx-4 (16px margin)
+                // Desktop: w-48 (192px) and mx-8 (32px margin)
+                className="flex-shrink-0 w-32 mx-4 md:w-48 md:mx-8 h-full flex items-center justify-center"
+                title={brand.alt} 
               >
-                {/* --- FIX: Reverted from next/image to a standard <img> tag --- */}
                 <img 
                   src={brand.src} 
                   alt={brand.alt} 
-                  className="object-contain max-h-20 w-auto" // Tailwind classes for sizing
+                  // RESPONSIVE FIX: 
+                  // Mobile: max-h-12 (48px)
+                  // Desktop: max-h-20 (80px)
+                  className="object-contain max-h-12 w-auto md:max-h-20" 
                   loading="lazy"
                 />
               </div>
