@@ -1269,7 +1269,7 @@ function BigDealsBannerSection() {
             style={{ paddingBottom: '15%' }} // <-- CHANGED from '20%' to '15%' for a shorter banner
           >
             <Image
-              src="/banner4.webp" // <-- UPDATE THIS PATH
+              src="/banner.webp" // <-- UPDATE THIS PATH
               alt="Big deals banner" // <-- UPDATE THIS ALT TEXT
               layout="fill"
               objectFit="cover" // Use 'cover' to fill the space
