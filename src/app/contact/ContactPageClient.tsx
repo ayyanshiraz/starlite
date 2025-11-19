@@ -195,9 +195,9 @@ export default function ContactPageClient() {
               <ContactInfoBox 
                 Icon={MailIcon} 
                 title="Email Us" 
-                text="sales@starlightlinker.com"
+                text="sales@starlightlinkers.com"
                 delay={0.6}
-                href="mailto:sales@starlightlinker.com"
+                href="mailto:sales@starlightlinkers.com"
               />
 
               {/* WhatsApp (Clickable) */}
