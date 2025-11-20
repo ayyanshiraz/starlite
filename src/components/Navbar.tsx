@@ -10,7 +10,7 @@ const navLinks = [
   { name: "Track Your Order", href: "/track-your-order" },
   { name: "Contact Us", href: "/contact" },
   { name: "Shop", href: "/shop" },
-  { name: "Login", href: "/login" },
+  { name: "Login", href: "/my-account" },
 ];
 
 const menuVariants = {
