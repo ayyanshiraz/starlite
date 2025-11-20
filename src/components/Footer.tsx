@@ -1,10 +1,11 @@
 "use client";
 
 import React from 'react';
+import Image from 'next/image'; // Import Image component for optimized images
 
 // --- Icon Components ---
 
-// A simple placeholder for the RIK dot logo
+// A simple placeholder for the RIK dot logo (Preserved but unused)
 const RikLogoDots = () => (
   <svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" className="w-20 h-20 mb-2">
     <defs>
@@ -65,10 +66,10 @@ const RssIcon = () => (
   <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M4 11a9 9 0 0 1 9 9h-3a6 6 0 0 0-6-6v-3zm0-5a14 14 0 0 1 14 14h-3a11 11 0 0 0-11-11v-3zm0-5a19 19 0 0 1 19 19h-3a16 16 0 0 0-16-16v-3z" /></svg>
 );
 
-// --- FIXED: WhatsApp Icon with correct ViewBox ---
+// --- FIXED: WhatsApp Icon (Standard filled version to match others) ---
 const WhatsAppIcon = () => (
-  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 16 16">
-    <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/>
+  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.463 1.065 2.876 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
   </svg>
 );
 
@@ -88,7 +89,7 @@ export default function Footer() {
     { name: "Workstations", href: "/category/workstations" },
     { name: "Routers", href: "/category/routers" },
     { name: "UPS", href: "/category/ups" },
-    { name: "Brands", href: "/store-directory" }
+    { name: "Brands", href: "/product" }
   ];
 
   const aboutLinks = [
@@ -98,7 +99,6 @@ export default function Footer() {
     { name: "Wishlist", href: "/wishlist" },
     { name: "Compare", href: "/compare" },
     { name: "Store Directory", href: "/store-directory" },
-    { name: "Contact Us", href: "/contact" }
   ];
 
   const customerCareLinks = [
@@ -112,16 +112,20 @@ export default function Footer() {
   return (
     <footer className="bg-[#00001E] border-t border-gray-800 text-gray-300">
       {/* --- Main Footer Section --- */}
-     <div className="container mx-auto px-8 lg:pl-20 lg:pr-6 py-16">
+      <div className="container mx-auto px-8 lg:pl-20 lg:pr-6 py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           
-          {/* Column 1: Logo, Contact, Social */}
+          {/* Column 1: Logo (Image), Contact, Social */}
           <div className="flex flex-col">
             <div className="flex items-center mb-6">
-              <RikLogoDots />
-              <div>
-                <span className="text-2xl font-extrabold text-blue-400">Starlight Linkers LLC </span>
-              </div>
+              {/* Logo Image Component */}
+              <Image 
+                src="/starlightlogowhite.jpg" 
+                alt="Starlight Linkers LLC Logo"
+                width={200} 
+                height={80} 
+                className="mb-2"
+              />
             </div>
 
             <div className="mb-6 space-y-3">
@@ -203,9 +207,9 @@ export default function Footer() {
 
       {/* --- Bottom Bar --- */}
       <div className="bg-black/50 py-6">
-       <div className="container mx-auto px-8 lg:pl-20 lg:pr-6 flex flex-col md:flex-row justify-center items-center text-sm">
+        <div className="container mx-auto px-8 lg:pl-20 lg:pr-6 flex flex-col md:flex-row justify-center items-center text-sm">
           <p className="text-white mb-4 md:mb-0">
-            ©2025 Starlight Linkers LLC  - All Rights Reserved.
+            ©2025 Starlight Linkers LLC  - All Rights Reserved.
           </p>
         </div>
       </div>
