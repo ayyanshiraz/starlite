@@ -789,103 +789,134 @@ const BestDealItem = ({ product }: { product: any }) => {
 function BestDealsSection() {
   const [activeCategory, setActiveCategory] = useState('all');
   const [isMobile, setIsMobile] = useState(false);
-  useEffect(() => { const checkMobile = () => { setIsMobile(window.innerWidth < 768); }; checkMobile(); window.addEventListener('resize', checkMobile); return () => window.removeEventListener('resize', checkMobile); }, []);
+  const [isAutoSwitching, setIsAutoSwitching] = useState(true); // New state to control auto-play
 
-  // --- START: MODIFIED FILTER LOGIC ---
+  useEffect(() => { 
+    const checkMobile = () => { setIsMobile(window.innerWidth < 768); }; 
+    checkMobile(); 
+    window.addEventListener('resize', checkMobile); 
+    return () => window.removeEventListener('resize', checkMobile); 
+  }, []);
+
+  // --- AUTO-SWITCH TABS LOGIC ---
+  useEffect(() => {
+    // If paused or no categories, don't do anything
+    if (!isAutoSwitching || !bestDealsCategories.length) return;
+
+    const interval = setInterval(() => {
+      // Find the index of the current active category
+      const currentIndex = bestDealsCategories.findIndex(c => c.id === activeCategory);
+      
+      // Calculate next index (loop back to 0 if at the end)
+      const nextIndex = (currentIndex + 1) % bestDealsCategories.length;
+      
+      // Set the new active category
+      setActiveCategory(bestDealsCategories[nextIndex].id);
+    }, 4000); // Switch every 4 seconds
+
+    return () => clearInterval(interval);
+  }, [activeCategory, isAutoSwitching]);
+
+  // --- FILTER LOGIC ---
   const allFilteredProducts = useMemo(() => {
-    if (activeCategory === 'all') {
-      return bestDealsProducts;
-    }
-    const allProductsFormatted = allProducts.map(p => ({
-      id: p.id,
-      slug: p.slug,
-      image: p.image,
-      title: p.name,
-      brand: p.category,
+    if (activeCategory === 'all') return bestDealsProducts;
+    
+    const allProductsFormatted = allProducts.map(p => ({ 
+      id: p.id, 
+      slug: p.slug, 
+      image: p.image, 
+      title: p.name, 
+      brand: p.category 
     }));
+
     if (activeCategory === 'lenovo-laptop') {
-      return allProductsFormatted.filter(product => {
-        const searchableText = (product.brand.toLowerCase() + ' ' + product.title.toLowerCase());
-        return searchableText.includes('lenovo') &&
-          (searchableText.includes('laptop') || searchableText.includes('laptops'));
-      });
+      return allProductsFormatted.filter(p => 
+        (p.brand + p.title).toLowerCase().includes('lenovo') && 
+        (p.brand + p.title).toLowerCase().includes('laptop')
+      );
     }
+
     const searchTerms = activeCategory.split('-');
-    return allProductsFormatted.filter(product => {
-      const searchableText = (product.title.toLowerCase() + ' ' + product.brand.toLowerCase())
-        .replace(/&/g, '');
-      return searchTerms.every(term => searchableText.includes(term));
+    return allProductsFormatted.filter(p => { 
+      const txt = (p.title + p.brand).toLowerCase().replace(/&/g, ''); 
+      return searchTerms.every(t => txt.includes(t)); 
     });
-  }, [activeCategory]); // Rerun logic when activeCategory changes
+  }, [activeCategory]);
 
-  const productsToShow = activeCategory === 'all'
-    ? allFilteredProducts
-    : allFilteredProducts.slice(0, 5);
-
-  const sectionStompVariant = {
-    hidden: { opacity: 0, scale: 0.95 },
-    visible: { opacity: 1, scale: 1, transition: { duration: 0.4, ease: "easeOut" } }
-  };
-
+  const productsToShow = activeCategory === 'all' ? allFilteredProducts : allFilteredProducts.slice(0, 5);
   const currentCategory = bestDealsCategories.find(c => c.id === activeCategory);
-  const showViewAllButton =
-    currentCategory &&
-    activeCategory !== 'all' &&
-    allFilteredProducts.length > 5;
-
-  const motionProps = isMobile
-    ? { initial: "visible", animate: "visible", variants: sectionStompVariant }
+  const showViewAllButton = currentCategory && activeCategory !== 'all' && allFilteredProducts.length > 5;
+  
+  const sectionStompVariant = { 
+    hidden: { opacity: 0, scale: 0.95 }, 
+    visible: { opacity: 1, scale: 1, transition: { duration: 0.4, ease: "easeOut" } } 
+  };
+  
+  const motionProps = isMobile 
+    ? { initial: "visible", animate: "visible", variants: sectionStompVariant } 
     : { variants: sectionStompVariant, initial: "hidden", whileInView: "visible", viewport: { once: true, amount: 0.2 } };
 
   return (
-    <motion.section
-      className="py-16 bg-white"
+    <motion.section 
+      className="py-16 bg-white" 
       {...motionProps}
+      // Pause auto-switching when user hovers over the section
+      onMouseEnter={() => setIsAutoSwitching(false)}
+      onMouseLeave={() => setIsAutoSwitching(true)}
     >
       <div className="container mx-auto px-8 lg:px-24">
-        {/* Category Tabs */}
+        
+        {/* --- NAVIGATION TABS --- */}
         <div className="flex justify-center flex-wrap gap-x-6 gap-y-2 mb-8">
           {bestDealsCategories.map((category) => (
-            <motion.button
+            <button
               key={category.id}
-              onClick={() => setActiveCategory(category.id)}
+              onClick={() => {
+                setActiveCategory(category.id);
+                // Optional: keep it paused for a moment if manually clicked? 
+                // For now, purely relying on hover state is usually best UX.
+              }}
               className={`relative pb-2 text-sm font-medium transition-colors duration-300
-                ${activeCategory === category.id
-                  ? 'text-blue-600'
+                ${activeCategory === category.id 
+                  ? 'text-blue-600' 
                   : 'text-gray-700 hover:text-blue-600'
-                }`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+                }
+              `}
             >
               {category.title}
+              {/* Animated Underline for Active Tab */}
               {activeCategory === category.id && (
                 <motion.div
                   className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"
                   layoutId="best-deals-underline"
-                  transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                 />
               )}
-            </motion.button>
+            </button>
           ))}
         </div>
+        {/* --- END TABS --- */}
 
         {/* Product Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-          {productsToShow.map((product) => (
-            // This now uses the correct component
-            <BestDealItem key={product.id} product={product} />
-          ))}
-        </div>
+        <AnimatePresence mode="wait">
+          <motion.div 
+            key={activeCategory} // Key change triggers animation
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3 }}
+            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6"
+          >
+            {productsToShow.map((product) => (
+              <BestDealItem key={product.id} product={product} />
+            ))}
+          </motion.div>
+        </AnimatePresence>
 
-        {/* Dynamic "View All" Button */}
         {showViewAllButton && (
           <div className="flex justify-center mt-10">
-            <Link
-              href={`/category/${currentCategory.id}`}
-              className="inline-flex items-center text-lg font-semibold py-3 px-8 bg-blue-600 text-white rounded-md transition-all duration-300 hover:bg-blue-700 hover:shadow-blue-glow group"
-            >
-              View All {currentCategory.title}
-              <ArrowRightIcon className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" />
+            <Link href={`/category/${currentCategory?.id}`} className="inline-flex items-center text-lg font-semibold py-3 px-8 bg-blue-600 text-white rounded-md hover:bg-blue-700 group">
+              View All {currentCategory?.title} <ArrowRightIcon className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
         )}
