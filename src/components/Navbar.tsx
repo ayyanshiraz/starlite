@@ -41,14 +41,14 @@ export default function Navbar() {
   return (
     <nav className="fixed w-full z-[100] bg-[#00001E] text-white shadow-lg">
       <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-        {/* Logo Section - Replaced text with Image component */}
-        <div className="flex items-center">
+        {/* Logo Section - Decreased size further */}
+        <div className="flex items-center pl-4">
           <Link href="/">
             <Image
-              src="/starlightlogowhite.jpg" // <--- IMPORTANT: Update this path to your actual logo image file
+              src="/logogif.gif" // <--- IMPORTANT: Update this path to your actual logo image file
               alt="Starlight Linkers LLC Logo"
-              width={180} // Adjust width as needed
-              height={50} // Adjust height as needed
+              width={50} // Further decreased width to 90
+              height={27} // Adjusted height to 27
               priority // Prioritize loading for LCP
             />
           </Link>
