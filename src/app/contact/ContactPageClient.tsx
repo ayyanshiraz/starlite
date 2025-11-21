@@ -184,7 +184,7 @@ export default function ContactPageClient() {
                 title="Call Us" 
                 text={
                   <>
-                    <span className="block">+44 191 673 3012</span>
+                    <span className="block">(972) 431 0905</span>
                   </>
                 }
                 delay={0.55}

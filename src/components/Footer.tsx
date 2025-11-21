@@ -135,7 +135,7 @@ export default function Footer() {
               </div>
               <div className="flex items-center">
                 <PhoneIcon />
-                <p className="text-sm">+44 191 673 3012</p>
+                <p className="text-sm">(972) 431 0905</p>
               </div>
               
               {/* --- Opening Hours --- */}

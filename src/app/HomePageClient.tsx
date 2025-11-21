@@ -10,8 +10,7 @@ import { allProducts, type Product } from '../lib/products'; // Added Product ty
 import { useWishlist } from '../hooks/useWishlist';
 import { useCompare } from '../hooks/useCompare';
 
-// --- IMPORTS ---
-// ... (rest of your imports)
+
 
 // --- IMPORTS ---
 import { HeaderSection } from '../components/Header';
