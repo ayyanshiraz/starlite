@@ -15,6 +15,7 @@ import type { Product, StandardProductDescription, KeyFeatureProductDescription 
 import { useWishlist } from '@/hooks/useWishlist';
 import { useCompare } from '@/hooks/useCompare';
 import { useCart } from '@/hooks/useCart';
+
 // --- ICONS ---
 const iconProps = {
   xmlns: "http://www.w3.org/2000/svg",
@@ -66,43 +67,8 @@ const StarIcon = ({ className = "" }) => (
 );
 
 // --- UPDATED SIDEBAR DATA (From HomePage Recently Added) ---
-const latestProductsSidebarData = [
-  { 
-    id: 'switch-smart-managed-layer2-5-port', 
-    name: 'Switch smart managed Layer2 5 Port', 
-    price: 160.00, 
-    image: '/ubiquiti/4.avif',
-    slug: 'switch-smart-managed-layer2-5-port'
-  },
-  { 
-    id: 'ubiquiti-unifi-dream-machine-pro-managed-gigabit-udm-pro', 
-    name: 'Ubiquiti UniFi Dream Machine Pro Managed Gigabit (UDM-Pro)', 
-    price: 315.11, 
-    image: '/ubiquiti/5.png',
-    slug: 'ubiquiti-unifi-dream-machine-pro-managed-gigabit-udm-pro'
-  },
-  { 
-    id: 'ubiquiti-edgerouter-6p-wired-router-gigabit-ethernet-er-6p', 
-    name: 'Ubiquiti EdgeRouter 6P wired router Gigabit Ethernet – ER-6P', 
-    price: 570.00, 
-    image: '/ubiquiti/6.png',
-    slug: 'ubiquiti-edgerouter-6p-wired-router-gigabit-ethernet-er-6p'
-  },
-  { 
-    id: 'ra4', 
-    name: 'Ubiquiti UniFi U6+', 
-    price: 71.35, 
-    image: '/ubiquiti/7.jpg',
-    slug: 'ubiquiti-unifi-u6-access-point' // Updated to match typical slug format
-  },
-  { 
-    id: 'ra5', 
-    name: 'Ubiquiti NanoBeam AC GEN2 NBE-5AC-GEN2', 
-    price: 65.21, 
-    image: '/ubiquiti/15.jpg',
-    slug: 'ubiquiti-nanobeam-ac-gen2-nbe-5ac-gen2'
-  }
-];
+// --- UPDATED SIDEBAR DATA ---
+
 
 // --- SIDEBAR COMPONENTS ---
 const CategoriesSidebar = ({ currentCategorySlug }: { currentCategorySlug?: string }) => {
@@ -157,32 +123,47 @@ const CategoriesSidebar = ({ currentCategorySlug }: { currentCategorySlug?: stri
   );
 };
 
-const LatestProductsSidebar = () => (
-  <div className="border border-gray-200 rounded-lg p-6 bg-white shadow-sm">
-    <h3 className="text-xl font-bold text-gray-900 mb-6">Latest Products</h3>
-    <div className="space-y-6">
-      {latestProductsSidebarData.map((product) => (
-        <Link href={`/product/${product.slug}`} key={product.id} className="flex items-center gap-4 group">
-          <div className="w-20 h-20 bg-gray-50 rounded-md shrink-0 border border-gray-100 flex items-center justify-center overflow-hidden">
-            <Image 
-              src={product.image} 
-              alt={product.name} 
-              width={80} 
-              height={80} 
-              className="object-contain w-full h-full p-1 transition-transform group-hover:scale-105" 
-            />
-          </div>
-          <div>
-            <h4 className="text-sm font-semibold text-gray-800 group-hover:text-blue-600 transition line-clamp-2">{product.name}</h4>
-            <p className="text-xs font-bold text-gray-500 mt-1 uppercase tracking-wide">
-              {typeof product.price === 'number' ? `£${product.price.toFixed(2)}` : product.price}
-            </p>
-          </div>
-        </Link>
-      ))}
+const LatestProductsSidebar = () => {
+  // Define the products we want to show by their ID or Slug
+  const sidebarIds = [
+    'switch-smart-managed-layer2-5-port',
+    'ubiquiti-unifi-dream-machine-pro-managed-gigabit-udm-pro',
+    'ubiquiti-edgerouter-6p-wired-router-gigabit-ethernet-er-6p',
+    'ubiquiti-unifi-u6',
+    'ubiquiti-nanobeam-ac-gen2-nbe-5ac-gen2'
+  ];
+
+  // Get the live data from the master list
+  const products = allProducts.filter(p => sidebarIds.includes(p.id) || sidebarIds.includes(p.slug));
+
+  return (
+    <div className="border border-gray-200 rounded-lg p-6 bg-white shadow-sm">
+      <h3 className="text-xl font-bold text-gray-900 mb-6">Latest Products</h3>
+      <div className="space-y-6">
+        {products.map((product) => (
+          <Link href={`/product/${product.slug}`} key={product.id} className="flex items-center gap-4 group">
+            <div className="w-20 h-20 bg-gray-100 rounded-md shrink-0 border border-gray-100 flex items-center justify-center overflow-hidden">
+              <Image 
+                src={product.image} 
+                alt={product.name} 
+                width={80} 
+                height={80} 
+                className="object-contain w-full h-full p-1 transition-transform group-hover:scale-105" 
+              />
+            </div>
+            <div>
+              <h4 className="text-sm font-semibold text-gray-800 group-hover:text-blue-600 transition line-clamp-2">{product.name}</h4>
+              <p className="text-xs font-bold text-gray-500 mt-1 uppercase tracking-wide">
+                 {/* This now pulls the REAL price from sku-data.ts */}
+                 {typeof product.price === 'number' ? `£${product.price.toFixed(2)}` : product.price}
+              </p>
+            </div>
+          </Link>
+        ))}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 // --- SUB-COMPONENTS ---
 
@@ -272,11 +253,12 @@ const ProductInfo = ({ product }: { product: Product }) => {
   const { isInCompare, toggleCompare } = useCompare(product.slug);
   const { addToCart } = useCart();
   
-  // Check if product has a valid price
-  const hasPrice = typeof product.price === 'number' && product.price > 0;
+  // --- UPDATED LOGIC ---
+  // Check if product has a numeric price. If string (e.g., "Get a Quote") or undefined, treat as Quote Only.
+  const isQuoteOnly = typeof product.price !== 'number';
 
   const handleAction = (e: React.MouseEvent) => {
-    if (hasPrice) {
+    if (!isQuoteOnly) {
       e.preventDefault();
       addToCart(product);
     }
@@ -296,11 +278,11 @@ const ProductInfo = ({ product }: { product: Product }) => {
       </div>
       <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mt-2 mb-4">{product.name}</h1>
       
-      {/* Price Display */}
-      {hasPrice ? (
+      {/* Price Display Update */}
+      {!isQuoteOnly ? (
         <p className="text-3xl font-bold text-gray-900 mb-6">£{product.price}</p>
       ) : (
-        <p className="text-2xl font-bold text-blue-600 mb-6">Call for Pricing</p>
+        <p className="text-2xl font-bold text-blue-600 mb-6">Call For Pricing</p>
       )}
       
       <div className="flex flex-wrap items-center gap-4 sm:gap-6 mb-6">
@@ -326,8 +308,8 @@ const ProductInfo = ({ product }: { product: Product }) => {
       </div>
       
       <div className="flex items-center gap-3">
-        {/* UPDATED: Button Color changed to #1447E6 */}
-        {hasPrice ? (
+        {/* Action Button Update */}
+        {!isQuoteOnly ? (
           <button 
             onClick={handleAction}
             className="px-8 py-3 bg-[#1447E6] text-white font-bold rounded-md hover:bg-blue-700 transition w-full md:w-auto text-center shadow-md"
@@ -335,15 +317,17 @@ const ProductInfo = ({ product }: { product: Product }) => {
             Add to Cart
           </button>
         ) : (
-          <Link href="/contact-us" className="px-8 py-3 bg-[#1447E6] text-white font-bold rounded-md hover:bg-blue-700 transition w-full md:w-auto text-center shadow-md">
-            Get a quote
-          </Link>
+          <a 
+            href="tel:9724310905" 
+            className="px-8 py-3 bg-[#1447E6] text-white font-bold rounded-md hover:bg-blue-700 transition w-full md:w-auto text-center shadow-md block"
+          >
+            Get a Quote
+          </a>
         )}
       </div>
     </div>
   );
 };
-
 // --- SPEC HELPER COMPONENTS ---
 const SpecSection = ({ 
   title, children, bgColorClass = "", titleColorClass = "text-gray-900", borderColorClass = "border-gray-200"

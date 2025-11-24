@@ -184,43 +184,17 @@ const FilterSidebar = ({
 };
 
 const LatestProductsSidebar = () => {
-  const sidebarProducts = [
-    { 
-      id: 'switch-smart-managed-layer2-5-port', 
-      name: 'Switch smart managed Layer2 5 Port', 
-      price: 160.00, 
-      image: '/ubiquiti/4.avif', 
-      slug: 'switch-smart-managed-layer2-5-port' 
-    },
-    { 
-      id: 'ubiquiti-unifi-dream-machine-pro-managed-gigabit-udm-pro', 
-      name: 'Ubiquiti UniFi Dream Machine Pro Managed Gigabit (UDM-Pro)', 
-      price: 315.11, 
-      image: '/ubiquiti/5.png', 
-      slug: 'ubiquiti-unifi-dream-machine-pro-managed-gigabit-udm-pro' 
-    },
-    { 
-      id: 'ubiquiti-edgerouter-6p-wired-router-gigabit-ethernet-er-6p', 
-      name: 'Ubiquiti EdgeRouter 6P wired router Gigabit Ethernet – ER-6P', 
-      price: 570.00, 
-      image: '/ubiquiti/6.png', 
-      slug: 'ubiquiti-edgerouter-6p-wired-router-gigabit-ethernet-er-6p' 
-    },
-    { 
-      id: 'ra4', 
-      name: 'Ubiquiti UniFi U6+', 
-      price: 71.35, 
-      image: '/ubiquiti/7.jpg', 
-      slug: 'ubiquiti-unifi-u6-access-point' 
-    },
-    { 
-      id: 'ra5', 
-      name: 'Ubiquiti NanoBeam AC GEN2 NBE-5AC-GEN2', 
-      price: 65.21, 
-      image: '/ubiquiti/15.jpg', 
-      slug: 'ubiquiti-nanobeam-ac-gen2-nbe-5ac-gen2' 
-    }
+  // We only need IDs or Names to find the real data now
+  const sidebarProductIds = [
+    'switch-smart-managed-layer2-5-port',
+    'ubiquiti-unifi-dream-machine-pro-managed-gigabit-udm-pro',
+    'ubiquiti-edgerouter-6p-wired-router-gigabit-ethernet-er-6p',
+    'ubiquiti-unifi-u6',
+    'ubiquiti-nanobeam-ac-gen2-nbe-5ac-gen2'
   ];
+
+  // Filter the real products from your database
+  const sidebarProducts = allProducts.filter(p => sidebarProductIds.includes(p.id) || sidebarProductIds.includes(p.slug));
 
   return (
     <div className="border border-gray-200 rounded-lg p-6">
@@ -242,6 +216,7 @@ const LatestProductsSidebar = () => {
                 {product.name}
               </h4>
               <p className="text-md font-bold text-gray-900 mt-1">
+                 {/* This now pulls the REAL price from sku-data.ts */}
                  {typeof product.price === 'number' ? `£${product.price.toFixed(2)}` : product.price}
               </p>
             </div>
@@ -396,14 +371,16 @@ const ProductCard = ({ product, viewMode }: { product: Product, viewMode: 'grid'
   const { isInWishlist, toggleWishlist } = useWishlist(product.slug);
   const { isInCompare, toggleCompare } = useCompare(product.slug);
   const { addToCart } = useCart(); 
+  
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     addToCart(product);
   };
   const [isHovered, setIsHovered] = useState(false);
   
-  const productPrice = typeof product.price === 'number' ? product.price : -1;
-  const priceDisplay = productPrice !== -1 ? `£${productPrice.toFixed(2)}` : 'Get a Quote';
+  // --- UPDATED LOGIC ---
+  const isQuoteOnly = typeof product.price !== 'number';
+  const priceDisplay = !isQuoteOnly ? `£${Number(product.price).toFixed(2)}` : 'Get a Quote';
   const productUrl = `/product/${product.slug}`; 
 
   if (viewMode === 'list') {
@@ -427,7 +404,8 @@ const ProductCard = ({ product, viewMode }: { product: Product, viewMode: 'grid'
                onClick={handleAddToCart}
                className="bg-blue-600 text-white font-bold py-2 px-5 rounded-md hover:bg-blue-700 transition"
             >
-               {typeof product.price === 'number' ? 'Add to Cart' : 'Get a Quote'}
+               {/* Button Text Update */}
+               {!isQuoteOnly ? 'Add to Cart' : 'Get a Quote'}
             </button>
             <button 
               onClick={toggleWishlist}
@@ -491,7 +469,8 @@ const ProductCard = ({ product, viewMode }: { product: Product, viewMode: 'grid'
                onClick={handleAddToCart}
                className="bg-blue-600 text-white w-full py-2 rounded-md font-bold text-sm hover:bg-blue-700 transition"
             >
-               {typeof product.price === 'number' ? 'Add to Cart' : 'Get a Quote'}
+               {/* Button Text Update */}
+               {!isQuoteOnly ? 'Add to Cart' : 'Get a Quote'}
             </button>
             <div className="flex flex-col">
               <button 

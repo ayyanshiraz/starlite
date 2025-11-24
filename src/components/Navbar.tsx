@@ -1,9 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import Image from "next/image"; // Import Image component
 
 const navLinks = [
   { name: "Home", href: "/" },
@@ -41,29 +39,56 @@ export default function Navbar() {
   return (
     <nav className="fixed w-full z-[100] bg-[#00001E] text-white shadow-lg">
       <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-        {/* Logo Section - Decreased size further */}
+        {/* Logo Section */}
         <div className="flex items-center pl-4">
-          <Link href="/">
-            <Image
-              src="/logogif.gif" // <--- IMPORTANT: Update this path to your actual logo image file
+          <a href="/" className="flex items-center gap-3 group">
+            <img
+              src="/logogif.gif" 
               alt="Starlight Linkers LLC Logo"
-              width={50} // Further decreased width to 90
-              height={27} // Adjusted height to 27
-              priority // Prioritize loading for LCP
+              width={50} 
+              height={27} 
             />
-          </Link>
+            {/* Animated Text Container - Increased width to w-[300px] */}
+            <div className="font-bold text-lg tracking-wide text-white group-hover:text-blue-400 transition-colors leading-tight flex flex-col overflow-hidden w-[300px]">
+              <motion.span
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: [0, 1, 1, 0], x: [-20, 0, 0, -20] }}
+                transition={{
+                  duration: 6, // Total cycle time
+                  times: [0, 0.2, 0.8, 1], // 0-20% Enter, 20-80% Stay, 80-100% Exit
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              >
+                Starlight
+              </motion.span>
+              <motion.span
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: [0, 1, 1, 0], y: [15, 0, 0, 15] }}
+                transition={{
+                  duration: 6,
+                  times: [0, 0.2, 0.8, 1],
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 0.2, // Staggered start
+                }}
+              >
+                Linkers LLC
+              </motion.span>
+            </div>
+          </a>
         </div>
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex space-x-8">
           {navLinks.map((link) => (
-            <Link
+            <a
               key={link.name}
               href={link.href}
               className="text-white hover:text-blue-400 transition-colors duration-200"
             >
               {link.name}
-            </Link>
+            </a>
           ))}
         </div>
 
@@ -114,13 +139,13 @@ export default function Navbar() {
             <ul className="flex flex-col p-4 space-y-2">
               {navLinks.map((link) => (
                 <motion.li key={link.name} variants={linkVariants}>
-                  <Link
+                  <a
                     href={link.href}
                     className="block px-4 py-2 text-white hover:bg-gray-800 rounded-md transition-colors duration-200"
                     onClick={() => setIsOpen(false)} // Close menu on link click
                   >
                     {link.name}
-                  </Link>
+                  </a>
                 </motion.li>
               ))}
             </ul>

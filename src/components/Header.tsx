@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { allProducts } from '../lib/products';
-import { useCart } from '../hooks/useCart'; // <--- 1. IMPORT THE HOOK
+import { useCart } from '../hooks/useCart';
 
 // --- SVG ICON COMPONENTS ---
 const iconProps = {
@@ -76,7 +76,7 @@ export function HeaderSection() {
   const [wishlistCount, setWishlistCount] = useState(0);
   const [compareCount, setCompareCount] = useState(0);
 
-  // --- 2. GET CART STATE ---
+  // --- GET CART STATE ---
   const { cartCount, cartTotal } = useCart(); 
 
   const router = useRouter();
@@ -141,7 +141,7 @@ export function HeaderSection() {
   // --- Search Logic ---
   useEffect(() => {
     if (searchQuery.trim().length > 0) {
-      if (!allProducts) return; // Guard clause if allProducts isn't loaded
+      if (!allProducts) return;
       const lowerQuery = searchQuery.toLowerCase();
       const filtered = allProducts.filter(p =>
         p.name.toLowerCase().includes(lowerQuery) ||
@@ -226,22 +226,20 @@ export function HeaderSection() {
               <UserIcon className="w-6 h-6" />
             </Link>
             
-            {/* --- CART ICON (UPDATED) --- */}
-            {/* 3. Use the Link component to go to the cart page */}
+            {/* --- CART ICON --- */}
             <Link href="/cart" className="flex items-center gap-2 cursor-pointer group">
               <div className="relative">
                 <ShoppingBagIcon className="w-7 h-7 text-gray-800 group-hover:text-blue-600 transition-colors" />
                 
-                {/* 4. Conditional Rendering for Cart Badge */}
                 {cartCount > 0 && (
                   <span className="absolute -top-2 -right-2 w-5 h-5 bg-blue-600 text-white text-xs font-bold rounded-full flex items-center justify-center border-2 border-white">
                     {cartCount}
                   </span>
                 )}
               </div>
-              {/* 5. Display Total Price */}
+              {/* Display Total Price with $ Sign */}
               <span className="font-bold text-gray-800 hidden md:block group-hover:text-blue-600 transition-colors">
-                {cartTotal > 0 ? `£${cartTotal.toFixed(2)}` : '£0.00'}
+                {cartTotal > 0 ? `$${cartTotal.toFixed(2)}` : '$0.00'}
               </span>
             </Link>
           </div>

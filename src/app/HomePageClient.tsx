@@ -84,17 +84,24 @@ const generateSlug = (name: string) => {
     .replace(/^-+|-+$/g, '');       // Trim hyphens from start/end
 };
 
-// --- NEW: Function to add slugs to mock data ---
+// --- NEW: Function to add slugs AND sync prices from master list ---
 const addSlugsToProducts = (products: any[]) => {
   return products.map(p => {
-    // Try to find a matching product in the master list from lib/products.ts
-    const masterProduct = allProducts.find(master => master.name === p.title);
+    // Support both 'name' (new) and 'title' (old) keys
+    const productName = p.name || p.title;
+    
+    // Find the master product in lib/products.ts (which reads from sku-data.ts)
+    const masterProduct = allProducts.find(master => master.name === productName);
 
-    if (masterProduct && masterProduct.slug) {
-      return { ...p, slug: masterProduct.slug };
+    if (masterProduct) {
+      return { 
+        ...p, 
+        slug: masterProduct.slug,
+        price: masterProduct.price, // <--- THIS SYNCS THE PRICE AUTOMATICALLY
+        category: masterProduct.category // Syncs category too
+      };
     } else {
-      // If not found, generate a slug from the title
-      return { ...p, slug: generateSlug(p.title) };
+      return { ...p, slug: generateSlug(productName) };
     }
   });
 };
@@ -411,29 +418,27 @@ const specialOffer = {
 };
 
 // --- "Featured" products list ---
-// --- UPDATED: Added slug field to all products ---
 const featuredProducts = addSlugsToProducts([
-  { id: '1', brand: 'D-Link', title: 'D-Link DWA-X1850 AX1800 Wi-Fi 6 USB Adapter', image: '/dlink/0.jpg', price: 39.62 },
-  { id: '2', brand: 'D-Link', title: 'D-Link DAP-X2850 Nuclias Connect AX3600 Wi-Fi 6 PoE Access Point', image: '/dlink/2.jpg', price: 236.46 },
-  { id: '3', brand: 'Ubiquiti', title: 'Ubiquiti Networks UniFi 5 x Switch 8 Managed Gigabit', image: '/ubiquiti/1.jpg', price: 495.00, oldPrice: 515.00 },
-  { id: '4', brand: 'Ubiquiti', title: 'Ubiquiti Networks UA-SK-EU security access control system White', image: '/ubiquiti/2.jpg', price: 450.00 },
-  { id: '5', brand: 'Ubiquiti', title: 'Ubiquiti AmpliFi AFI-HD-UK Mesh Whole Home WiFi Router System', image: '/ubiquiti/3.jpg', price: 356.00 },
-  { id: '6', brand: 'Lexmark', title: 'Lexmark CX730de Laser A4 1200 x 1200 DPI 40 ppm', image: '/lexmark/1.jpg', price: 1120.00 },
-  { id: '7', brand: 'Acer', title: 'Acer Predator UM.KX3EE.P08 LED display', image: '/acer/1.jpg', price: 495.00, oldPrice: 515.00 },
-  { id: '8', brand: 'Apple', title: 'Apple Magic Keyboard for iPad Pro', image: '/apple/1.jpg', price: 320.00 },
+  { id: '1', brand: 'D-Link', title: 'D-Link DWA-X1850 AX1800 Wi-Fi 6 USB Adapter', image: '/dlink/0.jpg', price: 'Get a Quote' },
+  { id: '2', brand: 'D-Link', title: 'D-Link DAP-X2850 Nuclias Connect AX3600 Wi-Fi 6 PoE Access Point', image: '/dlink/2.jpg', price: 'Get a Quote' },
+  { id: '3', brand: 'Ubiquiti', title: 'Ubiquiti Networks UniFi 5 x Switch 8 Managed Gigabit', image: '/ubiquiti/1.jpg', price: 'Get a Quote' },
+  { id: '4', brand: 'Ubiquiti', title: 'Ubiquiti Networks UA-SK-EU security access control system White', image: '/ubiquiti/2.jpg', price: 'Get a Quote' },
+  { id: '5', brand: 'Ubiquiti', title: 'Ubiquiti AmpliFi AFI-HD-UK Mesh Whole Home WiFi Router System', image: '/ubiquiti/3.jpg', price: 'Get a Quote' },
+  { id: '6', brand: 'Lexmark', title: 'Lexmark CX730de Laser A4 1200 x 1200 DPI 40 ppm', image: '/lexmark/1.jpg', price: 'Get a Quote' },
+  { id: '7', brand: 'Acer', title: 'Acer Predator UM.KX3EE.P08 LED display', image: '/acer/1.jpg', price: 'Get a Quote' },
+  { id: '8', brand: 'Apple', title: 'Apple Magic Keyboard for iPad Pro', image: '/apple/1.jpg', price: 'Get a Quote' },
 ]);
 
 // --- "Top Rated" products list ---
-// --- UPDATED: Added slug field to all products ---
 const topRatedProducts = addSlugsToProducts([
-  { id: 'switch-smart-managed-layer2-5-port', brand: 'Ubiquiti Switches', title: 'Switch smart managed Layer2 5 Port', image: '/ubiquiti/4.avif', price: 160.00 },
-  { id: 'ubiquiti-unifi-dream-machine-pro-managed-gigabit-udm-pro', brand: 'Ubiquiti Switches', title: 'Ubiquiti UniFi Dream Machine Pro Managed Gigabit (UDM-Pro)', image: '/ubiquiti/5.png', price: 315.11 },
-  { id: 'ubiquiti-edgerouter-6p-wired-router-gigabit-ethernet-er-6p', brand: 'Ubiquiti Switches', title: 'Ubiquiti EdgeRouter 6P wired router Gigabit Ethernet – ER-6P', image: '/ubiquiti/6.png', price: 570.00 },
-  { id: 'tr4', brand: 'Access Point', title: 'Ubiquiti UniFi U6+', image: '/ubiquiti/7.jpg', price: 71.35 },
-  { id: 'tr5', brand: 'Ubiquiti Access Point', title: 'Ubiquiti NanoBeam AC GEN2 NBE-5AC-GEN2', image: '/ubiquiti/8.jpg', price: 120.00 },
-  { id: 'tr6', brand: 'Lenovo Laptop', title: 'Lenovo 14″ Privacy Screen Filter ? Blue Light Reduction, Nano Technology, Heat & Humidity Resistant', image: '/computerandlaptops/lenovo2/3.jpg', price: 45.00 },
-  { id: 'tr7', brand: 'Lenovo Laptop', title: 'Lenovo 14″ Privacy Screen Filter (16:10) for X1 Yoga', image: '/computerandlaptops/lenovo2/4.jpg', price: 42.00 },
-  { id: 'tr8', brand: 'Lenovo Laptop', title: 'Lenovo Privacy Screen Filter – For 33.8 cm (13.3″) Widescreen LCD 2 in 1 Notebook – 16:10', image: '/computerandlaptops/lenovo2/13.jpg', price: 42.00 },
+  { id: 'switch-smart-managed-layer2-5-port', brand: 'Ubiquiti Switches', title: 'Switch smart managed Layer2 5 Port', image: '/ubiquiti/4.avif', price: 'Get a Quote' },
+  { id: 'ubiquiti-unifi-dream-machine-pro-managed-gigabit-udm-pro', brand: 'Ubiquiti Switches', title: 'Ubiquiti UniFi Dream Machine Pro Managed Gigabit (UDM-Pro)', image: '/ubiquiti/5.png', price: 'Get a Quote' },
+  { id: 'ubiquiti-edgerouter-6p-wired-router-gigabit-ethernet-er-6p', brand: 'Ubiquiti Switches', title: 'Ubiquiti EdgeRouter 6P wired router Gigabit Ethernet – ER-6P', image: '/ubiquiti/6.png', price: 'Get a Quote' },
+  { id: 'tr4', brand: 'Access Point', title: 'Ubiquiti UniFi U6+', image: '/ubiquiti/7.jpg', price: 'Get a Quote' },
+  { id: 'tr5', brand: 'Ubiquiti Access Point', title: 'Ubiquiti NanoBeam AC GEN2 NBE-5AC-GEN2', image: '/ubiquiti/8.jpg', price: 'Get a Quote' },
+  { id: 'tr6', brand: 'Lenovo Laptop', title: 'Lenovo 14″ Privacy Screen Filter ? Blue Light Reduction, Nano Technology, Heat & Humidity Resistant', image: '/computerandlaptops/lenovo2/3.jpg', price: 'Get a Quote' },
+  { id: 'tr7', brand: 'Lenovo Laptop', title: 'Lenovo 14″ Privacy Screen Filter (16:10) for X1 Yoga', image: '/computerandlaptops/lenovo2/4.jpg', price: 'Get a Quote' },
+  { id: 'tr8', brand: 'Lenovo Laptop', title: 'Lenovo Privacy Screen Filter – For 33.8 cm (13.3″) Widescreen LCD 2 in 1 Notebook – 16:10', image: '/computerandlaptops/lenovo2/13.jpg', price: 'Get a Quote' },
 ]);
 // --- End of Mock Data ---
 
@@ -457,10 +462,14 @@ function ProductCard({ product }: { product: any }) {
   const { isInWishlist, toggleWishlist } = useWishlist(product.slug);
   const { isInCompare, toggleCompare } = useCompare(product.slug);
   const { addToCart } = useCart();
-const handleAddToCart = (e: React.MouseEvent) => {
-  e.preventDefault();
-  addToCart(product);
-};
+  
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    addToCart(product);
+  };
+
+  // Logic: Only show "Add to Cart" if price exists AND it is NOT the string "Get a Quote"
+  const showAddToCart = product.price && product.price !== 'Get a Quote';
 
   return (
     <motion.div
@@ -477,11 +486,11 @@ const handleAddToCart = (e: React.MouseEvent) => {
         </Link>
         <div className="mt-auto pt-4 border-t border-gray-200">
           <button 
-  onClick={handleAddToCart}
-  className="block w-full text-center bg-blue-600 text-white font-semibold py-2.5 rounded-md text-sm transition-all duration-300 hover:bg-blue-700 hover:shadow-md"
->
-  {product.price ? 'Add to Cart' : 'Get a Quote'}
-</button>
+            onClick={handleAddToCart}
+            className="block w-full text-center bg-blue-600 text-white font-semibold py-2.5 rounded-md text-sm transition-all duration-300 hover:bg-blue-700 hover:shadow-md"
+          >
+            {showAddToCart ? 'Add to Cart' : 'Get a Quote'}
+          </button>
           <div className="flex justify-between items-center pt-3">
             <button onClick={toggleWishlist} className={`flex items-center gap-1.5 text-sm transition-colors ${isInWishlist ? 'text-red-600 font-medium' : 'text-gray-500 hover:text-blue-600'}`}>
               <HeartIcon className="w-4 h-4" fill={isInWishlist ? "currentColor" : "none"} /><span>{isInWishlist ? 'Saved' : 'Save'}</span>
@@ -760,13 +769,14 @@ const bestDealsCategories = [
 // --- CARD 2: BEST DEALS ITEM (Updated) ---
 const BestDealItem = ({ product }: { product: any }) => {
   const { addToCart } = useCart();
-
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     addToCart(product);
   };
   const { isInWishlist, toggleWishlist } = useWishlist(product.slug);
-  const { isInCompare, toggleCompare } = useCompare(product.slug); // 1. Add Compare hook
+  const { isInCompare, toggleCompare } = useCompare(product.slug);
+
+  const showAddToCart = product.price && product.price !== 'Get a Quote';
 
   return (
     <div className="group bg-white rounded-lg border border-gray-200 hover:border-blue-600 transition-all duration-300 overflow-hidden flex flex-col shadow-sm hover:shadow-xl">
@@ -779,25 +789,18 @@ const BestDealItem = ({ product }: { product: any }) => {
           <h3 className="text-sm font-semibold text-gray-900 mb-3 h-10 line-clamp-2 group-hover:text-blue-600 transition-colors">{product.title}</h3>
         </Link>
         <div className="mt-auto pt-4 border-t border-gray-200">
-         <button 
-  onClick={handleAddToCart}
-  className="block w-full text-center bg-blue-600 text-white font-semibold py-2.5 rounded-md text-sm transition-all duration-300 hover:bg-blue-700 hover:shadow-md"
->
-  {product.price ? 'Add to Cart' : 'Get a Quote'}
-</button>
+          <button 
+            onClick={handleAddToCart}
+            className="block w-full text-center bg-blue-600 text-white font-semibold py-2.5 rounded-md text-sm transition-all duration-300 hover:bg-blue-700 hover:shadow-md"
+          >
+            {showAddToCart ? 'Add to Cart' : 'Get a Quote'}
+          </button>
           
-          {/* 2. Add the buttons in a flex container */}
           <div className="flex justify-between items-center pt-3">
-            <button 
-              onClick={toggleWishlist} 
-              className={`flex items-center gap-1 text-sm font-medium ${isInWishlist ? 'text-red-600' : 'text-gray-600 hover:text-blue-600'}`}
-            >
+            <button onClick={toggleWishlist} className={`flex items-center gap-1 text-sm font-medium ${isInWishlist ? 'text-red-600' : 'text-gray-600 hover:text-blue-600'}`}>
               <HeartIcon className="w-4 h-4" fill={isInWishlist ? "currentColor" : "none"} /> {isInWishlist ? 'Saved' : 'Save'}
             </button>
-            <button 
-              onClick={toggleCompare} 
-              className={`flex items-center gap-1 text-sm font-medium ${isInCompare ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600'}`}
-            >
+            <button onClick={toggleCompare} className={`flex items-center gap-1 text-sm font-medium ${isInCompare ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600'}`}>
               <CompareIcon className="w-4 h-4" /> {isInCompare ? 'Added' : 'Compare'}
             </button>
           </div>
@@ -957,25 +960,24 @@ const bestSellersTabs = [
 ];
 
 const allBestSellers = addSlugsToProducts([
-  { id: 'bs1', brand: 'Acer', title: 'Acer V246HL 24″ 1920 x 1080 pixels Full HD LED Black', image: '/acer/2.jpg', price: '£120.00' },
-  { id: 'bs2', brand: 'Acer', title: 'ACER V227Qbip Full HD 21.5″ IPS LCD Monitor – Black', image: '/acer/3.jpg', price: '£109.00' },
-  { id: 'bs3', brand: 'Lexmark', title: 'Lexmark CX730de Laser A4 1200 x 1200 DPI 40 ppm', image: '/lexmark/1.jpg', price: '£1,120.00' },
-  { id: 'bs4', brand: 'Lexmark', title: 'Lexmark 62D2H0E (622H) Toner black, 25K pages', image: '/lexmark/2.jpg', price: '£150.00' },
-  { id: 'bs5', brand: 'Aruba', title: 'Aruba JL683A#ABA Instant On 1930', image: '/aruba/1.jpg', price: '£300.00' },
-  { id: 'bs6', brand: 'HPE', title: 'HPE Aruba AP-303P (US)', image: '/aruba/2.jpg', price: '£250.00' },
-  { id: 'bs7', brand: 'APC', title: 'Apc Netshelter Sx 24u Freestanding Rack Black', image: '/apc/2.jpg', price: '£1,255.00' },
-  { id: 'bs8', brand: 'APC', title: 'APC NetShelter SX 48U 600mm Wide x 1070mm', image: '/apc/3.jpg', price: '£1,525.00' },
-  { id: 'bs9', brand: 'APC', title: 'APC Easy UPS Line-Interactive', image: '/apc/4.jpg', price: '£172.00' },
-  { id: 'bs10', brand: 'Ubiquiti', title: 'Ubiquiti U6-PRO UniFi Wifi 6 Access Point', image: '/ubiquiti/10.jpg', price: '£130.00' },
-  { id: 'bs11', brand: 'MSI', title: 'MSI Cyborg 15 AI A1VFK-001UK', image: '/msi/1.jpg', price: '£999.00' },
-  { id: 'bs12', brand: 'MSI', title: 'MSI PRO H610M-E motherboard Intel H610 LGA 1700 micro ATX', image: '/msi/2.jpg', price: '£85.00' },
-  // --- Start of Slide 2 ---
-  { id: 'bs13', brand: 'Ubiquiti Router', title: 'Ubiquiti UniFi Cloud Gateway Max (UCG-MAX) – 512GB', image: '/ubiquiti/11.jpg', price: '£232.00' },
-  { id: 'bs14', brand: 'Cisco, Cisco SFP Module', title: 'Alcatel-Lucent network transceiver module – SFP-10G-LR', image: '/cisco/1.jpg', price: '£2,610.00' },
-  { id: 'bs15', brand: 'Epson', title: 'Epson C13S050691/0691 Toner-kit black return program, 10K pages for Epson Workforce AL-M 300', image: '/epson/1.jpg', price: '£120.00' },
-  { id: 'bs16', brand: 'Avaya', title: 'Avaya Routing Switch 4524GT-PWR – switch – 24 ports', image: '/avaya/1.jpg', price: '£450.00' },
-  { id: 'bs17', brand: 'Avaya', title: 'Avaya J189 IP Phone Grey Led Wi-Fi 700512396', image: '/avaya/2.jpg', price: '£210.00' },
-  { id: 'bs18', brand: 'Acer', title: 'Acer Predator PH18-72 Intel? Core? i9', image: '/acer/4.jpg', price: '£2,500.00' },
+  { id: 'bs1', brand: 'Acer', title: 'Acer V246HL 24″ 1920 x 1080 pixels Full HD LED Black', image: '/acer/2.jpg', price: 'Get a Quote' },
+  { id: 'bs2', brand: 'Acer', title: 'ACER V227Qbip Full HD 21.5″ IPS LCD Monitor – Black', image: '/acer/3.jpg', price: 'Get a Quote' },
+  { id: 'bs3', brand: 'Lexmark', title: 'Lexmark CX730de Laser A4 1200 x 1200 DPI 40 ppm', image: '/lexmark/1.jpg', price: 'Get a Quote' },
+  { id: 'bs4', brand: 'Lexmark', title: 'Lexmark 62D2H0E (622H) Toner black, 25K pages', image: '/lexmark/2.jpg', price: 'Get a Quote' },
+  { id: 'bs5', brand: 'Aruba', title: 'Aruba JL683A#ABA Instant On 1930', image: '/aruba/1.jpg', price: 'Get a Quote' },
+  { id: 'bs6', brand: 'HPE', title: 'HPE Aruba AP-303P (US)', image: '/aruba/2.jpg', price: 'Get a Quote' },
+  { id: 'bs7', brand: 'APC', title: 'Apc Netshelter Sx 24u Freestanding Rack Black', image: '/apc/2.jpg', price: 'Get a Quote' },
+  { id: 'bs8', brand: 'APC', title: 'APC NetShelter SX 48U 600mm Wide x 1070mm', image: '/apc/3.jpg', price: 'Get a Quote' },
+  { id: 'bs9', brand: 'APC', title: 'APC Easy UPS Line-Interactive', image: '/apc/4.jpg', price: 'Get a Quote' },
+  { id: 'bs10', brand: 'Ubiquiti', title: 'Ubiquiti U6-PRO UniFi Wifi 6 Access Point', image: '/ubiquiti/10.jpg', price: 'Get a Quote' },
+  { id: 'bs11', brand: 'MSI', title: 'MSI Cyborg 15 AI A1VFK-001UK', image: '/msi/1.jpg', price: 'Get a Quote' },
+  { id: 'bs12', brand: 'MSI', title: 'MSI PRO H610M-E motherboard Intel H610 LGA 1700 micro ATX', image: '/msi/2.jpg', price: 'Get a Quote' },
+  { id: 'bs13', brand: 'Ubiquiti Router', title: 'Ubiquiti UniFi Cloud Gateway Max (UCG-MAX) – 512GB', image: '/ubiquiti/11.jpg', price: 'Get a Quote' },
+  { id: 'bs14', brand: 'Cisco, Cisco SFP Module', title: 'Alcatel-Lucent network transceiver module – SFP-10G-LR', image: '/cisco/1.jpg', price: 'Get a Quote' },
+  { id: 'bs15', brand: 'Epson', title: 'Epson C13S050691/0691 Toner-kit black return program, 10K pages for Epson Workforce AL-M 300', image: '/epson/1.jpg', price: 'Get a Quote' },
+  { id: 'bs16', brand: 'Avaya', title: 'Avaya Routing Switch 4524GT-PWR – switch – 24 ports', image: '/avaya/1.jpg', price: 'Get a Quote' },
+  { id: 'bs17', brand: 'Avaya', title: 'Avaya J189 IP Phone Grey Led Wi-Fi 700512396', image: '/avaya/2.jpg', price: 'Get a Quote' },
+  { id: 'bs18', brand: 'Acer', title: 'Acer Predator PH18-72 Intel? Core? i9', image: '/acer/4.jpg', price: 'Get a Quote' },
 ]);
 // --- END: MOCK DATA FOR BEST SELLERS ---
 
@@ -984,13 +986,14 @@ const allBestSellers = addSlugsToProducts([
 function BestSellerProductCard({ product }: { product: any }) 
 {
   const { addToCart } = useCart();
-
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     addToCart(product);
   };
   const { isInWishlist, toggleWishlist } = useWishlist(product.slug);
   const { isInCompare, toggleCompare } = useCompare(product.slug);
+  
+  const showAddToCart = product.price && product.price !== 'Get a Quote';
 
   return (
     <div className="relative isolate border border-gray-200 rounded-lg overflow-hidden bg-white transition-all duration-300 ease-in-out shadow-md">
@@ -1001,11 +1004,11 @@ function BestSellerProductCard({ product }: { product: any })
         <span className="block text-xs text-gray-500 mb-1">{product.brand}</span>
         <Link href={`/product/${product.slug}`}><h3 className="text-sm font-semibold text-gray-900 mb-2 h-10 line-clamp-2 transition-colors group-hover:text-blue-600">{product.title}</h3></Link>
         <button 
-  onClick={handleAddToCart}
-  className="block w-full text-center bg-blue-600 text-white font-semibold py-2.5 rounded-md text-sm transition-all duration-300 hover:bg-blue-700 hover:shadow-md mt-2"
->
-   {product.price ? 'Add to Cart' : 'Get a Quote'}
-</button>
+          onClick={handleAddToCart}
+          className="block w-full text-center bg-blue-600 text-white font-semibold py-2.5 rounded-md text-sm transition-all duration-300 hover:bg-blue-700 hover:shadow-md mt-2"
+        >
+           {showAddToCart ? 'Add to Cart' : 'Get a Quote'}
+        </button>
         <div className="flex justify-between items-center mt-3 px-1">
           <button onClick={toggleWishlist} className={`flex items-center gap-1.5 text-sm font-medium ${isInWishlist ? 'text-red-600' : 'text-gray-600 hover:text-blue-600'}`}>
             <HeartIcon className="w-4 h-4" fill={isInWishlist ? "currentColor" : "none"} /> {isInWishlist ? 'Saved' : 'Save'}
@@ -1018,6 +1021,7 @@ function BestSellerProductCard({ product }: { product: any })
     </div>
   );
 }
+
 // --- END: BEST SELLER PRODUCT CARD ---
 
 // --- Animation Variants for BestSellers Carousel ---
@@ -1351,33 +1355,32 @@ function BigDealsBannerSection() {
 // --- START: NEW RECENTLY ADDED SECTION ---
 
 // --- UPDATED: Added slug field to all products ---
+// --- RECENTLY ADDED SECTION ---
 const recentlyAddedProducts = addSlugsToProducts([
-  // Page 1
-  { id: 'switch-smart-managed-layer2-5-port', brand: 'Ubiquiti Switches', title: 'Switch smart managed Layer2 5 Port', price: '£160.00', image: '/ubiquiti/4.avif' },
-  { id: 'ubiquiti-unifi-dream-machine-pro-managed-gigabit-udm-pro', brand: 'Ubiquiti Switches', title: 'Ubiquiti UniFi Dream Machine Pro Managed Gigabit (UDM-Pro)', price: '£315.11', image: '/ubiquiti/5.png' },
-  { id: 'ubiquiti-edgerouter-6p-wired-router-gigabit-ethernet-er-6p', brand: 'Ubiquiti Switches', title: 'Ubiquiti EdgeRouter 6P wired router Gigabit Ethernet – ER-6P', price: '£570.00', image: '/ubiquiti/6.png' },
-  { id: 'ra4', brand: 'Access Point', title: 'Ubiquiti UniFi U6+', price: '£71.35', image: '/ubiquiti/7.jpg' },
-  // Page 2
-  { id: 'ra5', brand: 'Ubiquiti Access Point', title: 'Ubiquiti NanoBeam AC GEN2 NBE-5AC-GEN2', price: '£65.21', image: '/ubiquiti/15.jpg' },
-  { id: 'ra6', brand: 'Lenovo Laptop', title: 'Lenovo 14″ Privacy Screen Filter ? Blue Light Reduction, Nano Technology, Heat & Humidity Resistant', price: '£44.90', image: '/computerandlaptops/lenovo2/3.jpg' },
-  { id: 'ra7', brand: 'Lenovo Laptop', title: 'Lenovo 14″ Privacy Screen Filter (16:10) for X1 Yoga Gen6 ? Anti-Glare, Blue Light Reduction, 3M Nanolouvre Tech', price: '£46.02', image: '/computerandlaptops/lenovo2/4.jpg' },
-  { id: 'ra8', brand: 'Lenovo Laptop', title: 'Lenovo Privacy Screen Filter – For 33.8 cm (13.3″) Widescreen LCD 2 in 1 Notebook – 16:10', price: '£44.90', image: '/computerandlaptops/lenovo2/13.jpg' },
+  { id: 'switch-smart-managed-layer2-5-port', brand: 'Ubiquiti Switches', title: 'Switch smart managed Layer2 5 Port', price: 'Get a Quote', image: '/ubiquiti/4.avif' },
+  { id: 'ubiquiti-unifi-dream-machine-pro-managed-gigabit-udm-pro', brand: 'Ubiquiti Switches', title: 'Ubiquiti UniFi Dream Machine Pro Managed Gigabit (UDM-Pro)', price: 'Get a Quote', image: '/ubiquiti/5.png' },
+  { id: 'ubiquiti-edgerouter-6p-wired-router-gigabit-ethernet-er-6p', brand: 'Ubiquiti Switches', title: 'Ubiquiti EdgeRouter 6P wired router Gigabit Ethernet – ER-6P', price: 'Get a Quote', image: '/ubiquiti/6.png' },
+  { id: 'ra4', brand: 'Access Point', title: 'Ubiquiti UniFi U6+', price: 'Get a Quote', image: '/ubiquiti/7.jpg' },
+  { id: 'ra5', brand: 'Ubiquiti Access Point', title: 'Ubiquiti NanoBeam AC GEN2 NBE-5AC-GEN2', price: 'Get a Quote', image: '/ubiquiti/15.jpg' },
+  { id: 'ra6', brand: 'Lenovo Laptop', title: 'Lenovo 14″ Privacy Screen Filter ? Blue Light Reduction, Nano Technology, Heat & Humidity Resistant', price: 'Get a Quote', image: '/computerandlaptops/lenovo2/3.jpg' },
+  { id: 'ra7', brand: 'Lenovo Laptop', title: 'Lenovo 14″ Privacy Screen Filter (16:10) for X1 Yoga Gen6 ? Anti-Glare, Blue Light Reduction, 3M Nanolouvre Tech', price: 'Get a Quote', image: '/computerandlaptops/lenovo2/4.jpg' },
+  { id: 'ra8', brand: 'Lenovo Laptop', title: 'Lenovo Privacy Screen Filter – For 33.8 cm (13.3″) Widescreen LCD 2 in 1 Notebook – 16:10', price: 'Get a Quote', image: '/computerandlaptops/lenovo2/13.jpg' },
   // Page 3
-  { id: 'ra9', brand: 'Lenovo Laptop', title: 'Lenovo ThinkPad P16v Gen 2 16″ Mobile Workstation ? Intel Core Ultra 9, 32GB RAM, 1TB SSD, NVIDIA RTX 3000 Ada, WUXGA Display, Windows 11 Pro', price: '£540.24', image: '/computerandlaptops/lenovo2/13.jpg' },
-  { id: 'ra10', brand: 'Lenovo Laptop', title: 'Lenovo ThinkPad P1 Gen 7 16″ Laptop ? Intel Core Ultra 9, 32GB RAM, 1TB SSD, NVIDIA RTX 2000, WQXGA Display, Windows 11 Pro', price: '£1,441.53', image: '/computerandlaptops/lenovo2/16.jpg' },
-  { id: 'ra11', brand: 'Lenovo Laptop', title: 'ThinkPad Series 14 WUXGA R5-7530U | Powerful Laptop | AMD', price: '£1,275.20', image: '/computerandlaptops/lenovo2/2.jpg' },
-  { id: 'ra12', brand: 'Lenovo Laptop', title: 'Lenovo ThinkPad P14s Gen 5 Mobile Workstation – 14.5″ WQXGA, Intel Core Ultra 9, 32GB RAM, 1TB SSD, Intel Arc Graphics, Windows 11 Pro', price: '£1,164.32', image: '/computerandlaptops/lenovo2/19.jpg' },
+  { id: 'ra9', brand: 'Lenovo Laptop', title: 'Lenovo ThinkPad P16v Gen 2 16″ Mobile Workstation ? Intel Core Ultra 9, 32GB RAM, 1TB SSD, NVIDIA RTX 3000 Ada, WUXGA Display, Windows 11 Pro', price: 'Get a Quote', image: '/computerandlaptops/lenovo2/13.jpg' },
+  { id: 'ra10', brand: 'Lenovo Laptop', title: 'Lenovo ThinkPad P1 Gen 7 16″ Laptop ? Intel Core Ultra 9, 32GB RAM, 1TB SSD, NVIDIA RTX 2000, WQXGA Display, Windows 11 Pro', price: 'Get a Quote', image: '/computerandlaptops/lenovo2/16.jpg' },
+  { id: 'ra11', brand: 'Lenovo Laptop', title: 'ThinkPad Series 14 WUXGA R5-7530U | Powerful Laptop | AMD', price: 'Get a Quote', image: '/computerandlaptops/lenovo2/2.jpg' },
+  { id: 'ra12', brand: 'Lenovo Laptop', title: 'Lenovo ThinkPad P14s Gen 5 Mobile Workstation – 14.5″ WQXGA, Intel Core Ultra 9, 32GB RAM, 1TB SSD, Intel Arc Graphics, Windows 11 Pro', price: 'Get a Quote', image: '/computerandlaptops/lenovo2/19.jpg' },
   // Page 4
-  { id: 'ra13', brand: 'Lenovo Laptop', title: 'Lenovo ThinkPad P14s Gen 5 14.5″ Mobile Workstation – Intel Core Ultra 7, 32GB RAM, 1TB SSD, NVIDIA RTX 500, WUXGA Display – Windows 11 Pro', price: '£1,242.55', image: '/computerandlaptops/lenovo2/12.jpg' },
-  { id: 'ra14', brand: 'Lenovo Laptop', title: 'ThinkPad P16V1 R9-P7940HS | High-Performance Laptop with 32GB RAM, 1TB SSD, NVIDIA RTX 2000 | Windows 11 Pro', price: '£1,529.79', image: '/computerandlaptops/lenovo2/12.jpg' },
-  { id: 'ra15', brand: 'Lenovo Laptop', title: 'ThinkPad L16 G1 AMD R7P-7735U 16-inch Laptop | 32GB RAM, 1TB SSD, NVIDIA RTX A1000 ? High Performance & Reliability', price: '£1,289.02', image: '/computerandlaptops/lenovo2/12.jpg' },
-  { id: 'ra16', brand: 'Lenovo Laptop', title: 'Lenovo ThinkPad P14s Gen 5 – Ultra-Portable Rugged Workstation | 64GB RAM, RTX 500 Ada, 1TB SSD', price: '£1,378.82', image: '/computerandlaptops/lenovo2/12.jpg' },
+  { id: 'ra13', brand: 'Lenovo Laptop', title: 'Lenovo ThinkPad P14s Gen 5 14.5″ Mobile Workstation – Intel Core Ultra 7, 32GB RAM, 1TB SSD, NVIDIA RTX 500, WUXGA Display – Windows 11 Pro', price: 'Get a Quote', image: '/computerandlaptops/lenovo2/12.jpg' },
+  { id: 'ra14', brand: 'Lenovo Laptop', title: 'ThinkPad P16V1 R9-P7940HS | High-Performance Laptop with 32GB RAM, 1TB SSD, NVIDIA RTX 2000 | Windows 11 Pro', price: 'Get a Quote', image: '/computerandlaptops/lenovo2/12.jpg' },
+  { id: 'ra15', brand: 'Lenovo Laptop', title: 'ThinkPad L16 G1 AMD R7P-7735U 16-inch Laptop | 32GB RAM, 1TB SSD, NVIDIA RTX A1000 ? High Performance & Reliability', price: 'Get a Quote', image: '/computerandlaptops/lenovo2/12.jpg' },
+  { id: 'ra16', brand: 'Lenovo Laptop', title: 'Lenovo ThinkPad P14s Gen 5 – Ultra-Portable Rugged Workstation | 64GB RAM, RTX 500 Ada, 1TB SSD', price: 'Get a Quote', image: '/computerandlaptops/lenovo2/12.jpg' },
   // Page 5
-  { id: 'ra17', brand: 'Lenovo Laptop', title: 'Lenovo ThinkBook 16 G6 IRL – 16-inch Laptop with Intel Core i5, 8GB RAM, 256GB SSD, and 1920×1200 Display', price: '£1,984.64', image: '/computerandlaptops/lenovo/l18.jpg' },
-  { id: 'ra18', brand: 'Lenovo Laptop', title: 'Lenovo ThinkPad X9-14 Gen 1 (21QA001KUK) 14″ WUXGA Laptop – Intel Core Ultra 7, 32GB RAM, 512GB SSD, Windows 11 Pro – Grey', price: '£2,128.16', image: '/computerandlaptops/lenovo/l18.jpg' },
-  { id: 'ra19', brand: 'Lenovo Laptop', title: 'Lenovo ThinkPad T14s Gen 6 14″ Touchscreen Rugged Laptop – Qualcomm Snapdragon X Elite, 32GB RAM, 512GB SSD, WUXGA Display, Windows 11 Pro', price: '£895.30', image: '/computerandlaptops/lenovo/l18.jpg' },
+  { id: 'ra17', brand: 'Lenovo Laptop', title: 'Lenovo ThinkBook 16 G6 IRL – 16-inch Laptop with Intel Core i5, 8GB RAM, 256GB SSD, and 1920×1200 Display', price: 'Get a Quote', image: '/computerandlaptops/lenovo/l18.jpg' },
+  { id: 'ra18', brand: 'Lenovo Laptop', title: 'Lenovo ThinkPad X9-14 Gen 1 (21QA001KUK) 14″ WUXGA Laptop – Intel Core Ultra 7, 32GB RAM, 512GB SSD, Windows 11 Pro – Grey', price: 'Get a Quote', image: '/computerandlaptops/lenovo/l18.jpg' },
+  { id: 'ra19', brand: 'Lenovo Laptop', title: 'Lenovo ThinkPad T14s Gen 6 14″ Touchscreen Rugged Laptop – Qualcomm Snapdragon X Elite, 32GB RAM, 512GB SSD, WUXGA Display, Windows 11 Pro', price: 'Get a Quote', image: '/computerandlaptops/lenovo/l18.jpg' },
   // --- FIX: Corrected duplicate ID ---
-  { id: 'ra20', brand: 'Lenovo Laptop', title: 'Lenovo ThinkPad T14s Gen 6 14″ Rugged Copilot+ Laptop – Qualcomm Snapdragon X Plus, 16GB RAM, 512GB SSD, WUXGA Display, Windows 11 Pro', price: '£895.30', image: '/computerandlaptops/lenovo2/20.jpg' },
+  { id: 'ra20', brand: 'Lenovo Laptop', title: 'Lenovo ThinkPad T14s Gen 6 14″ Rugged Copilot+ Laptop – Qualcomm Snapdragon X Plus, 16GB RAM, 512GB SSD, WUXGA Display, Windows 11 Pro', price: 'Get a Quote', image: '/computerandlaptops/lenovo2/20.jpg' },
 ]);
 
 
@@ -1392,6 +1395,8 @@ function RecentlyAddedProductCard({ product }: { product: any }) {
   const { isInWishlist, toggleWishlist } = useWishlist(product.slug);
   const { isInCompare, toggleCompare } = useCompare(product.slug);
 
+  const showAddToCart = product.price && product.price !== 'Get a Quote';
+
   return (
     <div className="bg-white border border-gray-200 rounded-lg overflow-hidden transition-all duration-300 hover:border-blue-500 hover:shadow-lg">
       <div className="p-4">
@@ -1404,19 +1409,19 @@ function RecentlyAddedProductCard({ product }: { product: any }) {
         </Link>
         <div className="mb-4">
          <button 
-  onClick={handleAddToCart}
-  className="w-full inline-block bg-blue-600 text-white text-sm font-semibold py-2 px-5 rounded-md transition-all hover:bg-blue-700"
->
-  {product.price ? 'Add to Cart' : 'Get a Quote'}
-</button>
+            onClick={handleAddToCart}
+            className="w-full inline-block bg-blue-600 text-white text-sm font-semibold py-2 px-5 rounded-md transition-all hover:bg-blue-700"
+          >
+            {showAddToCart ? 'Add to Cart' : 'Get a Quote'}
+          </button>
         </div>
         <div className="flex justify-between items-center">
-           <button onClick={toggleWishlist} className={`flex items-center gap-2 transition-colors ${isInWishlist ? 'text-red-600' : 'text-gray-600 hover:text-blue-600'}`}>
-             <HeartIcon className="w-5 h-5" fill={isInWishlist ? "currentColor" : "none"} /> <span className="text-sm font-medium">{isInWishlist ? 'Saved' : 'Add to wishlist'}</span>
-           </button>
-           <button onClick={toggleCompare} className={`flex items-center gap-2 transition-colors ${isInCompare ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600'}`}>
-             <CompareIcon className="w-5 h-5" /> <span className="text-sm font-medium">{isInCompare ? 'Added' : 'Compare'}</span>
-           </button>
+            <button onClick={toggleWishlist} className={`flex items-center gap-2 transition-colors ${isInWishlist ? 'text-red-600' : 'text-gray-600 hover:text-blue-600'}`}>
+              <HeartIcon className="w-5 h-5" fill={isInWishlist ? "currentColor" : "none"} /> <span className="text-sm font-medium">{isInWishlist ? 'Saved' : 'Add to wishlist'}</span>
+            </button>
+            <button onClick={toggleCompare} className={`flex items-center gap-2 transition-colors ${isInCompare ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600'}`}>
+              <CompareIcon className="w-5 h-5" /> <span className="text-sm font-medium">{isInCompare ? 'Added' : 'Compare'}</span>
+            </button>
         </div>
       </div>
     </div>

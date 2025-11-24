@@ -12436,8 +12436,10 @@ const rawProducts: Product[] = [
 
 ];
 
+
+
 /// 5. EXPORT THE FINAL MERGED LIST
-// This maps over your raw list and injects the SKU/Category from sku-data.ts if a match is found
+// This maps over your raw list and injects the SKU/Category/Price from sku-data.ts if a match is found
 export const allProducts: Product[] = rawProducts.map(product => {
   // Look up the SKU data using the product slug
   const extraData = productSkus[product.slug];
@@ -12445,8 +12447,9 @@ export const allProducts: Product[] = rawProducts.map(product => {
   if (extraData) {
     return {
       ...product,
-      sku: extraData.sku || product.sku, // Use SKU from file, or keep existing if matched file is empty
-      category: extraData.category || product.category, // Overwrite category if exists in file
+      sku: extraData.sku || product.sku, // Use SKU from file
+      category: extraData.category || product.category, // Overwrite category if exists
+      price: extraData.price || product.price, // <--- ADD THIS LINE: Overwrite price if exists
     };
   }
 
@@ -12454,5 +12457,4 @@ export const allProducts: Product[] = rawProducts.map(product => {
   return product;
 });
 
-// Create a dedicated list for the sidebar
 export const latestProducts = allProducts.slice(0, 3);

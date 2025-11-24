@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation'; // Added useRouter
 import { HeaderSection } from '../../components/Header';
 import { useCart } from '../../hooks/useCart';
 import { CustomScrollbarStyles } from '../../components/SharedComponents';
@@ -25,6 +26,7 @@ const SearchIcon = ({ className = "" }) => (
 export default function CheckoutPage() {
   const { cartItems, cartTotal, clearCart } = useCart();
   const [isClient, setIsClient] = useState(false);
+  const router = useRouter(); // Initialize router
   
   // Logic: Determine if this is a Quote Request
   const isQuoteOrder = cartTotal === 0;
@@ -70,10 +72,17 @@ export default function CheckoutPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const actionType = isQuoteOrder ? 'Quote Request Sent' : 'Order Placed';
-    alert(`Success! ${actionType}. Confirmation sent to ${formData.email}.`);
+    
+    // In a real app, you would send data to your backend here
+    
+    // Determine Type
+    const type = isQuoteOrder ? 'quote' : 'order';
+    
+    // Clear the cart
     clearCart();
-    window.location.href = '/'; 
+
+    // Redirect to confirmation page with query params
+    router.push(`/order-confirmation?type=${type}&email=${encodeURIComponent(formData.email)}`);
   };
 
   if (!isClient) return null;
@@ -250,7 +259,7 @@ export default function CheckoutPage() {
                       }`}
                     >
                       <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                         paymentMethod === 'card' ? 'border-blue-600' : 'border-gray-300'
+                          paymentMethod === 'card' ? 'border-blue-600' : 'border-gray-300'
                       }`}>
                         {paymentMethod === 'card' && <div className="w-2.5 h-2.5 bg-blue-600 rounded-full"></div>}
                       </div>
@@ -263,7 +272,7 @@ export default function CheckoutPage() {
                       }`}
                     >
                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                         paymentMethod === 'bank' ? 'border-blue-600' : 'border-gray-300'
+                          paymentMethod === 'bank' ? 'border-blue-600' : 'border-gray-300'
                       }`}>
                         {paymentMethod === 'bank' && <div className="w-2.5 h-2.5 bg-blue-600 rounded-full"></div>}
                       </div>

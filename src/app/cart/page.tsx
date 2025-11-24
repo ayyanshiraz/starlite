@@ -86,7 +86,8 @@ export default function CartPage() {
 
               <div className="divide-y divide-gray-100">
                 {cartItems.map((item) => (
-                  <div key={item.id} className="p-4 sm:p-6 flex flex-col sm:grid sm:grid-cols-12 gap-4 sm:items-center">
+                  /* FIX: Changed key from item.id to item.slug to ensure uniqueness */
+                  <div key={item.slug} className="p-4 sm:p-6 flex flex-col sm:grid sm:grid-cols-12 gap-4 sm:items-center">
                     
                     <div className="col-span-6 flex items-center gap-4">
                       <div className="w-20 h-20 flex-shrink-0 bg-gray-50 rounded-lg border border-gray-100 p-2 overflow-hidden">
@@ -185,7 +186,7 @@ export default function CartPage() {
                 <div className="flex justify-between text-gray-600">
                   <span>Tax</span>
                   <span className="font-medium text-gray-900">
-                     {isQuoteOrder ? '-' : '£0.00'}
+                      {isQuoteOrder ? '-' : '£0.00'}
                   </span>
                 </div>
               </div>
