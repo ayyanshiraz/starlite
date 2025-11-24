@@ -4,15 +4,17 @@ import React, { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { HeaderSection } from 'src/components/Header';
-import { ChatButton, CustomScrollbarStyles } from 'src/components/SharedComponents';
-import { allProducts } from 'src/lib/products';
-import { categoriesData } from 'src/lib/data';
-import { productSkus } from 'src/lib/sku-data'; 
-import type { Product, StandardProductDescription, KeyFeatureProductDescription } from 'src/lib/products';
-import { useWishlist } from 'src/hooks/useWishlist';
-import { useCompare } from 'src/hooks/useCompare';
 
+// --- FIX: Use '@/' to point directly to src/ folder ---
+import { HeaderSection } from '@/components/Header'; 
+import { ChatButton, CustomScrollbarStyles } from '@/components/SharedComponents'; 
+import { allProducts } from '@/lib/products';
+import { productSkus } from '@/lib/sku-data'; 
+import { categoriesData } from '@/lib/data';
+import type { Product, StandardProductDescription, KeyFeatureProductDescription } from '@/lib/products';
+import { useWishlist } from '@/hooks/useWishlist';
+import { useCompare } from '@/hooks/useCompare';
+import { useCart } from '@/hooks/useCart';
 // --- ICONS ---
 const iconProps = {
   xmlns: "http://www.w3.org/2000/svg",
@@ -63,13 +65,43 @@ const StarIcon = ({ className = "" }) => (
   </svg>
 );
 
-// --- MOCK DATA ---
+// --- UPDATED SIDEBAR DATA (From HomePage Recently Added) ---
 const latestProductsSidebarData = [
-  { id: "lp1", name: "Ubiquiti UniFi Switch Ultra 210W", price: "Get a Quote", image: "/ubiquiti/12.jpg", slug: "ubiquiti-unifi-switch-ultra-210w" },
-  { id: "lp2", name: "Ubiquiti UniFi Switch Pro Max 24", price:"Get a Quote", image: "/ubiquiti/5.jpg", slug: "ubiquiti-unifi-switch-pro-max-24" },
-  { id: "lp3", name: "Ubiquiti UniFi Switch USW-Enterprise-24-PoE", price: "Get a Quote", image: "/ubiquiti/6.jpg", slug: "ubiquiti-unifi-switch-usw-enterprise-24-poe" },
-  { id: "lp4", name: "Ubiquiti UniFi U6+", price: "Get a Quote", image: "/ubiquiti/7.jpg", slug: "ubiquiti-unifi-u6-plus" },
-  { id: "lp5", name: "Ubiquiti NanoBeam AC GEN2 NBE-5AC-GEN2", price: "Get a Quote", image: "/ubiquiti/8.jpg", slug: "ubiquiti-nanobeam-ac-gen2-nbe-5ac-gen2" },
+  { 
+    id: 'switch-smart-managed-layer2-5-port', 
+    name: 'Switch smart managed Layer2 5 Port', 
+    price: 160.00, 
+    image: '/ubiquiti/4.avif',
+    slug: 'switch-smart-managed-layer2-5-port'
+  },
+  { 
+    id: 'ubiquiti-unifi-dream-machine-pro-managed-gigabit-udm-pro', 
+    name: 'Ubiquiti UniFi Dream Machine Pro Managed Gigabit (UDM-Pro)', 
+    price: 315.11, 
+    image: '/ubiquiti/5.png',
+    slug: 'ubiquiti-unifi-dream-machine-pro-managed-gigabit-udm-pro'
+  },
+  { 
+    id: 'ubiquiti-edgerouter-6p-wired-router-gigabit-ethernet-er-6p', 
+    name: 'Ubiquiti EdgeRouter 6P wired router Gigabit Ethernet – ER-6P', 
+    price: 570.00, 
+    image: '/ubiquiti/6.png',
+    slug: 'ubiquiti-edgerouter-6p-wired-router-gigabit-ethernet-er-6p'
+  },
+  { 
+    id: 'ra4', 
+    name: 'Ubiquiti UniFi U6+', 
+    price: 71.35, 
+    image: '/ubiquiti/7.jpg',
+    slug: 'ubiquiti-unifi-u6-access-point' // Updated to match typical slug format
+  },
+  { 
+    id: 'ra5', 
+    name: 'Ubiquiti NanoBeam AC GEN2 NBE-5AC-GEN2', 
+    price: 65.21, 
+    image: '/ubiquiti/15.jpg',
+    slug: 'ubiquiti-nanobeam-ac-gen2-nbe-5ac-gen2'
+  }
 ];
 
 // --- SIDEBAR COMPONENTS ---
@@ -131,12 +163,20 @@ const LatestProductsSidebar = () => (
     <div className="space-y-6">
       {latestProductsSidebarData.map((product) => (
         <Link href={`/product/${product.slug}`} key={product.id} className="flex items-center gap-4 group">
-          <div className="w-20 h-20 bg-gray-50 rounded-md shrink-0 border border-gray-100 flex items-center justify-center">
-            <Image src={product.image} alt={product.name} width={60} height={60} className="max-w-full max-h-full object-contain p-1" />
+          <div className="w-20 h-20 bg-gray-50 rounded-md shrink-0 border border-gray-100 flex items-center justify-center overflow-hidden">
+            <Image 
+              src={product.image} 
+              alt={product.name} 
+              width={80} 
+              height={80} 
+              className="object-contain w-full h-full p-1 transition-transform group-hover:scale-105" 
+            />
           </div>
           <div>
             <h4 className="text-sm font-semibold text-gray-800 group-hover:text-blue-600 transition line-clamp-2">{product.name}</h4>
-            <p className="text-xs font-bold text-gray-500 mt-1 uppercase tracking-wide">Get a Quote</p>
+            <p className="text-xs font-bold text-gray-500 mt-1 uppercase tracking-wide">
+              {typeof product.price === 'number' ? `£${product.price.toFixed(2)}` : product.price}
+            </p>
           </div>
         </Link>
       ))}
@@ -230,6 +270,17 @@ const ProductGallery = ({ product }: { product: Product }) => {
 const ProductInfo = ({ product }: { product: Product }) => {
   const { isInWishlist, toggleWishlist } = useWishlist(product.slug);
   const { isInCompare, toggleCompare } = useCompare(product.slug);
+  const { addToCart } = useCart();
+  
+  // Check if product has a valid price
+  const hasPrice = typeof product.price === 'number' && product.price > 0;
+
+  const handleAction = (e: React.MouseEvent) => {
+    if (hasPrice) {
+      e.preventDefault();
+      addToCart(product);
+    }
+  };
 
   return (
     <div className="w-full md:w-3/5">
@@ -245,6 +296,13 @@ const ProductInfo = ({ product }: { product: Product }) => {
       </div>
       <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mt-2 mb-4">{product.name}</h1>
       
+      {/* Price Display */}
+      {hasPrice ? (
+        <p className="text-3xl font-bold text-gray-900 mb-6">£{product.price}</p>
+      ) : (
+        <p className="text-2xl font-bold text-blue-600 mb-6">Call for Pricing</p>
+      )}
+      
       <div className="flex flex-wrap items-center gap-4 sm:gap-6 mb-6">
         <button 
           onClick={toggleWishlist} 
@@ -257,7 +315,7 @@ const ProductInfo = ({ product }: { product: Product }) => {
         </button>
 
         <button 
-          onClick={toggleCompare}
+          onClick={toggleCompare} 
           className={`flex items-center gap-2 text-sm transition ${
             isInCompare ? 'text-blue-600 hover:text-blue-700' : 'text-gray-700 hover:text-blue-600'
           }`}
@@ -269,9 +327,18 @@ const ProductInfo = ({ product }: { product: Product }) => {
       
       <div className="flex items-center gap-3">
         {/* UPDATED: Button Color changed to #1447E6 */}
-        <a href="#" className="px-8 py-3 bg-[#1447E6] text-white font-bold rounded-md hover:bg-blue-700 transition w-full md:w-auto text-center shadow-md">
-          Get a quote
-        </a>
+        {hasPrice ? (
+          <button 
+            onClick={handleAction}
+            className="px-8 py-3 bg-[#1447E6] text-white font-bold rounded-md hover:bg-blue-700 transition w-full md:w-auto text-center shadow-md"
+          >
+            Add to Cart
+          </button>
+        ) : (
+          <Link href="/contact-us" className="px-8 py-3 bg-[#1447E6] text-white font-bold rounded-md hover:bg-blue-700 transition w-full md:w-auto text-center shadow-md">
+            Get a quote
+          </Link>
+        )}
       </div>
     </div>
   );

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { allProducts } from '../lib/products';
+import { useCart } from '../hooks/useCart'; // <--- 1. IMPORT THE HOOK
 
 // --- SVG ICON COMPONENTS ---
 const iconProps = {
@@ -74,6 +75,9 @@ export function HeaderSection() {
   // Badge Counts
   const [wishlistCount, setWishlistCount] = useState(0);
   const [compareCount, setCompareCount] = useState(0);
+
+  // --- 2. GET CART STATE ---
+  const { cartCount, cartTotal } = useCart(); 
 
   const router = useRouter();
   const searchRef = useRef<HTMLDivElement>(null);
@@ -198,7 +202,6 @@ export function HeaderSection() {
           <div className="flex items-center gap-3 sm:gap-4 flex-shrink-0 md:order-3">
             
             {/* --- COMPARE ICON --- */}
-            {/* FIX: Removed 'hidden md:block' so it is visible on mobile */}
             <Link href="/compare" className="text-gray-700 hover:text-black relative">
               <RepeatIcon className="w-6 h-6" />
               {compareCount > 0 && (
@@ -223,16 +226,24 @@ export function HeaderSection() {
               <UserIcon className="w-6 h-6" />
             </Link>
             
-            {/* Cart Icon */}
-            <div className="flex items-center gap-2">
+            {/* --- CART ICON (UPDATED) --- */}
+            {/* 3. Use the Link component to go to the cart page */}
+            <Link href="/cart" className="flex items-center gap-2 cursor-pointer group">
               <div className="relative">
-                <ShoppingBagIcon className="w-7 h-7 text-gray-800" />
-                <span className="absolute -top-2 -right-2 w-5 h-5 bg-blue-600 text-white text-xs font-bold rounded-full flex items-center justify-center border-2 border-white">
-                  0
-                </span>
+                <ShoppingBagIcon className="w-7 h-7 text-gray-800 group-hover:text-blue-600 transition-colors" />
+                
+                {/* 4. Conditional Rendering for Cart Badge */}
+                {cartCount > 0 && (
+                  <span className="absolute -top-2 -right-2 w-5 h-5 bg-blue-600 text-white text-xs font-bold rounded-full flex items-center justify-center border-2 border-white">
+                    {cartCount}
+                  </span>
+                )}
               </div>
-              <span className="font-bold text-gray-800 hidden md:block">£0.00</span>
-            </div>
+              {/* 5. Display Total Price */}
+              <span className="font-bold text-gray-800 hidden md:block group-hover:text-blue-600 transition-colors">
+                {cartTotal > 0 ? `£${cartTotal.toFixed(2)}` : '£0.00'}
+              </span>
+            </Link>
           </div>
 
           {/* --- Search Bar --- */}

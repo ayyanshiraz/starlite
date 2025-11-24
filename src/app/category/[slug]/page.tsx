@@ -4,13 +4,15 @@ import React, { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { HeaderSection } from 'src/components/Header';
-import { ChatButton, CustomScrollbarStyles } from 'src/components/SharedComponents';
-import { categoriesData } from 'src/lib/data';
-import { allProducts } from 'src/lib/products';
-import type { Product } from 'src/lib/products';
-import { useWishlist } from 'src/hooks/useWishlist';
-import { useCompare } from 'src/hooks/useCompare';
+
+import { HeaderSection } from '@/components/Header'; 
+import { ChatButton, CustomScrollbarStyles } from '@/components/SharedComponents'; 
+import { categoriesData } from '@/lib/data';
+import { allProducts } from '@/lib/products';
+import type { Product } from '@/lib/products';
+import { useWishlist } from '@/hooks/useWishlist';
+import { useCompare } from '@/hooks/useCompare';
+import { useCart } from '@/hooks/useCart';
 
 // --- ICONS ---
 const iconProps = {
@@ -53,35 +55,26 @@ const CompareIcon = ({ className = "" }) => (
 );
 
 // --- HELPER: CATEGORY NORMALIZER ---
-// This cleans up the category strings so "Dell Laptop" and "Laptops" become the same thing.
 const normalizeCategoryName = (rawCategory: string, currentBrandName: string): string => {
   if (!rawCategory) return "Other";
-
-  // 1. Split by comma and take the last part (usually the most specific)
   const parts = rawCategory.split(',');
   let specificPart = parts[parts.length - 1].trim();
 
-  // 2. If the specific part is just the brand name (e.g., "HP"), try the part before it
   if (specificPart.toLowerCase() === currentBrandName.toLowerCase() && parts.length > 1) {
     specificPart = parts[parts.length - 2].trim();
   }
 
-  // 3. Remove the brand name from the string (e.g., "Dell Laptop" -> "Laptop")
-  // We use a Regex to replace the brand name (case insensitive)
   const brandRegex = new RegExp(`\\b${currentBrandName}\\b`, 'gi');
   let cleanName = specificPart.replace(brandRegex, '').trim();
-
-  // 4. Clean up any leftover punctuation or extra spaces
   cleanName = cleanName.replace(/^[-&,]+|[-&,]+$/g, '').trim();
 
-  // 5. Standardize common variations (optional, but helps grouping)
   if (cleanName.toLowerCase().includes('laptop') || cleanName.toLowerCase().includes('notebook')) return 'Laptops';
   if (cleanName.toLowerCase().includes('dock')) return 'Docking Stations';
   if (cleanName.toLowerCase().includes('workstation')) return 'Workstations';
   if (cleanName.toLowerCase().includes('switch')) return 'Switches';
   if (cleanName.toLowerCase().includes('server')) return 'Servers';
+  if (cleanName.toLowerCase().includes('display') || cleanName.toLowerCase().includes('monitor')) return 'Displays';
 
-  // 6. Fallback if empty
   return cleanName || "Accessories";
 };
 
@@ -192,11 +185,41 @@ const FilterSidebar = ({
 
 const LatestProductsSidebar = () => {
   const sidebarProducts = [
-    { id: "lp1", name: "Ubiquiti UniFi Switch Ultra 210W", price: 160.00, image: "/ubiquiti/12.jpg", slug: "ubiquiti-unifi-switch-ultra-210w" },
-    { id: "lp2", name: "Ubiquiti UniFi Switch Pro Max 24", price: 315.11, image: "/ubiquiti/5.jpg", slug: "ubiquiti-unifi-switch-pro-max-24" },
-    { id: "lp3", name: "Ubiquiti UniFi Switch USW-Enterprise-24-PoE", price: 570.00, image: "/ubiquiti/6.jpg", slug: "ubiquiti-unifi-switch-usw-enterprise-24-poe" },
-    { id: "lp4", name: "Ubiquiti UniFi U6+", price: 71.35, image: "/ubiquiti/7.jpg", slug: "ubiquiti-unifi-u6-plus" },
-    { id: "lp5", name: "Ubiquiti NanoBeam AC GEN2 NBE-5AC-GEN2", price: 65.21, image: "/ubiquiti/8.jpg", slug: "ubiquiti-nanobeam-ac-gen2-nbe-5ac-gen2" },
+    { 
+      id: 'switch-smart-managed-layer2-5-port', 
+      name: 'Switch smart managed Layer2 5 Port', 
+      price: 160.00, 
+      image: '/ubiquiti/4.avif', 
+      slug: 'switch-smart-managed-layer2-5-port' 
+    },
+    { 
+      id: 'ubiquiti-unifi-dream-machine-pro-managed-gigabit-udm-pro', 
+      name: 'Ubiquiti UniFi Dream Machine Pro Managed Gigabit (UDM-Pro)', 
+      price: 315.11, 
+      image: '/ubiquiti/5.png', 
+      slug: 'ubiquiti-unifi-dream-machine-pro-managed-gigabit-udm-pro' 
+    },
+    { 
+      id: 'ubiquiti-edgerouter-6p-wired-router-gigabit-ethernet-er-6p', 
+      name: 'Ubiquiti EdgeRouter 6P wired router Gigabit Ethernet – ER-6P', 
+      price: 570.00, 
+      image: '/ubiquiti/6.png', 
+      slug: 'ubiquiti-edgerouter-6p-wired-router-gigabit-ethernet-er-6p' 
+    },
+    { 
+      id: 'ra4', 
+      name: 'Ubiquiti UniFi U6+', 
+      price: 71.35, 
+      image: '/ubiquiti/7.jpg', 
+      slug: 'ubiquiti-unifi-u6-access-point' 
+    },
+    { 
+      id: 'ra5', 
+      name: 'Ubiquiti NanoBeam AC GEN2 NBE-5AC-GEN2', 
+      price: 65.21, 
+      image: '/ubiquiti/15.jpg', 
+      slug: 'ubiquiti-nanobeam-ac-gen2-nbe-5ac-gen2' 
+    }
   ];
 
   return (
@@ -205,12 +228,22 @@ const LatestProductsSidebar = () => {
       <div className="space-y-6">
         {sidebarProducts.map((product) => (
           <Link href={`/product/${product.slug}`} key={product.id} className="flex items-center gap-4 group">
-            <div className="w-20 h-20 bg-gray-100 rounded-md shrink-0">
-              <Image src={product.image} alt={product.name} width={80} height={80} className="w-full h-full object-contain"/>
+            <div className="w-20 h-20 bg-gray-100 rounded-md shrink-0 border border-gray-100 flex items-center justify-center overflow-hidden">
+              <Image 
+                src={product.image} 
+                alt={product.name} 
+                width={80} 
+                height={80} 
+                className="object-contain w-full h-full p-1 transition-transform group-hover:scale-105"
+              />
             </div>
             <div>
-              <h4 className="text-sm font-semibold text-gray-800 group-hover:text-blue-600 transition">{product.name}</h4>
-              <p className="text-md font-bold text-gray-900 mt-1">Get a Quote</p>
+              <h4 className="text-sm font-semibold text-gray-800 group-hover:text-blue-600 transition line-clamp-2">
+                {product.name}
+              </h4>
+              <p className="text-md font-bold text-gray-900 mt-1">
+                 {typeof product.price === 'number' ? `£${product.price.toFixed(2)}` : product.price}
+              </p>
             </div>
           </Link>
         ))}
@@ -219,7 +252,7 @@ const LatestProductsSidebar = () => {
   );
 };
 
-// --- 2. FIXED & CLEAN: Dynamic Categories Sidebar ---
+// --- Dynamic Categories Sidebar ---
 const DynamicCategoriesSidebar = ({ 
   currentCategoryName, 
   products,
@@ -232,24 +265,19 @@ const DynamicCategoriesSidebar = ({
   activeSubCategory: string | null;
 }) => {
   
-  // CLEAN and COUNT categories
   const subCategoryStats = useMemo(() => {
     const stats: { [key: string]: number } = {};
     
     products.forEach(product => {
-      // Use our helper function to get the clean, merged name
       const cleanName = normalizeCategoryName(product.category, currentCategoryName);
       stats[cleanName] = (stats[cleanName] || 0) + 1;
     });
 
-    // Sort alphabetically or by count (currently by count desc)
     return Object.entries(stats).sort((a, b) => b[1] - a[1]);
   }, [products, currentCategoryName]);
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden mb-8">
-      
-      {/* Top Header */}
       <Link 
         href="/categories" 
         className="flex items-center gap-2 px-5 py-4 bg-gray-50 border-b border-gray-100 text-blue-600 hover:text-blue-800 transition-colors group"
@@ -258,7 +286,6 @@ const DynamicCategoriesSidebar = ({
         <span className="text-sm font-semibold">Show All Categories</span>
       </Link>
 
-      {/* Title Area */}
       <div className="px-5 py-4">
         <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
           {currentCategoryName}
@@ -266,10 +293,7 @@ const DynamicCategoriesSidebar = ({
         </h2>
       </div>
 
-      {/* Professional List */}
       <div className="flex flex-col pb-2">
-        
-        {/* "View All" Option */}
         <button
           onClick={() => onSubCategoryClick(null)}
           className={`
@@ -286,7 +310,6 @@ const DynamicCategoriesSidebar = ({
           </span>
         </button>
 
-        {/* Merged Sub Categories */}
         {subCategoryStats.map(([displayName, count]) => {
           const isActive = activeSubCategory === displayName;
 
@@ -372,6 +395,11 @@ const SortToolbar = ({ viewMode, setViewMode, setSortBy, setPerPage, totalProduc
 const ProductCard = ({ product, viewMode }: { product: Product, viewMode: 'grid' | 'list' }) => {
   const { isInWishlist, toggleWishlist } = useWishlist(product.slug);
   const { isInCompare, toggleCompare } = useCompare(product.slug);
+  const { addToCart } = useCart(); 
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    addToCart(product);
+  };
   const [isHovered, setIsHovered] = useState(false);
   
   const productPrice = typeof product.price === 'number' ? product.price : -1;
@@ -387,7 +415,7 @@ const ProductCard = ({ product, viewMode }: { product: Product, viewMode: 'grid'
             alt={product.name} 
             width={300} 
             height={300} 
-            className="w-full h-full object-cover rounded-md"
+            className="w-full h-full object-contain rounded-md"
           />
         </Link>
         <div className="grow">
@@ -395,8 +423,11 @@ const ProductCard = ({ product, viewMode }: { product: Product, viewMode: 'grid'
           <Link href={productUrl}><h3 className="text-lg font-bold hover:text-blue-600 transition mt-1">{product.name}</h3></Link>
           <p className="text-xl font-bold my-3">{priceDisplay}</p>
           <div className="flex items-center gap-4">
-            <button className="bg-blue-600 text-white font-bold py-2 px-5 rounded-md hover:bg-blue-700 transition">
-              {productPrice !== -1 ? 'Add to Cart' : 'Get a Quote'}
+            <button 
+               onClick={handleAddToCart}
+               className="bg-blue-600 text-white font-bold py-2 px-5 rounded-md hover:bg-blue-700 transition"
+            >
+               {typeof product.price === 'number' ? 'Add to Cart' : 'Get a Quote'}
             </button>
             <button 
               onClick={toggleWishlist}
@@ -456,8 +487,11 @@ const ProductCard = ({ product, viewMode }: { product: Product, viewMode: 'grid'
           </div>
         ) : (
           <div className="animate-fadeIn flex flex-col gap-2">
-            <button className="bg-blue-600 text-white w-full py-2 rounded-md font-bold text-sm hover:bg-blue-700 transition">
-              {productPrice !== -1 ? 'Add to Cart' : 'Get a Quote'}
+            <button 
+               onClick={handleAddToCart}
+               className="bg-blue-600 text-white w-full py-2 rounded-md font-bold text-sm hover:bg-blue-700 transition"
+            >
+               {typeof product.price === 'number' ? 'Add to Cart' : 'Get a Quote'}
             </button>
             <div className="flex flex-col">
               <button 
@@ -508,7 +542,6 @@ export default function CategoryDetailPage() {
   const [appliedMinPrice, setAppliedMinPrice] = useState(0);
   const [appliedMaxPrice, setAppliedMaxPrice] = useState(MAX_SLIDER_PRICE);
 
-  // NEW STATE for Sub-Category filtering (stores the CLEAN name)
   const [selectedSubCategory, setSelectedSubCategory] = useState<string | null>(null);
 
   const handleFilterClick = () => {
@@ -530,6 +563,41 @@ export default function CategoryDetailPage() {
   // 1. Filter products that belong to this MAIN page slug (e.g., "Dell")
   const categoryProducts = useMemo(() => {
     if (!allProducts) return [];
+    
+    // --- SPECIAL LOGIC FOR ACCESSORIES ---
+    if (slug === 'accessories') {
+       // Only include items EXPLICITLY categorized as Accessories, Keyboards, Mice, Docks, etc.
+       // Exclude Laptops, Monitors (Displays), Printers, etc.
+       return allProducts.filter(product => {
+          const lowerCat = product.category.toLowerCase();
+          const lowerName = product.name.toLowerCase();
+          
+          // Whitelist for accessories
+          const isAccessory = 
+            lowerCat.includes('accessories') || 
+            lowerCat.includes('keyboard') || 
+            lowerCat.includes('mouse') || 
+            lowerCat.includes('dock') || 
+            lowerCat.includes('cable') || 
+            lowerCat.includes('adapter') ||
+            lowerCat.includes('webcam') ||
+            lowerCat.includes('headset');
+
+          // Blacklist to prevent bleed-over
+          const isNotAccessory = 
+            lowerCat.includes('laptop') || 
+            lowerCat.includes('display') || 
+            lowerCat.includes('monitor') || 
+            lowerCat.includes('printer') || 
+            lowerCat.includes('server') ||
+            lowerCat.includes('switch') || 
+            lowerCat.includes('router');
+
+          return isAccessory && !isNotAccessory; 
+       });
+    }
+    // --- END SPECIAL LOGIC ---
+
     return allProducts.filter(product => {
        if (mainCategory) {
           return product.categorySlug === slug;

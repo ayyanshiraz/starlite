@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { HeaderSection } from '../../components/Header';
 import { ChatButton, CustomScrollbarStyles } from '../../components/SharedComponents';
 import { allProducts } from '../../lib/products';
+import { useCart } from '../../hooks/useCart';
 
 // --- ICONS ---
 const iconProps = {
@@ -46,6 +47,7 @@ export default function WishlistPage() {
   // State to store the list of slugs (IDs) saved in LocalStorage
   const [wishlistSlugs, setWishlistSlugs] = useState<string[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+  const { addToCart } = useCart();
 
   // 1. Load Wishlist from LocalStorage on Mount
   useEffect(() => {
@@ -129,10 +131,16 @@ export default function WishlistPage() {
                       {product.price}
                     </span>
                     
-                    <button className="flex items-center gap-2 bg-gray-900 hover:bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors">
-                      <CartIcon className="w-4 h-4" />
-                      <span className="hidden sm:inline">Add to Cart</span>
-                    </button>
+                   <button 
+  onClick={() => addToCart(product)}
+  className="flex items-center gap-2 bg-gray-900 hover:bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+>
+  <CartIcon className="w-4 h-4" />
+  <span className="hidden sm:inline">
+    {/* Logic: If price exists, show Add to Cart, otherwise Get Quote */}
+    {product.price ? 'Add to Cart' : 'Get a Quote'}
+  </span>
+</button>
                   </div>
                 </div>
               </div>

@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { allProducts, type Product } from '../lib/products'; // Added Product type
 import { useWishlist } from '../hooks/useWishlist';
 import { useCompare } from '../hooks/useCompare';
+import { useCart } from '../hooks/useCart';
 
 
 
@@ -455,6 +456,11 @@ const TabButton = ({ title, isActive, onClick }: { title: string, isActive: bool
 function ProductCard({ product }: { product: any }) {
   const { isInWishlist, toggleWishlist } = useWishlist(product.slug);
   const { isInCompare, toggleCompare } = useCompare(product.slug);
+  const { addToCart } = useCart();
+const handleAddToCart = (e: React.MouseEvent) => {
+  e.preventDefault();
+  addToCart(product);
+};
 
   return (
     <motion.div
@@ -470,7 +476,12 @@ function ProductCard({ product }: { product: any }) {
           <h3 className="text-sm font-semibold text-gray-900 mb-3 h-10 line-clamp-2 group-hover:text-blue-600 transition-colors">{product.title}</h3>
         </Link>
         <div className="mt-auto pt-4 border-t border-gray-200">
-          <a href="#" className="block w-full text-center bg-blue-600 text-white font-semibold py-2.5 rounded-md text-sm transition-all duration-300 hover:bg-blue-700 hover:shadow-md">Get a Quote</a>
+          <button 
+  onClick={handleAddToCart}
+  className="block w-full text-center bg-blue-600 text-white font-semibold py-2.5 rounded-md text-sm transition-all duration-300 hover:bg-blue-700 hover:shadow-md"
+>
+  {product.price ? 'Add to Cart' : 'Get a Quote'}
+</button>
           <div className="flex justify-between items-center pt-3">
             <button onClick={toggleWishlist} className={`flex items-center gap-1.5 text-sm transition-colors ${isInWishlist ? 'text-red-600 font-medium' : 'text-gray-500 hover:text-blue-600'}`}>
               <HeartIcon className="w-4 h-4" fill={isInWishlist ? "currentColor" : "none"} /><span>{isInWishlist ? 'Saved' : 'Save'}</span>
@@ -748,6 +759,12 @@ const bestDealsCategories = [
 // --- CARD 2: BEST DEALS ITEM (Updated) ---
 // --- CARD 2: BEST DEALS ITEM (Updated) ---
 const BestDealItem = ({ product }: { product: any }) => {
+  const { addToCart } = useCart();
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    addToCart(product);
+  };
   const { isInWishlist, toggleWishlist } = useWishlist(product.slug);
   const { isInCompare, toggleCompare } = useCompare(product.slug); // 1. Add Compare hook
 
@@ -762,7 +779,12 @@ const BestDealItem = ({ product }: { product: any }) => {
           <h3 className="text-sm font-semibold text-gray-900 mb-3 h-10 line-clamp-2 group-hover:text-blue-600 transition-colors">{product.title}</h3>
         </Link>
         <div className="mt-auto pt-4 border-t border-gray-200">
-          <a href="#" className="block w-full text-center bg-blue-600 text-white font-semibold py-2.5 rounded-md text-sm transition-all duration-300 hover:bg-blue-700 hover:shadow-md">Get a Quote</a>
+         <button 
+  onClick={handleAddToCart}
+  className="block w-full text-center bg-blue-600 text-white font-semibold py-2.5 rounded-md text-sm transition-all duration-300 hover:bg-blue-700 hover:shadow-md"
+>
+  {product.price ? 'Add to Cart' : 'Get a Quote'}
+</button>
           
           {/* 2. Add the buttons in a flex container */}
           <div className="flex justify-between items-center pt-3">
@@ -959,7 +981,14 @@ const allBestSellers = addSlugsToProducts([
 
 
 // --- START: BEST SELLER PRODUCT CARD (White Card) ---
-function BestSellerProductCard({ product }: { product: any }) {
+function BestSellerProductCard({ product }: { product: any }) 
+{
+  const { addToCart } = useCart();
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    addToCart(product);
+  };
   const { isInWishlist, toggleWishlist } = useWishlist(product.slug);
   const { isInCompare, toggleCompare } = useCompare(product.slug);
 
@@ -971,7 +1000,12 @@ function BestSellerProductCard({ product }: { product: any }) {
       <div className="p-3 bg-white">
         <span className="block text-xs text-gray-500 mb-1">{product.brand}</span>
         <Link href={`/product/${product.slug}`}><h3 className="text-sm font-semibold text-gray-900 mb-2 h-10 line-clamp-2 transition-colors group-hover:text-blue-600">{product.title}</h3></Link>
-        <a href="#" className="block w-full text-center bg-blue-600 text-white font-semibold py-2.5 rounded-md text-sm transition-all duration-300 hover:bg-blue-700 hover:shadow-md mt-2">Get a Quote</a>
+        <button 
+  onClick={handleAddToCart}
+  className="block w-full text-center bg-blue-600 text-white font-semibold py-2.5 rounded-md text-sm transition-all duration-300 hover:bg-blue-700 hover:shadow-md mt-2"
+>
+   {product.price ? 'Add to Cart' : 'Get a Quote'}
+</button>
         <div className="flex justify-between items-center mt-3 px-1">
           <button onClick={toggleWishlist} className={`flex items-center gap-1.5 text-sm font-medium ${isInWishlist ? 'text-red-600' : 'text-gray-600 hover:text-blue-600'}`}>
             <HeartIcon className="w-4 h-4" fill={isInWishlist ? "currentColor" : "none"} /> {isInWishlist ? 'Saved' : 'Save'}
@@ -1349,6 +1383,12 @@ const recentlyAddedProducts = addSlugsToProducts([
 
 // --- 2. New Product Card Component ---
 function RecentlyAddedProductCard({ product }: { product: any }) {
+  const { addToCart } = useCart();
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    addToCart(product);
+  };
   const { isInWishlist, toggleWishlist } = useWishlist(product.slug);
   const { isInCompare, toggleCompare } = useCompare(product.slug);
 
@@ -1363,7 +1403,12 @@ function RecentlyAddedProductCard({ product }: { product: any }) {
           <Image src={product.image} alt={product.title} layout="fill" objectFit="contain" />
         </Link>
         <div className="mb-4">
-          <a href="#" className="inline-block bg-blue-600 text-white text-sm font-semibold py-2 px-5 rounded-md transition-all hover:bg-blue-700">Get a Quote</a>
+         <button 
+  onClick={handleAddToCart}
+  className="w-full inline-block bg-blue-600 text-white text-sm font-semibold py-2 px-5 rounded-md transition-all hover:bg-blue-700"
+>
+  {product.price ? 'Add to Cart' : 'Get a Quote'}
+</button>
         </div>
         <div className="flex justify-between items-center">
            <button onClick={toggleWishlist} className={`flex items-center gap-2 transition-colors ${isInWishlist ? 'text-red-600' : 'text-gray-600 hover:text-blue-600'}`}>

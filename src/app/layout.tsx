@@ -5,6 +5,9 @@ import CookieBanner from "../components/CookieBanner"; // <-- 1. Add this import
 import { BrandsSlideShow } from '@/components/BrandsSlideShow';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+// 1. ADD THIS IMPORT
+import { CartProvider } from "../hooks/useCart";
+
 
 
 
@@ -36,7 +39,9 @@ export default function RootLayout({
         <Navbar />
         {/* This pt-20 matches the h-20 of the new navbar */}
        <main className="pt-20 min-h-screen overflow-hidden">
+        <CartProvider>
           {children}
+          </CartProvider>
         </main>
         <BrandsSlideShow />
         <Footer />

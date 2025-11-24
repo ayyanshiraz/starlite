@@ -8,6 +8,7 @@ import { ChatButton, CustomScrollbarStyles } from '../../components/SharedCompon
 import { allProducts, type Product } from '../../lib/products';
 import { useWishlist } from '../../hooks/useWishlist';
 import { useCompare } from '../../hooks/useCompare';
+import { useCart } from '../../hooks/useCart';
 
 // --- ICONS ---
 const iconProps = {
@@ -230,6 +231,11 @@ const SortToolbar = ({ viewMode, setViewMode, setSortBy, totalProducts, sortBy }
 const ShopProductCard = ({ product, viewMode }: { product: Product, viewMode: 'grid' | 'list' }) => {
   const { isInWishlist, toggleWishlist } = useWishlist(product.slug);
   const { isInCompare, toggleCompare } = useCompare(product.slug);
+  const { addToCart } = useCart();
+const handleAddToCart = (e: React.MouseEvent) => {
+  e.preventDefault();
+  addToCart(product);
+};
 
   const productPrice = typeof product.price === 'number' ? product.price : -1;
   const priceDisplay = productPrice !== -1 ? `£${productPrice.toFixed(2)}` : 'Get a Quote';
@@ -254,9 +260,12 @@ const ShopProductCard = ({ product, viewMode }: { product: Product, viewMode: 'g
           <p className="text-xl font-bold my-3 text-gray-900">{priceDisplay}</p>
           <p className="text-sm text-gray-600 mb-4">This is a placeholder description for the product. More details would go here.</p>
           <div className="flex flex-wrap items-center gap-4">
-            <button className="bg-blue-600 text-white font-bold py-2 px-5 rounded-md hover:bg-blue-700 transition">
-              {productPrice !== -1 ? 'Add to Cart' : 'Get a Quote'}
-            </button>
+           <button 
+  onClick={handleAddToCart}
+  className="bg-blue-600 text-white font-bold py-2 px-5 rounded-md hover:bg-blue-700 transition"
+>
+  {typeof product.price === 'number' ? 'Add to Cart' : 'Get a Quote'}
+</button>
             <button 
               onClick={toggleWishlist}
               className={`flex items-center gap-2 text-sm font-medium transition ${isInWishlist ? 'text-red-600' : 'text-gray-700 hover:text-blue-600'}`}
@@ -302,9 +311,12 @@ const ShopProductCard = ({ product, viewMode }: { product: Product, viewMode: 'g
         {/* --- ACTION BUTTONS --- */}
         <div className="mt-auto space-y-2">
           {productPrice === -1 && (
-             <button className="w-full text-center bg-blue-600 text-white font-semibold py-2.5 rounded-md text-sm transition-all duration-300 hover:bg-blue-700 hover:shadow-md">
-                Get a Quote
-             </button>
+            <button 
+   onClick={handleAddToCart}
+   className="w-full text-center bg-blue-600 text-white font-semibold py-2.5 rounded-md text-sm transition-all duration-300 hover:bg-blue-700 hover:shadow-md"
+ >
+   {typeof product.price === 'number' ? 'Add to Cart' : 'Get a Quote'}
+ </button>
           )}
 
           <div className="flex justify-between items-center pt-1 gap-2">
