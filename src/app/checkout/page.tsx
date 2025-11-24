@@ -310,7 +310,7 @@ export default function CheckoutPage() {
                       {item.brand && <p className="text-xs text-gray-500 mt-1">{item.brand}</p>}
                     </div>
                     <div className="text-sm font-medium text-gray-900 flex items-center">
-                      {item.price ? `£${(item.price * item.quantity).toFixed(2)}` : 'Quote'}
+                      {item.price ? `$${(item.price * item.quantity).toFixed(2)}` : 'Quote'}
                     </div>
                   </div>
                 ))}
@@ -320,7 +320,7 @@ export default function CheckoutPage() {
                 <div className="flex justify-between text-sm text-gray-600">
                   <span>Subtotal</span>
                   <span className="font-medium text-gray-900">
-                    {isQuoteOrder ? 'To be quoted' : `£${cartTotal.toFixed(2)}`}
+                    {isQuoteOrder ? 'To be quoted' : `$${cartTotal.toFixed(2)}`}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm text-gray-600">
@@ -332,7 +332,7 @@ export default function CheckoutPage() {
                 <div className="flex justify-between text-sm text-gray-600">
                   <span>Tax (VAT)</span>
                   <span className="font-medium text-gray-900">
-                    {isQuoteOrder ? '-' : '£0.00'}
+                    {isQuoteOrder ? '-' : '$0.00'}
                   </span>
                 </div>
                 <div className="flex justify-between items-end pt-3 border-t border-gray-100">
@@ -340,7 +340,7 @@ export default function CheckoutPage() {
                     {isQuoteOrder ? 'Total' : 'Total'}
                   </span>
                   <span className="text-2xl font-bold text-blue-600">
-                    {isQuoteOrder ? 'Quote Request' : `£${cartTotal.toFixed(2)}`}
+                    {isQuoteOrder ? 'Quote Request' : `$${cartTotal.toFixed(2)}`}
                   </span>
                 </div>
               </div>
@@ -358,7 +358,7 @@ export default function CheckoutPage() {
                 ) : (
                   <>
                     <LockIcon className="w-4 h-4" />
-                    Pay £{cartTotal.toFixed(2)}
+                    Pay ${cartTotal.toFixed(2)}
                   </>
                 )}
               </button>

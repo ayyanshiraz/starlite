@@ -138,7 +138,7 @@ const FilterSidebar = ({
           <div>
             <div className="flex justify-between text-sm text-gray-600">
               <span>Min Price</span>
-              <span>£{minPrice}</span>
+              <span>${minPrice}</span>
             </div>
             <input
               type="range"
@@ -154,7 +154,7 @@ const FilterSidebar = ({
           <div>
             <div className="flex justify-between text-sm text-gray-600">
               <span>Max Price</span>
-              <span>£{maxPrice}</span>
+              <span>${maxPrice}</span>
             </div>
             <input
               type="range"
@@ -169,7 +169,7 @@ const FilterSidebar = ({
         </div>
         
         <div className="flex justify-between items-center text-sm pt-2">
-          <span className="text-gray-500">Price: £{minPrice} — £{maxPrice}</span>
+          <span className="text-gray-500">Price: ${minPrice} — ${maxPrice}</span>
         </div>
         
         <button
@@ -217,7 +217,7 @@ const LatestProductsSidebar = () => {
               </h4>
               <p className="text-md font-bold text-gray-900 mt-1">
                  {/* This now pulls the REAL price from sku-data.ts */}
-                 {typeof product.price === 'number' ? `£${product.price.toFixed(2)}` : product.price}
+                 {typeof product.price === 'number' ? `$${product.price.toFixed(2)}` : product.price}
               </p>
             </div>
           </Link>
@@ -380,7 +380,7 @@ const ProductCard = ({ product, viewMode }: { product: Product, viewMode: 'grid'
   
   // --- UPDATED LOGIC ---
   const isQuoteOnly = typeof product.price !== 'number';
-  const priceDisplay = !isQuoteOnly ? `£${Number(product.price).toFixed(2)}` : 'Get a Quote';
+  const priceDisplay = !isQuoteOnly ? `$${Number(product.price).toFixed(2)}` : 'Get a Quote';
   const productUrl = `/product/${product.slug}`; 
 
   if (viewMode === 'list') {

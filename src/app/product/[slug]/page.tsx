@@ -155,7 +155,7 @@ const LatestProductsSidebar = () => {
               <h4 className="text-sm font-semibold text-gray-800 group-hover:text-blue-600 transition line-clamp-2">{product.name}</h4>
               <p className="text-xs font-bold text-gray-500 mt-1 uppercase tracking-wide">
                  {/* This now pulls the REAL price from sku-data.ts */}
-                 {typeof product.price === 'number' ? `£${product.price.toFixed(2)}` : product.price}
+                 {typeof product.price === 'number' ? `$${product.price.toFixed(2)}` : product.price}
               </p>
             </div>
           </Link>
@@ -280,7 +280,7 @@ const ProductInfo = ({ product }: { product: Product }) => {
       
       {/* Price Display Update */}
       {!isQuoteOnly ? (
-        <p className="text-3xl font-bold text-gray-900 mb-6">£{product.price}</p>
+        <p className="text-3xl font-bold text-gray-900 mb-6">${product.price}</p>
       ) : (
         <p className="text-2xl font-bold text-blue-600 mb-6">Call For Pricing</p>
       )}

@@ -207,7 +207,7 @@ export default function ComparePage() {
                       <h3 className="text-lg font-bold text-blue-600 hover:underline mb-1">{product.name}</h3>
                     </Link>
                     <span className="text-xl font-bold text-gray-900 mb-3">
-                      {typeof product.price === 'number' ? `£${product.price.toFixed(2)}` : 'Get a Quote'}
+                      {typeof product.price === 'number' ? `$${product.price.toFixed(2)}` : 'Get a Quote'}
                     </span>
                     {/* --- ADDED: Description for Mobile --- */}
                     <p className="text-sm text-gray-600 line-clamp-3">
@@ -290,7 +290,7 @@ export default function ComparePage() {
 
                 {/* --- SPECIFICATION ROWS --- */}
                 <DesktopCompareRow label="Price" productValues={compareProducts.map(p => (
-                  <span className="text-lg font-bold text-gray-900">{typeof p.price === 'number' ? `£${p.price.toFixed(2)}` : 'Get a Quote'}</span>
+                  <span className="text-lg font-bold text-gray-900">{typeof p.price === 'number' ? `$${p.price.toFixed(2)}` : 'Get a Quote'}</span>
                 ))} />
                 
                 {/* --- ADDED: Description Row for Desktop --- */}

@@ -118,7 +118,7 @@ export default function CartPage() {
                     <div className="col-span-2 flex sm:justify-center items-center mt-2 sm:mt-0">
                       <span className="sm:hidden text-gray-500 text-sm mr-2">Price: </span>
                       <span className="text-gray-900 font-medium">
-                        {item.price > 0 ? `£${item.price.toFixed(2)}` : 'Quote'}
+                        {item.price > 0 ? `$${item.price.toFixed(2)}` : 'Quote'}
                       </span>
                     </div>
 
@@ -144,7 +144,7 @@ export default function CartPage() {
                     <div className="col-span-2 flex sm:justify-end items-center mt-2 sm:mt-0">
                       <span className="sm:hidden text-gray-500 text-sm mr-2">Total: </span>
                       <span className="text-gray-900 font-bold">
-                        {item.price > 0 ? `£${(item.price * item.quantity).toFixed(2)}` : '-'}
+                        {item.price > 0 ? `$${(item.price * item.quantity).toFixed(2)}` : '-'}
                       </span>
                     </div>
 
@@ -174,7 +174,7 @@ export default function CartPage() {
                 <div className="flex justify-between text-gray-600">
                   <span>Subtotal</span>
                   <span className="font-medium text-gray-900">
-                    {isQuoteOrder ? 'To be quoted' : `£${cartTotal.toFixed(2)}`}
+                    {isQuoteOrder ? 'To be quoted' : `$${cartTotal.toFixed(2)}`}
                   </span>
                 </div>
                 <div className="flex justify-between text-gray-600">
@@ -186,7 +186,7 @@ export default function CartPage() {
                 <div className="flex justify-between text-gray-600">
                   <span>Tax</span>
                   <span className="font-medium text-gray-900">
-                      {isQuoteOrder ? '-' : '£0.00'}
+                      {isQuoteOrder ? '-' : '$0.00'}
                   </span>
                 </div>
               </div>
@@ -195,7 +195,7 @@ export default function CartPage() {
                 <div className="flex justify-between items-end">
                   <span className="text-lg font-bold text-gray-900">Total</span>
                   <span className="text-2xl font-bold text-blue-600">
-                    {isQuoteOrder ? 'Quote Request' : `£${cartTotal.toFixed(2)}`}
+                    {isQuoteOrder ? 'Quote Request' : `$${cartTotal.toFixed(2)}`}
                   </span>
                 </div>
                 {!isQuoteOrder && <p className="text-xs text-gray-400 mt-1 text-right">Includes VAT where applicable</p>}

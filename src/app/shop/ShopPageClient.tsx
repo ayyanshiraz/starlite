@@ -144,7 +144,7 @@ const FilterSidebar = ({
           <div>
             <div className="flex justify-between text-sm text-gray-600">
               <span>Min Price</span>
-              <span>£{minPrice}</span>
+              <span>${minPrice}</span>
             </div>
             <input
               type="range"
@@ -160,7 +160,7 @@ const FilterSidebar = ({
           <div>
             <div className="flex justify-between text-sm text-gray-600">
               <span>Max Price</span>
-              <span>£{maxPrice}</span>
+              <span>${maxPrice}</span>
             </div>
             <input
               type="range"
@@ -175,7 +175,7 @@ const FilterSidebar = ({
         </div>
         
         <div className="flex justify-between items-center text-sm pt-2">
-          <span className="text-gray-500">Price: £{minPrice} — £{maxPrice}</span>
+          <span className="text-gray-500">Price: ${minPrice} — ${maxPrice}</span>
         </div>
         
         <button
@@ -238,7 +238,7 @@ const handleAddToCart = (e: React.MouseEvent) => {
 };
 
   const productPrice = typeof product.price === 'number' ? product.price : -1;
-  const priceDisplay = productPrice !== -1 ? `£${productPrice.toFixed(2)}` : 'Get a Quote';
+  const priceDisplay = productPrice !== -1 ? `$${productPrice.toFixed(2)}` : 'Get a Quote';
   const productUrl = `/product/${product.slug}`;
 
   // --- LIST VIEW ---

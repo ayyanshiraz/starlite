@@ -9,17 +9,17 @@ export const productSkus: Record<string, SkuData> = {
   "dell-14-latitude-7420-2-in-1-touchscreen-rgrw0": { 
     sku: "RGRW0", 
     category: "Computers & Laptops, Dell, Laptop", 
-    price: "100.00" 
+    price: 850.00 
   },
   "dell-latitude-5540-15-6-intel-core-i5-1345u-yryyw": { 
     sku: "YRYYW", 
     category: "Dell, Dell Laptop", 
-    price: "Get a Quote" 
+    price: 920.50 
   },
   "dell-latitude-5540-15-6-intel-core-i7-1365u-tpjj4": { 
     sku: "TPJJ4", 
     category: "Dell, Dell Laptop", 
-    price: "Get a Quote" 
+    price: 1200.00 
   },
   "dell-15-6-latitude-5540-notebook-x3vh2": { 
     sku: "X3VH2", 
@@ -41,7 +41,7 @@ export const productSkus: Record<string, SkuData> = {
   "dell-performance-docking-station-wd19s": { 
     sku: "DELL-WD19DCS", 
     category: "Dell, Dell Docking Station", 
-    price: "Get a Quote" 
+    price: 215.00 
   },
   "dell-wd19s-docking-station-150w": { 
     sku: "DELL-WD19S130W", 
@@ -145,7 +145,7 @@ export const productSkus: Record<string, SkuData> = {
   "hp-wired-desktop-320k-keyboard-usb": { sku: "", category: "HP Keyboards & Keypads", price: "Get a Quote" },
 
   // --- HP Laptops ---
-  "hp-14-elitebook-640-g9-6c0z3ut": { sku: "6C0Z3UT", category: "Computers & Laptops, HP, HP Laptops, Laptop", price: "Get a Quote" },
+  "hp-14-elitebook-640-g9-6c0z3ut": { sku: "6C0Z3UT", category: "Computers & Laptops, HP, HP Laptops, Laptop", price: 1050.00 },
   "hp-14-elitebook-640-g9-6c0z3ut-aba": { sku: "6C0Z3UT#ABA", category: "Computers & Laptops, HP, HP Laptops, Laptop", price: "Get a Quote" },
   "hp-250-g10-39-6-cm-15-6-notebook-16-gb": { sku: "9B9R8EA#ABU", category: "Computers & Laptops, HP, HP Laptops, Laptop", price: "Get a Quote" },
   "hp-250-g10-laptop-intel-i5-16gb-ram-256gb-ssd-full-hd-win-11-pro": { sku: "AK9U4AT#ABU", category: "Computers & Laptops, HP, HP Laptops, Laptop", price: "Get a Quote" },
@@ -209,7 +209,7 @@ export const productSkus: Record<string, SkuData> = {
 
   // --- HP Switches ---
   "aruba-2930m-48g-poe-1-slot-managed-l3": { sku: "JL322A", category: "HP Switches, Switches", price: "Get a Quote" },
-  "aruba-6100-48g-class4-poe-4sfp-370w": { sku: "JL675A", category: "HP Switches, Switches", price: "Get a Quote" },
+  "aruba-6100-48g-class4-poe-4sfp-370w": { sku: "JL675A", category: "HP Switches, Switches", price: 450.00 },
   "aruba-cx-6300m-managed-l3-black": { sku: "JL658A", category: "HP Switches, Switches", price: "Get a Quote" },
   "aruba-instant-on-1960-48g-2xgt-2sfp": { sku: "JL808A#ABA", category: "HP Switches, Switches", price: "Get a Quote" },
   "aruba-instant-on-1960-48g-40p-class4-8p": { sku: "JL809A#ABA", category: "HP Switches, Switches", price: "Get a Quote" },
@@ -223,7 +223,7 @@ export const productSkus: Record<string, SkuData> = {
   "hp-pro-290-g9-intel-core-i5-6z3w1et": { sku: "623W1ET#ABU", category: "HP, HP Workstation, Workstations", price: "Get a Quote" },
   "hp-pro-400-g9-intel-core-i5": { sku: "623W9ET#ABU", category: "HP, HP Workstation, Workstations", price: "Get a Quote" },
   "hp-tower-windows-11-pro-core-i9-14th-gen": { sku: "996Y7ET#ABU", category: "HP, HP Workstation, Workstations", price: "Get a Quote" },
-  "hp-z1-g9-desktop-computer-intel-core-i9": { sku: "996V8ET#ABU", category: "HP, HP Workstation, Workstations", price: "Get a Quote" },
+  "hp-z1-g9-desktop-computer-intel-core-i9": { sku: "996V8ET#ABU", category: "HP, HP Workstation, Workstations", price: 2450.00 },
   "hp-z2-g9-workstation-core-i7-14th-gen": { sku: "996Y3ET#ABU", category: "HP, HP Workstation, Workstations", price: "Get a Quote" },
   "hp-z2-g9-workstation-i7-14700-16gb": { sku: "8T1R4EA#ABU", category: "HP, HP Workstation, Workstations", price: "Get a Quote" },
   "hp-z2-g9-workstation-i7-14700-32gb": { sku: "996Y2ET#ABU", category: "HP, HP Workstation, Workstations", price: "Get a Quote" },
