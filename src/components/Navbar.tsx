@@ -48,8 +48,8 @@ export default function Navbar() {
               width={50} 
               height={27} 
             />
-            {/* Animated Text Container - Increased width to w-[300px] */}
-            <div className="font-bold text-lg tracking-wide text-white group-hover:text-blue-400 transition-colors leading-tight flex flex-col overflow-hidden w-[300px]">
+            {/* Animated Text Container - Increased size to text-2xl */}
+            <div className="font-bold text-2xl tracking-wide text-white group-hover:text-blue-400 transition-colors leading-tight flex flex-col overflow-hidden w-[300px]">
               <motion.span
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: [0, 1, 1, 0], x: [-20, 0, 0, -20] }}

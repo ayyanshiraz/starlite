@@ -31,6 +31,8 @@ export type Product = {
   categorySlug: string; // The link (e.g., "computers-and-laptops")
   slug: string; // This is required
   sku?: string; // <--- ADDED THIS FIELD
+  // --- NEW: Add availability type ---
+  availability?: string;
   description: StandardProductDescription | KeyFeatureProductDescription; // This allows both formats
 };
 // 3. CREATE THE DETAILED DELL DESCRIPTION
@@ -6048,7 +6050,7 @@ const rawProducts: Product[] = [
   { 
     id: 'fp1', 
     name: 'D-Link DWA-X1850 AX1800 Wi-Fi 6 USB Adapter', 
-    price: 39.62, 
+    price: "Get a Quote", 
     image: '/dlink/0.jpg', 
     category: 'Accessories, D-Link', 
     categorySlug: 'accessories', 
@@ -6065,7 +6067,7 @@ const rawProducts: Product[] = [
   { 
     id: 'fp2', 
     name: 'D-Link DAP-X2850 Nuclias Connect AX3600 Wi-Fi 6 PoE Access Point', 
-    price: 236.46, 
+    price: "Get a Quote", 
     image: '/dlink/2.jpg', 
     category: 'Networking, D-Link', 
     categorySlug: 'switches', 
@@ -6082,7 +6084,7 @@ const rawProducts: Product[] = [
   { 
     id: 'fp3', 
     name: 'Ubiquiti Networks UniFi 5 x Switch 8 Managed Gigabit', 
-    price: 495.00, 
+    price: "Get a Quote", 
     image: '/ubiquiti/1.jpg', 
     category: 'Networking, Ubiquiti', 
     categorySlug: 'switches', 
@@ -6099,7 +6101,7 @@ const rawProducts: Product[] = [
   { 
     id: 'fp4', 
     name: 'Ubiquiti Networks UA-SK-EU security access control system White', 
-    price: 450.00, 
+    price:"Get a Quote", 
     image: '/ubiquiti/2.jpg', 
     category: 'Networking, Ubiquiti', 
     categorySlug: 'accessories', 
@@ -6116,7 +6118,7 @@ const rawProducts: Product[] = [
   { 
     id: 'fp5', 
     name: 'Ubiquiti AmpliFi AFI-HD-UK Mesh Whole Home WiFi Router System', 
-    price: 356.00, 
+    price: "Get a Quote", 
     image: '/ubiquiti/3.jpg', 
     category: 'Networking, Ubiquiti', 
     categorySlug: 'routers', 
@@ -6133,7 +6135,7 @@ const rawProducts: Product[] = [
   { 
     id: 'fp6', 
     name: 'Lexmark CX730de Laser A4 1200 x 1200 DPI 40 ppm', 
-    price: 1120.00, 
+    price: "Get a Quote", 
     image: '/lexmark/1.jpg', 
     category: 'Printers, Lexmark', 
     categorySlug: 'printers', 
@@ -6150,7 +6152,7 @@ const rawProducts: Product[] = [
   { 
     id: 'fp7', 
     name: 'Acer Predator UM.KX3EE.P08 LED display', 
-    price: 495.00, 
+    price: "Get a Quote", 
     image: '/acer/1.jpg', 
     category: 'Accessories, Acer', 
     categorySlug: 'accessories', 
@@ -6167,7 +6169,7 @@ const rawProducts: Product[] = [
   { 
     id: 'fp8', 
     name: 'Apple Magic Keyboard for iPad Pro', 
-    price: 320.00, 
+    price: "Get a Quote", 
     image: '/apple/1.jpg', 
     category: 'Accessories, Apple', 
     categorySlug: 'accessories', 
@@ -6317,7 +6319,7 @@ const rawProducts: Product[] = [
   { 
     id: 'tr4', 
     name: 'Ubiquiti UniFi U6+', 
-    price: 71.35, 
+    price: "Get a Quote", 
     image: '/ubiquiti/7.jpg', 
     category: 'Networking, Ubiquiti', 
     categorySlug: 'routers', 
@@ -6681,7 +6683,7 @@ const rawProducts: Product[] = [
   { 
     id: 'bs1', 
     name: 'Acer V246HL 24″ 1920 x 1080 pixels Full HD LED Black', 
-    price: 120.00, 
+    price: "Get a Quote", 
     image: '/acer/2.jpg', 
     category: 'Accessories, Acer', 
     categorySlug: 'accessories', 
@@ -6698,7 +6700,7 @@ const rawProducts: Product[] = [
   { 
     id: 'bs2', 
     name: 'ACER V227Qbip Full HD 21.5″ IPS LCD Monitor – Black', 
-    price: 109.00, 
+    price: "Get a Quote", 
     image: '/acer/3.jpg', 
     category: 'Accessories, Acer', 
     categorySlug: 'accessories', 
@@ -6716,7 +6718,7 @@ const rawProducts: Product[] = [
   { 
     id: 'bs4', 
     name: 'Lexmark 62D2H0E (622H) Toner black, 25K pages', 
-    price: 150.00, 
+    price: "Get a Quote", 
     image: '/lexmark/2.jpg', 
     category: 'Printers, Lexmark', 
     categorySlug: 'printers', 
@@ -6733,7 +6735,7 @@ const rawProducts: Product[] = [
   { 
     id: 'bs5', 
     name: 'Aruba JL683A#ABA Instant On 1930', 
-    price: 300.00, 
+    price:"Get a Quote", 
     image: '/aruba/1.jpg', 
     category: 'Networking, Aruba', 
     categorySlug: 'switches', 
@@ -6750,7 +6752,7 @@ const rawProducts: Product[] = [
   { 
     id: 'bs6', 
     name: 'HPE Aruba AP-303P (US)', 
-    price: 250.00, 
+    price: "Get a Quote", 
     image: '/aruba/2.jpg', 
     category: 'Networking, Aruba', 
     categorySlug: 'routers', 
@@ -6767,7 +6769,7 @@ const rawProducts: Product[] = [
   { 
     id: 'bs7', 
     name: 'Apc Netshelter Sx 24u Freestanding Rack Black', 
-    price: 1255.00, 
+    price: "Get a Quote", 
     image: '/apc/2.jpg', 
     category: 'Accessories, APC', 
     categorySlug: 'accessories', 
@@ -6784,7 +6786,7 @@ const rawProducts: Product[] = [
   { 
     id: 'bs8', 
     name: 'APC NetShelter SX 48U 600mm Wide x 1070mm', 
-    price: 1525.00, 
+    price: "Get a Quote", 
     image: '/apc/3.jpg', 
     category: 'Accessories, APC', 
     categorySlug: 'accessories', 
@@ -6801,7 +6803,7 @@ const rawProducts: Product[] = [
   { 
     id: 'bs9', 
     name: 'APC Easy UPS Line-Interactive', 
-    price: 172.00, 
+    price: "Get a Quote", 
     image: '/apc/4.jpg', 
     category: 'UPS, APC', 
     categorySlug: 'ups', 
@@ -6818,7 +6820,7 @@ const rawProducts: Product[] = [
   { 
     id: 'bs10', 
     name: 'Ubiquiti U6-PRO UniFi Wifi 6 Access Point', 
-    price: 130.00, 
+    price:"Get a Quote", 
     image: '/ubiquiti/10.jpg', 
     category: 'Networking, Ubiquiti', 
     categorySlug: 'routers', 
@@ -6835,7 +6837,7 @@ const rawProducts: Product[] = [
   { 
     id: 'bs11', 
     name: 'MSI Cyborg 15 AI A1VFK-001UK', 
-    price: 999.00, 
+    price: "Get a Quote", 
     image: '/msi/1.jpg', 
     category: 'Laptops, MSI', 
     categorySlug: 'computers-and-laptops', 
@@ -6852,7 +6854,7 @@ const rawProducts: Product[] = [
   { 
     id: 'bs12', 
     name: 'MSI PRO H610M-E motherboard Intel H610 LGA 1700 micro ATX', 
-    price: 85.00, 
+    price:"Get a Quote", 
     image: '/msi/2.jpg', 
     category: 'Accessories, MSI', 
     categorySlug: 'accessories', 
@@ -6869,7 +6871,7 @@ const rawProducts: Product[] = [
   { 
     id: 'bs13', 
     name: 'Ubiquiti UniFi Cloud Gateway Max (UCG-MAX) – 512GB', 
-    price: 232.00, 
+    price:"Get a Quote", 
     image: '/ubiquiti/11.jpg', 
     category: 'Networking, Ubiquiti', 
      categorySlug: 'routers', 
@@ -6886,7 +6888,7 @@ const rawProducts: Product[] = [
   { 
     id: 'bs14', 
     name: 'Alcatel-Lucent network transceiver module – SFP-10G-LR', 
-    price: 2610.00, 
+    price: "Get a Quote", 
     image: '/cisco/1.jpg', 
     category: 'Networking, Cisco', 
     categorySlug: 'switches', 
@@ -6903,7 +6905,7 @@ const rawProducts: Product[] = [
   { 
     id: 'bs15', 
     name: 'Epson C13S050691/0691 Toner-kit black return program, 10K pages for Epson Workforce AL-M 300', 
-    price: 120.00, 
+    price: "Get a Quote", 
     image: '/epson/1.jpg', 
     category: 'Printers, Epson', 
     categorySlug: 'printers', 
@@ -6920,7 +6922,7 @@ const rawProducts: Product[] = [
   { 
     id: 'bs16', 
     name: 'Avaya Routing Switch 4524GT-PWR – switch – 24 ports', 
-    price: 450.00, 
+    price: "Get a Quote", 
     image: '/avaya/1.jpg', 
     category: 'Networking, Avaya', 
     categorySlug: 'switches', 
@@ -6937,7 +6939,7 @@ const rawProducts: Product[] = [
   { 
     id: 'bs17', 
     name: 'Avaya J189 IP Phone Grey Led Wi-Fi 700512396', 
-    price: 210.00, 
+    price: "Get a Quote", 
     image: '/avaya/2.jpg', 
     category: 'Accessories, Avaya', 
     categorySlug: 'accessories', 
@@ -6954,7 +6956,7 @@ const rawProducts: Product[] = [
   { 
     id: 'bs18', 
     name: 'Acer Predator PH18-72 Intel? Core? i9', 
-    price: 2500.00, 
+    price: "Get a Quote", 
     image: '/acer/4.jpg', 
     category: 'Laptops, Acer', 
     categorySlug: 'computers-and-laptops', 
@@ -12439,22 +12441,25 @@ const rawProducts: Product[] = [
 
 
 /// 5. EXPORT THE FINAL MERGED LIST
-// This maps over your raw list and injects the SKU/Category/Price from sku-data.ts if a match is found
 export const allProducts: Product[] = rawProducts.map(product => {
-  // Look up the SKU data using the product slug
   const extraData = productSkus[product.slug];
 
   if (extraData) {
     return {
       ...product,
-      sku: extraData.sku || product.sku, // Use SKU from file
-      category: extraData.category || product.category, // Overwrite category if exists
-      price: extraData.price || product.price, // <--- ADD THIS LINE: Overwrite price if exists
+      sku: extraData.sku || product.sku, 
+      category: extraData.category || product.category, 
+      price: extraData.price || product.price, 
+      // --- NEW: Merge availability, default to 'In Stock' if not defined ---
+      availability: extraData.availability || 'In Stock', 
     };
   }
 
-  // Return original product if no mapping found
-  return product;
+  // Default for products not in sku-data.ts
+  return {
+    ...product,
+    availability: 'In Stock'
+  };
 });
 
 export const latestProducts = allProducts.slice(0, 3);

@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
-// --- FIX: Use '@/' to point directly to src/ folder ---
+// --- IMPORTS ---
 import { HeaderSection } from '@/components/Header'; 
 import { ChatButton, CustomScrollbarStyles } from '@/components/SharedComponents'; 
 import { allProducts } from '@/lib/products';
@@ -66,9 +66,21 @@ const StarIcon = ({ className = "" }) => (
   </svg>
 );
 
-// --- UPDATED SIDEBAR DATA (From HomePage Recently Added) ---
-// --- UPDATED SIDEBAR DATA ---
+// --- NEW ICONS FOR AVAILABILITY ---
+const CheckCircleIcon = ({ className = "" }) => (
+  <svg {...iconProps} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+  </svg>
+);
 
+const XCircleIcon = ({ className = "" }) => (
+  <svg {...iconProps} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <circle cx="12" cy="12" r="10"></circle>
+    <line x1="15" y1="9" x2="9" y2="15"></line>
+    <line x1="9" y1="9" x2="15" y2="15"></line>
+  </svg>
+);
 
 // --- SIDEBAR COMPONENTS ---
 const CategoriesSidebar = ({ currentCategorySlug }: { currentCategorySlug?: string }) => {
@@ -248,17 +260,28 @@ const ProductGallery = ({ product }: { product: Product }) => {
   );
 };
 
+// --- PRODUCT INFO COMPONENT (FIXED LOGIC) ---
 const ProductInfo = ({ product }: { product: Product }) => {
   const { isInWishlist, toggleWishlist } = useWishlist(product.slug);
   const { isInCompare, toggleCompare } = useCompare(product.slug);
   const { addToCart } = useCart();
   
-  // --- UPDATED LOGIC ---
-  // Check if product has a numeric price. If string (e.g., "Get a Quote") or undefined, treat as Quote Only.
+  // Logic: Check if price is numeric (valid for adding to cart)
   const isQuoteOnly = typeof product.price !== 'number';
 
+  // Logic: Get the availability text, default to 'In Stock' if missing
+  const availabilityText = product.availability && product.availability.trim() !== "" 
+    ? product.availability 
+    : 'In Stock';
+    
+  // --- FIX: ROBUST CHECK ---
+  // Convert to lowercase and check if it includes "out". 
+  // This handles "Out of Stock", "out of stock", "Sold Out", and typos like "out of stoke".
+  const isOutOfStock = availabilityText.toLowerCase().includes('out') || availabilityText.toLowerCase().includes('sold');
+
   const handleAction = (e: React.MouseEvent) => {
-    if (!isQuoteOnly) {
+    // Prevent action if Quote Only OR Out of Stock
+    if (!isQuoteOnly && !isOutOfStock) {
       e.preventDefault();
       addToCart(product);
     }
@@ -278,7 +301,24 @@ const ProductInfo = ({ product }: { product: Product }) => {
       </div>
       <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mt-2 mb-4">{product.name}</h1>
       
-      {/* Price Display Update */}
+      {/* --- AVAILABILITY BADGE (UPDATED COLORS) --- */}
+      <div className="flex items-center mb-4">
+        <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+          isOutOfStock 
+            ? 'bg-red-100 text-red-800' // Red if out of stock
+            : 'bg-green-100 text-green-800' // Green otherwise
+        }`}>
+          {isOutOfStock ? (
+            <XCircleIcon className="w-4 h-4 mr-2" />
+          ) : (
+            <CheckCircleIcon className="w-4 h-4 mr-2" />
+          )}
+          {/* Display the text properly capitalized if it matches your specific typo, or just show raw text */}
+          {availabilityText}
+        </span>
+      </div>
+      
+      {/* Price Display */}
       {!isQuoteOnly ? (
         <p className="text-3xl font-bold text-gray-900 mb-6">${product.price}</p>
       ) : (
@@ -308,13 +348,18 @@ const ProductInfo = ({ product }: { product: Product }) => {
       </div>
       
       <div className="flex items-center gap-3">
-        {/* Action Button Update */}
+        {/* Action Button Logic - UPDATED */}
         {!isQuoteOnly ? (
           <button 
             onClick={handleAction}
-            className="px-8 py-3 bg-[#1447E6] text-white font-bold rounded-md hover:bg-blue-700 transition w-full md:w-auto text-center shadow-md"
+            disabled={isOutOfStock} // This now correctly respects the check
+            className={`px-8 py-3 font-bold rounded-md transition w-full md:w-auto text-center shadow-md flex justify-center items-center ${
+              isOutOfStock
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed hover:bg-gray-300' // Gray/Disabled style
+                : 'bg-[#1447E6] text-white hover:bg-blue-700' // Active Blue style
+            }`}
           >
-            Add to Cart
+            {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
           </button>
         ) : (
           <a 

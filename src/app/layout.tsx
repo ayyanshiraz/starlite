@@ -7,6 +7,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 // 1. ADD THIS IMPORT
 import { CartProvider } from "../hooks/useCart";
+import CartPopup from "../components/CartPopup"; // <--- Add this import
 
 
 
@@ -41,6 +42,7 @@ export default function RootLayout({
        <main className="pt-20 min-h-screen overflow-hidden">
         <CartProvider>
           {children}
+          <CartPopup /> {/* <--- Add this Component here, inside the Provider */}
           </CartProvider>
         </main>
         <BrandsSlideShow />

@@ -2,11 +2,11 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
-// Define the shape of a Cart Item (extends your basic Product structure)
+// Define the shape of a Cart Item
 export interface CartItem {
   id: string;
   slug: string;
-  name: string; // matches 'name' or 'title' from your product data
+  name: string;
   price: number;
   image: string;
   quantity: number;
@@ -21,8 +21,13 @@ interface CartContextType {
   removeFromCart: (itemId: string) => void;
   updateQuantity: (itemId: string, quantity: number) => void;
   clearCart: () => void;
-  cartCount: number; // Total number of items (sum of quantities)
-  cartTotal: number; // Total price
+  cartCount: number;
+  cartTotal: number;
+  
+  // NEW: Popup State
+  isPopupOpen: boolean;
+  lastAddedItem: CartItem | null;
+  closePopup: () => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -31,7 +36,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // 1. Load Cart from LocalStorage on mount
+  // NEW: State for the popup
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [lastAddedItem, setLastAddedItem] = useState<CartItem | null>(null);
+
+  // 1. Load Cart from LocalStorage
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const storedCart = localStorage.getItem('shopping-cart');
@@ -46,7 +55,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // 2. Save Cart to LocalStorage whenever it changes
+  // 2. Save Cart to LocalStorage
   useEffect(() => {
     if (isLoaded) {
       localStorage.setItem('shopping-cart', JSON.stringify(cartItems));
@@ -56,36 +65,49 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   // --- Actions ---
 
   const addToCart = useCallback((product: any) => {
+    let addedItem: CartItem;
+
     setCartItems((prevItems) => {
-      // Check if item already exists
       const existingItem = prevItems.find((item) => item.slug === product.slug);
 
+      // Prepare the item data for the popup
+      addedItem = {
+        id: product.id || product.slug,
+        slug: product.slug,
+        name: product.name || product.title,
+        price: typeof product.price === 'number' ? product.price : 0,
+        image: product.image,
+        quantity: 1, // This is just for display in popup
+        brand: product.brand,
+      };
+
       if (existingItem) {
-        // If exists, increment quantity
         return prevItems.map((item) =>
           item.slug === product.slug
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
       } else {
-        // If new, add to array with quantity 1
-        // Normalize data structure just in case product uses 'title' instead of 'name'
-        const newItem: CartItem = {
-          id: product.id || product.slug,
-          slug: product.slug,
-          name: product.name || product.title, 
-          price: typeof product.price === 'number' ? product.price : 0,
-          image: product.image,
-          quantity: 1,
-          brand: product.brand,
-          category: product.category,
-        };
-        return [...prevItems, newItem];
+        return [...prevItems, { ...addedItem, quantity: 1 }];
       }
     });
+
+    // TRIGGER THE POPUP INSTEAD OF ALERT
+    // We use setTimeout to ensure state updates if adding multiple quickly, 
+    // but primarily to grab the correct item data.
+    const itemForPopup = {
+        id: product.id || product.slug,
+        slug: product.slug,
+        name: product.name || product.title,
+        price: typeof product.price === 'number' ? product.price : 0,
+        image: product.image,
+        quantity: 1,
+        brand: product.brand,
+    };
     
-    // --- VISUAL FEEDBACK ENABLED HERE ---
-    alert(`${product.name || product.title} added to cart!`); 
+    setLastAddedItem(itemForPopup);
+    setIsPopupOpen(true);
+    
   }, []);
 
   const removeFromCart = useCallback((slug: string) => {
@@ -107,14 +129,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setCartItems([]);
   }, []);
 
-  // --- Derived State ---
-  
+  // NEW: Close Popup Action
+  const closePopup = useCallback(() => {
+    setIsPopupOpen(false);
+  }, []);
+
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
-  
-  const cartTotal = cartItems.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0
-  );
+  const cartTotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
 
   return (
     <CartContext.Provider
@@ -126,6 +147,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         clearCart,
         cartCount,
         cartTotal,
+        // Export popup values
+        isPopupOpen,
+        lastAddedItem,
+        closePopup
       }}
     >
       {children}
@@ -133,7 +158,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-// --- Hook Export ---
 export function useCart() {
   const context = useContext(CartContext);
   if (context === undefined) {
