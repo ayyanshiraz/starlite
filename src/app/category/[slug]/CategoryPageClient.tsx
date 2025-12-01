@@ -6,12 +6,12 @@ import Link from 'next/link';
 import { HeaderSection } from '@/components/Header'; 
 import { ChatButton, CustomScrollbarStyles } from '@/components/SharedComponents'; 
 import { categoriesData } from '@/lib/data';
-import type { Product } from '@/lib/products'; // Only Type!
+import type { Product } from '@/lib/products'; 
 import { useWishlist } from '@/hooks/useWishlist';
 import { useCompare } from '@/hooks/useCompare';
 import { useCart } from '@/hooks/useCart';
 
-// --- ICONS (Kept exactly as is) ---
+// --- ICONS ---
 const iconProps = { xmlns: "http://www.w3.org/2000/svg", width: "24", height: "24", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round" } as const;
 const GridIcon = ({ className = "" }) => (<svg {...iconProps} className={className}><rect width="7" height="7" x="3" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="14" rx="1"></rect><rect width="7" height="7" x="3" y="14" rx="1"></rect></svg>);
 const ListIcon = ({ className = "" }) => (<svg {...iconProps} className={className}><line x1="8" x2="21" y1="6" y2="6"></line><line x1="8" x2="21" y1="12" y2="12"></line><line x1="8" x2="21" y1="18" y2="18"></line><line x1="3" x2="3.01" y1="6" y2="6"></line><line x1="3" x2="3.01" y1="12" y2="12"></line><line x1="3" x2="3.01" y1="18" y2="18"></line></svg>);
@@ -81,7 +81,7 @@ const FilterSidebar = ({ minPrice, setMinPrice, maxPrice, setMaxPrice, maxSlider
 };
 
 const LatestProductsSidebar = ({ products }: { products: Product[] }) => {
-  const sidebarProducts = products.slice(0, 5); // Just show first 5 as latest
+  const sidebarProducts = products.slice(0, 5); 
   return (
     <div className="border border-gray-200 rounded-lg p-6">
       <h3 className="text-xl font-bold text-gray-900 mb-6">Latest Products</h3>
