@@ -9,21 +9,26 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // 1. Await the ID
+    // 🟢 CRITICAL FIX: You MUST await params before using the ID
     const { id } = await params;
 
-    // 2. Get the new status
+    // 1. Get the new status from the body
     const body = await request.json();
-    const { status } = body;
+    let { status } = body;
 
     console.log(`Updating Order ${id} to status: ${status}`);
 
+    // 2. Safety check for Enums (Optional but recommended)
+    // If your DB expects "CANCELLED" but you sent "cancelled", this fixes it.
+    // If your DB is string-based, this doesn't hurt.
+    if (status) {
+      status = status.toUpperCase(); // Convert "pending" -> "PENDING" just in case
+    }
+
     // 3. Update Database
-    // We treat status as case-insensitive by passing it directly.
-    // Ensure your Dropdown sends the correct case (usually lowercase for string fields).
     const updatedOrder = await prisma.order.update({
       where: { id: id },
-      data: { status: status },
+      data: { status: status }, // Sends "PENDING", "DELIVERED", etc.
     });
 
     return NextResponse.json(updatedOrder);
