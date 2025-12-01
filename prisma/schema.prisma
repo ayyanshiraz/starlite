@@ -1,0 +1,82 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// --- 1. ADMIN USER (For Login) ---
+model AdminUser {
+  id          String   @id @default(cuid())
+  username    String   @unique
+  password    String
+  // Store permissions as a comma-separated string (e.g. "dashboard,orders")
+  permissions String   @default("dashboard,products,orders,users") 
+  isSuperAdmin Boolean @default(false)
+  createdAt   DateTime @default(now())
+}
+
+// --- 2. PRODUCT MANAGEMENT (Dynamic Database) ---
+model Product {
+  id          String   @id @default(cuid())
+  slug        String   @unique  // Matches your "dell-latitude-..." keys
+  name        String
+  category    String?
+  price       Int?     // Stored in cents. Null means "Get a Quote"
+  image       String?  // URL to the image
+  sku String?
+  stock       Int      @default(100)
+  
+  // 🔥 NEW: Store complex description as a JSON object
+  description Json?    
+  
+  availability String? @default("In Stock")
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// --- 3. ORDERS (Stripe Transactions) ---
+model Order {
+  id              String   @id @default(cuid())
+  stripeSessionId String   @unique
+  createdAt       DateTime @default(now())
+  
+  // Customer Info
+  customerEmail   String
+  customerName    String?
+  customerPhone   String?
+  
+  // Shipping Address
+  addressLine1    String?
+  addressLine2    String?
+  city            String?
+  state           String?
+  postalCode      String?
+  country         String?
+  
+  // Money Info
+  amountTotal     Int      // Stored in cents
+  currency        String
+  status          String   @default("pending") // "paid", "shipped", "quote_requested"
+
+  items           OrderItem[]
+}
+
+model OrderItem {
+  id          String  @id @default(cuid())
+  
+  // Link to the Order
+  orderId     String
+  order       Order   @relation(fields: [orderId], references: [id])
+  
+  // Product Details (Snapshot at time of purchase)
+  name        String
+  quantity    Int
+  price       Int     
+  sku         String?
+}
