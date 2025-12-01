@@ -5,8 +5,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { HeaderSection } from '../../components/Header';
 import { ChatButton, CustomScrollbarStyles } from '../../components/SharedComponents';
-import { allProducts } from '../../lib/products';
 import { useCart } from '../../hooks/useCart';
+// 🔴 Removed static import
+import { getWishlistProducts } from '../actions/wishlist-actions'; // 🟢 Import Server Action
+import type { Product } from '../../lib/products'; // Import Type only
 
 // --- ICONS ---
 const iconProps = {
@@ -46,10 +48,12 @@ const EmptyHeartIcon = ({ className = "" }) => (
 export default function WishlistPage() {
   // State to store the list of slugs (IDs) saved in LocalStorage
   const [wishlistSlugs, setWishlistSlugs] = useState<string[]>([]);
+  const [wishlistProducts, setWishlistProducts] = useState<Product[]>([]); // 🟢 Store real product objects
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoadingData, setIsLoadingData] = useState(false);
   const { addToCart } = useCart();
 
-  // 1. Load Wishlist from LocalStorage on Mount
+  // 1. Load Slugs from LocalStorage on Mount
   useEffect(() => {
     const storedWishlist = localStorage.getItem('wishlist');
     if (storedWishlist) {
@@ -62,17 +66,42 @@ export default function WishlistPage() {
     setIsLoaded(true);
   }, []);
 
-  // 2. Remove item handler
+  // 2. 🟢 FETCH DATA FROM SERVER BASED ON SLUGS
+  useEffect(() => {
+    const fetchData = async () => {
+      if (wishlistSlugs.length === 0) {
+        setWishlistProducts([]);
+        return;
+      }
+      
+      setIsLoadingData(true);
+      try {
+        // Call the Server Action
+        const products = await getWishlistProducts(wishlistSlugs);
+        setWishlistProducts(products);
+      } catch (error) {
+        console.error("Failed to load wishlist products", error);
+      } finally {
+        setIsLoadingData(false);
+      }
+    };
+
+    if (isLoaded) {
+      fetchData();
+    }
+  }, [wishlistSlugs, isLoaded]);
+
+  // 3. Remove item handler
   const removeFromWishlist = (slugToRemove: string) => {
     const updatedList = wishlistSlugs.filter(slug => slug !== slugToRemove);
     setWishlistSlugs(updatedList);
+    // Update LocalStorage
     localStorage.setItem('wishlist', JSON.stringify(updatedList));
+    // Optimistically remove from UI
+    setWishlistProducts(prev => prev.filter(p => p.slug !== slugToRemove));
+    // Trigger global event so Header updates
+    window.dispatchEvent(new Event('wishlist-updated'));
   };
-
-  // 3. Filter actual product data based on slugs
-  const wishlistProducts = allProducts.filter(product => 
-    wishlistSlugs.includes(product.slug)
-  );
 
   return (
     <main className="bg-white min-h-screen">
@@ -81,13 +110,13 @@ export default function WishlistPage() {
       <div className="container mx-auto px-4 sm:px-8 py-10">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">My Wishlist</h1>
         <p className="text-gray-600 mb-8">
-          {isLoaded 
+          {isLoaded && !isLoadingData
             ? `${wishlistProducts.length} items saved for later` 
-            : 'Loading...'}
+            : 'Loading your items...'}
         </p>
 
         {/* --- CONTENT AREA --- */}
-        {isLoaded && wishlistProducts.length > 0 ? (
+        {wishlistProducts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {wishlistProducts.map((product) => (
               <div 
@@ -128,19 +157,18 @@ export default function WishlistPage() {
 
                   <div className="mt-auto pt-4 flex items-center justify-between border-t border-gray-100">
                     <span className="text-lg font-bold text-gray-900">
-                      {product.price}
+                      {typeof product.price === 'number' ? `$${product.price}` : product.price}
                     </span>
                     
                    <button 
-  onClick={() => addToCart(product)}
-  className="flex items-center gap-2 bg-gray-900 hover:bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
->
-  <CartIcon className="w-4 h-4" />
-  <span className="hidden sm:inline">
-    {/* Logic: If price exists, show Add to Cart, otherwise Get Quote */}
-    {product.price ? 'Add to Cart' : 'Get a Quote'}
-  </span>
-</button>
+                      onClick={() => addToCart(product)}
+                      className="flex items-center gap-2 bg-gray-900 hover:bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+                    >
+                      <CartIcon className="w-4 h-4" />
+                      <span className="hidden sm:inline">
+                        {typeof product.price === 'number' ? 'Add to Cart' : 'Get a Quote'}
+                      </span>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -148,7 +176,7 @@ export default function WishlistPage() {
           </div>
         ) : (
           // --- EMPTY STATE ---
-          isLoaded && (
+          isLoaded && !isLoadingData && (
             <div className="flex flex-col items-center justify-center py-20 bg-gray-50 rounded-2xl border border-gray-100 border-dashed">
               <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-4 shadow-sm">
                 <EmptyHeartIcon className="w-10 h-10 text-gray-300" />
