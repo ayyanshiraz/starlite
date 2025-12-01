@@ -3,11 +3,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation'; // Added useRouter
+import { useRouter } from 'next/navigation';
+import { loadStripe } from '@stripe/stripe-js'; // 🟢 Import Stripe Client
 import { HeaderSection } from '../../components/Header';
 import { useCart } from '../../hooks/useCart';
 import { CustomScrollbarStyles } from '../../components/SharedComponents';
 import { countries } from '../../lib/countries';
+
+// 🟢 Initialize Stripe with your Public Key
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 // --- ICONS ---
 const LockIcon = ({ className = "" }) => (
@@ -26,7 +30,7 @@ const SearchIcon = ({ className = "" }) => (
 export default function CheckoutPage() {
   const { cartItems, cartTotal, clearCart } = useCart();
   const [isClient, setIsClient] = useState(false);
-  const router = useRouter(); // Initialize router
+  const router = useRouter();
   const [isProcessing, setIsProcessing] = useState(false);
   
   // Logic: Determine if this is a Quote Request
@@ -64,18 +68,24 @@ export default function CheckoutPage() {
   const handleCountrySelect = (name: string, code: string) => {
     setFormData({ ...formData, country: name, countryCode: code });
     setIsCountryOpen(false);
-    setCountrySearch(""); // Reset search
+    setCountrySearch(""); 
   };
 
   const filteredCountries = countries.filter(c => 
     c.name.toLowerCase().includes(countrySearch.toLowerCase())
   );
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // 🟢 UPDATED SUBMIT HANDLER
+const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsProcessing(true); // Disable button while working
 
-    // 1. Handle Quote Request (No Payment)
+    if (!formData.firstName || !formData.lastName || !formData.email || !formData.address || !formData.city || !formData.zip) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
+    setIsProcessing(true);
+
     if (isQuoteOrder) {
       const type = 'quote';
       clearCart();
@@ -83,20 +93,34 @@ export default function CheckoutPage() {
       return;
     }
 
-    // 2. Handle Payment (Stripe)
     try {
-      // We send the 'slug' as the 'id' because that matches the keys in sku-data.ts
-      const cartPayload = cartItems.map(item => ({
-        id: item.slug, 
-        quantity: item.quantity
-      }));
+      // Prepare Payload
+      const payload = {
+        items: cartItems.map(item => ({
+           id: item.id,
+           name: item.name,
+           price: item.price,
+           quantity: item.quantity,
+           image: item.image,
+           // 🟢 Fix TS Error: Cast item to 'any' if 'sku' is missing in type definition, or ensure CartItem type has it.
+           sku: (item as any).sku || null 
+        })),
+        customerInfo: {
+           firstName: formData.firstName,
+           lastName: formData.lastName,
+           email: formData.email,
+           phone: formData.phone,
+           address: formData.address,
+           city: formData.city,
+           postalCode: formData.zip,
+           country: formData.country
+        }
+      };
 
       const response = await fetch('/api/checkout', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ cartItems: cartPayload }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
@@ -105,18 +129,20 @@ export default function CheckoutPage() {
         throw new Error(data.error || 'Payment initiation failed');
       }
 
-      // Redirect to the Stripe hosted page
+      // 🟢 FIX: Redirect using the URL returned by the API (New Way)
       if (data.url) {
-        window.location.href = data.url;
+        window.location.href = data.url; 
+      } else {
+        throw new Error("No payment URL returned");
       }
 
-    } catch (error) {
+    } catch (error: any) {
       console.error("Checkout Error:", error);
-      alert("Something went wrong with the payment gateway. Please try again.");
-      setIsProcessing(false); // Re-enable button if error
+      alert(`Error: ${error.message}`);
+      setIsProcessing(false); 
     }
   };
-
+  
   if (!isClient) return null;
 
   if (cartItems.length === 0) {
@@ -156,7 +182,7 @@ export default function CheckoutPage() {
           <div className="w-full lg:w-2/3 space-y-8">
             <form id="checkout-form" onSubmit={handleSubmit} className="space-y-8">
               
-              {/* 1. Contact Info (Z-Index 40) */}
+              {/* 1. Contact Info */}
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sm:p-8 relative z-40">
                 <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
                   <span className="flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 text-blue-600 text-xs font-bold">1</span>
@@ -164,17 +190,17 @@ export default function CheckoutPage() {
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
                     <input required name="email" type="email" onChange={handleInputChange} className={inputClasses} placeholder="you@example.com" />
                   </div>
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-                    <input required name="phone" type="tel" onChange={handleInputChange} className={inputClasses} placeholder="+44 7700 900000" />
+                    <input name="phone" type="tel" onChange={handleInputChange} className={inputClasses} placeholder="+1 555 000 0000" />
                   </div>
                 </div>
               </div>
 
-              {/* 2. Shipping Address (Z-Index 30 & Overflow Visible) */}
+              {/* 2. Shipping Address */}
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sm:p-8 relative z-30 overflow-visible">
                 <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
                   <span className="flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 text-blue-600 text-xs font-bold">2</span>
@@ -182,86 +208,54 @@ export default function CheckoutPage() {
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">First Name *</label>
                     <input required name="firstName" type="text" onChange={handleInputChange} className={inputClasses} placeholder="e.g. John" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Last Name *</label>
                     <input required name="lastName" type="text" onChange={handleInputChange} className={inputClasses} placeholder="e.g. Doe" />
                   </div>
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Address *</label>
                     <input required name="address" type="text" onChange={handleInputChange} className={inputClasses} placeholder="Street address, apartment, suite, unit, etc." />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
-                    <input required name="city" type="text" onChange={handleInputChange} className={inputClasses} placeholder="e.g. London" />
+                    <label className="block text-sm font-medium text-gray-700 mb-1">City *</label>
+                    <input required name="city" type="text" onChange={handleInputChange} className={inputClasses} placeholder="e.g. New York" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Postcode</label>
-                    <input required name="zip" type="text" onChange={handleInputChange} className={inputClasses} placeholder="e.g. SW1A 1AA" />
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Postcode / Zip *</label>
+                    <input required name="zip" type="text" onChange={handleInputChange} className={inputClasses} placeholder="e.g. 10001" />
                   </div>
                   
-                  {/* --- SEARCHABLE COUNTRY DROPDOWN --- */}
+                  {/* Country Dropdown */}
                   <div className="md:col-span-2 relative" ref={countryRef}>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Country</label>
-                    
                     <div 
                       onClick={() => setIsCountryOpen(!isCountryOpen)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white cursor-pointer flex items-center justify-between hover:border-blue-400 transition-colors"
                     >
                       <div className="flex items-center gap-3">
-                        <img 
-                          src={`https://flagcdn.com/w40/${formData.countryCode.toLowerCase()}.png`} 
-                          alt={formData.countryCode}
-                          className="w-6 h-auto shadow-sm object-cover rounded-sm"
-                        />
+                        <img src={`https://flagcdn.com/w40/${formData.countryCode.toLowerCase()}.png`} alt={formData.countryCode} className="w-6 h-auto shadow-sm object-cover rounded-sm" />
                         <span className="text-gray-900 font-medium">{formData.country}</span>
                       </div>
                       <ChevronDown className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${isCountryOpen ? 'rotate-180' : ''}`} />
                     </div>
 
                     {isCountryOpen && (
-                      <div className="absolute z-50 mt-2 w-full bg-white border border-gray-200 rounded-xl shadow-2xl max-h-72 overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-100">
-                        
-                        {/* Search Bar inside dropdown */}
+                      <div className="absolute z-50 mt-2 w-full bg-white border border-gray-200 rounded-xl shadow-2xl max-h-72 overflow-hidden flex flex-col">
                         <div className="p-2 border-b border-gray-100 bg-gray-50 sticky top-0 z-10">
                           <div className="relative">
                             <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                            <input 
-                              type="text"
-                              autoFocus
-                              placeholder="Search country..."
-                              className="w-full pl-9 pr-4 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 placeholder-gray-400"
-                              value={countrySearch}
-                              onChange={(e) => setCountrySearch(e.target.value)}
-                            />
+                            <input type="text" autoFocus placeholder="Search country..." className="w-full pl-9 pr-4 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 placeholder-gray-400" value={countrySearch} onChange={(e) => setCountrySearch(e.target.value)} />
                           </div>
                         </div>
-
-                        {/* Scrollable List */}
                         <div className="overflow-y-auto flex-1 custom-scrollbar">
                           {filteredCountries.length > 0 ? (
                             filteredCountries.map((country) => (
-                              <div 
-                                key={country.code}
-                                onClick={() => handleCountrySelect(country.name, country.code)}
-                                className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors border-b border-gray-50 last:border-0 ${
-                                  formData.countryCode === country.code 
-                                    ? 'bg-blue-100 text-blue-900' 
-                                    : 'hover:bg-blue-50 text-gray-900'
-                                }`}
-                              >
-                                <img 
-                                  src={`https://flagcdn.com/w40/${country.code.toLowerCase()}.png`}
-                                  alt={country.name}
-                                  className="w-6 h-auto shadow-sm rounded-sm"
-                                  loading="lazy"
-                                />
+                              <div key={country.code} onClick={() => handleCountrySelect(country.name, country.code)} className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors border-b border-gray-50 last:border-0 ${formData.countryCode === country.code ? 'bg-blue-100 text-blue-900' : 'hover:bg-blue-50 text-gray-900'}`}>
+                                <img src={`https://flagcdn.com/w40/${country.code.toLowerCase()}.png`} alt={country.name} className="w-6 h-auto shadow-sm rounded-sm" loading="lazy" />
                                 <span className="text-sm font-medium">{country.name}</span>
-                                {formData.countryCode === country.code && (
-                                  <span className="ml-auto text-blue-600 font-bold text-xs">Selected</span>
-                                )}
                               </div>
                             ))
                           ) : (
@@ -271,12 +265,10 @@ export default function CheckoutPage() {
                       </div>
                     )}
                   </div>
-                  {/* --- END DROPDOWN --- */}
-
                 </div>
               </div>
 
-              {/* 3. Payment Method (Z-Index 10) */}
+              {/* 3. Payment Method */}
               {!isQuoteOrder && (
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sm:p-8 relative z-10">
                   <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
@@ -284,31 +276,9 @@ export default function CheckoutPage() {
                     Payment Method
                   </h2>
                   <div className="space-y-4">
-                    <div 
-                      onClick={() => setPaymentMethod('card')}
-                      className={`rounded-lg p-4 flex items-center gap-3 cursor-pointer transition-all border ${
-                        paymentMethod === 'card' ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                    >
-                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                          paymentMethod === 'card' ? 'border-blue-600' : 'border-gray-300'
-                      }`}>
-                        {paymentMethod === 'card' && <div className="w-2.5 h-2.5 bg-blue-600 rounded-full"></div>}
-                      </div>
-                      <span className="font-medium text-gray-900">Credit Card (Stripe/PayPal Mock)</span>
-                    </div>
-                    <div 
-                      onClick={() => setPaymentMethod('bank')}
-                      className={`rounded-lg p-4 flex items-center gap-3 cursor-pointer transition-all border ${
-                        paymentMethod === 'bank' ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                    >
-                       <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                          paymentMethod === 'bank' ? 'border-blue-600' : 'border-gray-300'
-                      }`}>
-                        {paymentMethod === 'bank' && <div className="w-2.5 h-2.5 bg-blue-600 rounded-full"></div>}
-                      </div>
-                      <span className="font-medium text-gray-900">Bank Transfer</span>
+                    <div onClick={() => setPaymentMethod('card')} className={`rounded-lg p-4 flex items-center gap-3 cursor-pointer transition-all border ${paymentMethod === 'card' ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'}`}>
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'card' ? 'border-blue-600' : 'border-gray-300'}`}>{paymentMethod === 'card' && <div className="w-2.5 h-2.5 bg-blue-600 rounded-full"></div>}</div>
+                      <span className="font-medium text-gray-900">Credit Card (Stripe)</span>
                     </div>
                   </div>
                 </div>
@@ -316,92 +286,41 @@ export default function CheckoutPage() {
             </form>
           </div>
 
-          {/* --- RIGHT: ORDER/QUOTE SUMMARY --- */}
+          {/* --- RIGHT: SUMMARY --- */}
           <div className="w-full lg:w-1/3">
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:sticky lg:top-24 z-20">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">
-                {isQuoteOrder ? 'Quote Summary' : 'Order Summary'}
-              </h2>
+              <h2 className="text-lg font-bold text-gray-900 mb-4">{isQuoteOrder ? 'Quote Summary' : 'Order Summary'}</h2>
               
               <div className="max-h-80 overflow-y-auto mb-6 pr-2 custom-scrollbar">
                 {cartItems.map((item) => (
                   <div key={item.slug} className="flex gap-4 py-4 border-b border-gray-50 last:border-0">
                     <div className="w-16 h-16 bg-gray-50 rounded-md border border-gray-100 flex-shrink-0 p-1 relative">
-                        <Image 
-                          src={item.image} 
-                          alt={item.name} 
-                          fill
-                          className="object-contain"
-                        />
-                        <div className="absolute -top-2 -right-2 w-5 h-5 bg-gray-500 text-white text-xs font-bold rounded-full flex items-center justify-center shadow-sm">
-                          {item.quantity}
-                        </div>
+                        <Image src={item.image} alt={item.name} fill className="object-contain" />
+                        <div className="absolute -top-2 -right-2 w-5 h-5 bg-gray-500 text-white text-xs font-bold rounded-full flex items-center justify-center shadow-sm">{item.quantity}</div>
                     </div>
                     <div className="flex-1 min-w-0 flex flex-col justify-center">
                       <p className="text-sm font-medium text-gray-900 line-clamp-2 leading-snug">{item.name}</p>
-                      {item.brand && <p className="text-xs text-gray-500 mt-1">{item.brand}</p>}
+                      {item.category && <p className="text-xs text-gray-500 mt-1">{item.category.split(',')[0]}</p>}
                     </div>
                     <div className="text-sm font-medium text-gray-900 flex items-center">
-                      {item.price ? `$${(item.price * item.quantity).toFixed(2)}` : 'Quote'}
+                      {item.price ? `$${(Number(item.price) * item.quantity).toFixed(2)}` : 'Quote'}
                     </div>
                   </div>
                 ))}
               </div>
 
               <div className="border-t border-gray-100 pt-4 space-y-3 mb-6">
-                <div className="flex justify-between text-sm text-gray-600">
-                  <span>Subtotal</span>
-                  <span className="font-medium text-gray-900">
-                    {isQuoteOrder ? 'To be quoted' : `$${cartTotal.toFixed(2)}`}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm text-gray-600">
-                  <span>Shipping</span>
-                  <span className="text-green-600 font-medium">
-                    {isQuoteOrder ? 'To be calculated' : 'Free'}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm text-gray-600">
-                  <span>Tax (VAT)</span>
-                  <span className="font-medium text-gray-900">
-                    {isQuoteOrder ? '-' : '$0.00'}
-                  </span>
-                </div>
-                <div className="flex justify-between items-end pt-3 border-t border-gray-100">
-                  <span className="text-lg font-bold text-gray-900">
-                    {isQuoteOrder ? 'Total' : 'Total'}
-                  </span>
-                  <span className="text-2xl font-bold text-blue-600">
-                    {isQuoteOrder ? 'Quote Request' : `$${cartTotal.toFixed(2)}`}
-                  </span>
-                </div>
+                <div className="flex justify-between text-sm text-gray-600"><span>Subtotal</span><span className="font-medium text-gray-900">{isQuoteOrder ? 'To be quoted' : `$${cartTotal.toFixed(2)}`}</span></div>
+                <div className="flex justify-between text-sm text-gray-600"><span>Shipping</span><span className="text-green-600 font-medium">{isQuoteOrder ? 'To be calculated' : 'Free'}</span></div>
+                <div className="flex justify-between text-sm text-gray-600"><span>Tax (VAT)</span><span className="font-medium text-gray-900">{isQuoteOrder ? '-' : '$0.00'}</span></div>
+                <div className="flex justify-between items-end pt-3 border-t border-gray-100"><span className="text-lg font-bold text-gray-900">Total</span><span className="text-2xl font-bold text-blue-600">{isQuoteOrder ? 'Quote' : `$${cartTotal.toFixed(2)}`}</span></div>
               </div>
 
-              <button 
-                type="submit" 
-                form="checkout-form"
-                disabled={isProcessing} // Disable when loading
-                className={`w-full text-white font-bold py-4 rounded-lg transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 
-                  ${isProcessing ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#00001E] hover:bg-blue-900'}`}
-              >
-                {isProcessing ? (
-                  <span>Processing...</span>
-                ) : isQuoteOrder ? (
-                  <>
-                    <FileTextIcon className="w-5 h-5" />
-                    Submit Quote Request
-                  </>
-                ) : (
-                  <>
-                    <LockIcon className="w-4 h-4" />
-                    Pay ${cartTotal.toFixed(2)}
-                  </>
-                )}
+              <button type="submit" form="checkout-form" disabled={isProcessing} className={`w-full text-white font-bold py-4 rounded-lg transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 ${isProcessing ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#00001E] hover:bg-blue-900'}`}>
+                {isProcessing ? <span>Processing...</span> : isQuoteOrder ? <><FileTextIcon className="w-5 h-5" />Submit Quote Request</> : <><LockIcon className="w-4 h-4" />Pay ${cartTotal.toFixed(2)}</>}
               </button>
               
-              <p className="text-xs text-gray-400 text-center mt-4 flex items-center justify-center gap-1">
-                <LockIcon className="w-3 h-3" /> Secure {isQuoteOrder ? 'Submission' : 'Encrypted Checkout'}
-              </p>
+              <p className="text-xs text-gray-400 text-center mt-4 flex items-center justify-center gap-1"><LockIcon className="w-3 h-3" /> Secure {isQuoteOrder ? 'Submission' : 'Encrypted Checkout'}</p>
             </div>
           </div>
 

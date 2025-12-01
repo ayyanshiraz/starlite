@@ -1,6 +1,8 @@
 "use client"
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import Image from 'next/image'; // Optional: If you want to add your logo
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
@@ -15,79 +17,71 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      console.log("1. Sending login request...");
       const res = await fetch('/api/admin/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
       });
 
-      console.log("2. Response received, status:", res.status);
-
-      // Try to parse the JSON
       const data = await res.json();
-      console.log("3. Data parsed:", data);
 
-      if (res.ok) {
-        console.log("4. Login successful! Saving to storage...");
+      if (res.ok && data.user) {
+        // 1. Save basic info to localStorage (helps UI load faster before API check)
+        localStorage.setItem('adminUser', JSON.stringify(data.user));
         
-        // 🛑 CRITICAL CHECK: Ensure data.user exists before saving
-        if (data.user) {
-          localStorage.setItem('adminUser', JSON.stringify(data.user));
-          console.log("5. Saved to LocalStorage. Redirecting...");
-          
-          router.push('/admin/dashboard');
-          router.refresh(); 
-        } else {
-          console.error("ERROR: Backend returned success but no user data!");
-          setError("Login succeeded but user data is missing.");
-        }
-
+        // 2. Redirect and Refresh (Vital for Middleware to see new cookies)
+        router.push('/admin/dashboard');
+        router.refresh(); 
       } else {
-        // Handle server errors (like 'Invalid password')
-        console.warn("Login failed by server:", data.error);
-        setError(data.error || 'Login failed');
+        setError(data.error || 'Invalid credentials');
       }
 
     } catch (err) {
-      // This catches network errors or JSON parsing errors
-      console.error("CRITICAL FRONTEND ERROR:", err);
-      setError('Something went wrong. Check console for details.');
+      console.error("Login Error:", err);
+      setError('Connection failed. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-96">
-        <h1 className="text-2xl font-bold mb-6 text-center text-gray-800">Admin Login</h1>
-        
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 px-4">
+      
+      <div className="bg-white p-8 rounded-xl shadow-2xl w-full max-w-sm">
+        {/* Optional Logo Header */}
+        <div className="text-center mb-6">
+           <h2 className="text-2xl font-bold text-gray-800">Admin Portal</h2>
+           <p className="text-sm text-gray-500 mt-1">Sign in to manage your store</p>
+        </div>
+
+        {/* Error Message */}
         {error && (
-          <div className="bg-red-100 text-red-700 p-3 rounded mb-4 text-sm text-center font-bold">
+          <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-3 rounded mb-6 text-sm">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleLogin} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Username</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Username</label>
             <input 
               type="text" 
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full mt-1 p-2 border rounded focus:ring-2 focus:ring-blue-500 text-black"
+              className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-black transition"
+              placeholder="Enter admin username"
               required 
             />
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700">Password</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Password</label>
             <input 
               type="password" 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full mt-1 p-2 border rounded focus:ring-2 focus:ring-blue-500 text-black"
+              className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-black transition"
+              placeholder="••••••••"
               required 
             />
           </div>
@@ -95,13 +89,22 @@ export default function LoginPage() {
           <button 
             type="submit" 
             disabled={loading}
-            className={`w-full text-white font-bold py-2 px-4 rounded transition ${
-              loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+            className={`w-full text-white font-bold py-3 px-4 rounded-lg transition-all shadow-md ${
+              loading 
+                ? 'bg-gray-400 cursor-not-allowed' 
+                : 'bg-blue-600 hover:bg-blue-700 hover:shadow-lg transform active:scale-95'
             }`}
           >
-            {loading ? 'Signing In...' : 'Sign In'}
+            {loading ? 'Authenticating...' : 'Sign In'}
           </button>
         </form>
+
+        {/* Back to Website Link */}
+        <div className="mt-6 text-center pt-4 border-t border-gray-100">
+          <Link href="/" className="text-sm text-gray-500 hover:text-blue-600 transition">
+            ← Return to Live Website
+          </Link>
+        </div>
       </div>
     </div>
   );

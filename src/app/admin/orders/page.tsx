@@ -1,9 +1,6 @@
 "use client"
 import { useState, useEffect } from 'react';
 
-// ==========================================
-// 1. FIXED INTERFACE (This fixes the red lines)
-// ==========================================
 interface OrderItem {
   id: string;
   name?: string; 
@@ -15,12 +12,12 @@ interface Order {
   id: string; 
   customerName: string | null;
   customerEmail: string | null;
+  customerPhone: string | null;
   status: string;
-  total: number;       // Your API might return 'total'
-  amountTotal?: number; // Or 'amountTotal' (Prisma default)
+  total: number;     
+  amountTotal?: number;
   createdAt: string;
   
-  // 🟢 ADDED THESE ADDRESS FIELDS TO FIX ERRORS
   addressLine1?: string | null;
   addressLine2?: string | null;
   city?: string | null;
@@ -28,7 +25,6 @@ interface Order {
   postalCode?: string | null;
   country?: string | null;
 
-  // Relation
   items?: OrderItem[]; 
 }
 
@@ -82,6 +78,7 @@ export default function OrdersPage() {
     const term = search.toLowerCase();
     const orderId = order.id.toLowerCase();
     const customer = (order.customerName || '').toLowerCase();
+    // Safe check for items array
     const hasProduct = order.items?.some(item => 
       (item.name || '').toLowerCase().includes(term)
     );
@@ -102,130 +99,164 @@ export default function OrdersPage() {
         <input
           type="text"
           placeholder="Search by Order ID, Name, or Product..."
-          className="p-2 border border-gray-300 rounded w-full md:w-1/3 text-black"
+          className="p-2 border border-gray-300 rounded w-full md:w-1/3 text-black focus:ring-2 focus:ring-blue-500 outline-none"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
       </div>
       
-      <table className="w-full text-left border-collapse text-black">
-        <thead>
-          <tr className="border-b bg-gray-100">
-            <th className="p-4 font-bold">ID / Date</th>
-            <th className="p-4 font-bold">Customer</th>
-            <th className="p-4 font-bold">Total</th>
-            <th className="p-4 font-bold">Status</th>
-            <th className="p-4 font-bold">Details</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredOrders.length === 0 ? (
-            <tr><td colSpan={5} className="p-4 text-center">No orders found.</td></tr>
-          ) : (
-            filteredOrders.map((order) => {
-              const displayTotal = (order.total || order.amountTotal || 0) / 100;
+      <div className="overflow-x-auto">
+        <table className="w-full text-left border-collapse text-black">
+          <thead>
+            <tr className="border-b bg-gray-50 text-xs uppercase text-gray-500">
+              {/* 🟢 SPLIT INTO TWO COLUMNS */}
+              <th className="p-4 font-bold">Order ID</th>
+              <th className="p-4 font-bold">Date Placed</th>
               
-              return (
-                <>
-                  <tr key={order.id} className="border-b hover:bg-gray-50">
-                    <td className="p-4">
-                      <div className="text-xs font-mono font-bold">{order.id.slice(0, 8)}...</div>
-                      <div className="text-xs text-gray-500">
-                        {new Date(order.createdAt).toLocaleDateString()}
-                      </div>
-                    </td>
-                    <td className="p-4">
-                      <div className="font-bold">{order.customerName || "Guest"}</div>
-                      <div className="text-xs text-gray-500">{order.customerEmail}</div>
-                    </td> 
-                    <td className="p-4 font-bold">${displayTotal.toFixed(2)}</td>
-                    
-                    <td className="p-4">
-                      <select
-                        // 🟢 FIX: Force lowercase for comparison so it matches the options below
-                        value={order.status?.toLowerCase() || 'pending'} 
-                        onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                        className={`p-2 rounded text-xs font-bold border cursor-pointer outline-none shadow-sm ${
-                          order.status?.toLowerCase() === 'delivered' ? 'bg-green-100 text-green-800 border-green-300' :
-                          order.status?.toLowerCase() === 'cancelled' ? 'bg-red-100 text-red-800 border-red-300' :
-                          order.status?.toLowerCase() === 'refunded' ? 'bg-purple-100 text-purple-800 border-purple-300' :
-                          'bg-yellow-100 text-yellow-800 border-yellow-300'
-                        }`}
-                      >
-                        {/* 🟢 VALUES: Use lowercase to be safe with string DB fields */}
-                        <option value="pending">PENDING</option>
-                        <option value="delivered">DELIVERED</option>
-                        <option value="cancelled">CANCELLED</option>
-                        <option value="refunded">REFUNDED</option>
-                      </select>
-                    </td>
+              <th className="p-4 font-bold">Customer</th>
+              <th className="p-4 font-bold">Total</th>
+              <th className="p-4 font-bold">Status</th>
+              <th className="p-4 font-bold">Details</th>
+            </tr>
+          </thead>
+          <tbody className="text-sm">
+            {filteredOrders.length === 0 ? (
+              <tr><td colSpan={6} className="p-8 text-center text-gray-500">No orders found.</td></tr>
+            ) : (
+              filteredOrders.map((order) => {
+                // Normalize total
+                const displayTotal = (order.amountTotal || order.total || 0) / 100;
+                const orderDate = new Date(order.createdAt);
 
-                    <td className="p-4">
-                      <button 
-                        onClick={() => toggleDetails(order.id)}
-                        className="text-blue-600 hover:text-blue-800 font-medium text-sm flex items-center gap-1"
-                      >
-                        {expandedOrderId === order.id ? "Hide 🔼" : "View 🔽"}
-                      </button>
-                    </td>
-                  </tr>
+                return (
+                  <>
+                    <tr key={order.id} className="border-b hover:bg-gray-50 transition-colors">
+                      
+                      {/* 🟢 COLUMN 1: ORDER ID */}
+                      <td className="p-4">
+                        <span className="font-mono text-xs font-bold text-gray-700 bg-gray-100 px-2 py-1 rounded">
+                          #{order.id.toUpperCase()}
+                        </span>
+                      </td>
 
-                  {expandedOrderId === order.id && (
-                    <tr className="bg-gray-50 border-b">
-                      <td colSpan={5} className="p-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          
-                          {/* ADDRESS SECTION */}
-                          <div className="bg-white p-4 rounded border shadow-sm">
-                            <h3 className="font-bold border-b pb-2 mb-2 text-gray-700">📍 Shipping Address</h3>
-                            {order.addressLine1 ? (
-                              <p className="text-sm text-gray-600 leading-relaxed">
-                                {order.addressLine1}<br />
-                                {order.addressLine2 && <>{order.addressLine2}<br/></>}
-                                {order.city}, {order.state} {order.postalCode}<br />
-                                {order.country}
-                              </p>
-                            ) : (
-                              <p className="text-sm text-red-500 italic">
-                                ⚠️ No address found in database.
-                              </p>
-                            )}
-                          </div>
-
-                          {/* ITEMS SECTION */}
-                          <div className="bg-white p-4 rounded border shadow-sm">
-                            <h3 className="font-bold border-b pb-2 mb-2 text-gray-700">🛒 Items Ordered</h3>
-                            {order.items && order.items.length > 0 ? (
-                              <ul className="text-sm text-gray-600 space-y-2">
-                                {order.items.map((item, index) => (
-                                  <li key={index} className="flex justify-between items-center bg-gray-50 p-2 rounded">
-                                    <span className="font-medium">{item.name || "Product"}</span>
-                                    <div className="text-right">
-                                      <span className="block text-xs text-gray-500">Qty: {item.quantity}</span>
-                                      <span className="font-bold">
-                                        ${((item.price * item.quantity) / 100).toFixed(2)}
-                                      </span>
-                                    </div>
-                                  </li>
-                                ))}
-                              </ul>
-                            ) : (
-                              <p className="text-sm text-red-500 italic">
-                                ⚠️ No items found.
-                              </p>
-                            )}
-                          </div>
-
+                      {/* 🟢 COLUMN 2: DATE & TIME */}
+                      <td className="p-4">
+                        <div className="font-medium text-gray-900">
+                          {orderDate.toLocaleDateString()}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {orderDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </div>
                       </td>
+                      
+                      {/* CUSTOMER INFO */}
+                      <td className="p-4">
+                        <div className="font-bold text-gray-900">{order.customerName || "Guest"}</div>
+                        <div className="text-xs text-gray-500">{order.customerEmail}</div>
+                        {order.customerPhone && (
+                          <div className="text-xs text-blue-600 font-mono mt-1">{order.customerPhone}</div>
+                        )}
+                      </td> 
+                      
+                      {/* TOTAL PRICE */}
+                      <td className="p-4 font-bold text-lg">
+                        ${displayTotal.toFixed(2)}
+                      </td>
+                      
+                      {/* STATUS DROPDOWN */}
+                      <td className="p-4">
+                        <select
+                          value={order.status?.toLowerCase() || 'pending'} 
+                          onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                          className={`p-2 rounded text-xs font-bold border cursor-pointer outline-none shadow-sm uppercase ${
+                            order.status?.toLowerCase() === 'delivered' ? 'bg-green-100 text-green-800 border-green-300' :
+                            order.status?.toLowerCase() === 'cancelled' ? 'bg-red-100 text-red-800 border-red-300' :
+                            order.status?.toLowerCase() === 'refunded' ? 'bg-purple-100 text-purple-800 border-purple-300' :
+                            'bg-yellow-100 text-yellow-800 border-yellow-300'
+                          }`}
+                        >
+                          <option value="pending">PENDING</option>
+                          <option value="processing">PROCESSING</option>
+                          <option value="shipped">SHIPPED</option>
+                          <option value="delivered">DELIVERED</option>
+                          <option value="cancelled">CANCELLED</option>
+                          <option value="refunded">REFUNDED</option>
+                        </select>
+                      </td>
+
+                      {/* DETAILS TOGGLE */}
+                      <td className="p-4">
+                        <button 
+                          onClick={() => toggleDetails(order.id)}
+                          className="text-blue-600 hover:text-blue-800 font-bold text-xs flex items-center gap-1"
+                        >
+                          {expandedOrderId === order.id ? "Hide 🔼" : "View 🔽"}
+                        </button>
+                      </td>
                     </tr>
-                  )}
-                </>
-              );
-            })
-          )}
-        </tbody>
-      </table>
+
+                    {/* EXPANDED DETAILS ROW */}
+                    {expandedOrderId === order.id && (
+                      <tr className="bg-gray-50 border-b shadow-inner">
+                        <td colSpan={6} className="p-6">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            
+                            {/* SHIPPING DETAILS */}
+                            <div className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm">
+                              <h3 className="font-bold border-b pb-2 mb-3 text-gray-800 flex items-center gap-2">
+                                📍 Shipping Address
+                              </h3>
+                              {order.addressLine1 ? (
+                                <p className="text-sm text-gray-600 leading-relaxed">
+                                  <span className="block font-medium text-gray-900">{order.addressLine1}</span>
+                                  {order.addressLine2 && <span className="block">{order.addressLine2}</span>}
+                                  <span className="block">{order.city}, {order.state} {order.postalCode}</span>
+                                  <span className="block font-bold text-gray-400 mt-1">{order.country}</span>
+                                </p>
+                              ) : (
+                                <p className="text-sm text-red-500 italic">
+                                  ⚠️ No address found in database.
+                                </p>
+                              )}
+                            </div>
+
+                            {/* ORDER ITEMS */}
+                            <div className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm">
+                              <h3 className="font-bold border-b pb-2 mb-3 text-gray-800 flex items-center gap-2">
+                                🛒 Items Ordered
+                              </h3>
+                              {order.items && order.items.length > 0 ? (
+                                <ul className="space-y-0 divider-y divide-gray-100">
+                                  {order.items.map((item, index) => (
+                                    <li key={index} className="flex justify-between items-center py-3 border-b border-gray-100 last:border-0">
+                                      <div>
+                                        <span className="font-medium text-gray-900 block">{item.name || "Unknown Product"}</span>
+                                        <span className="text-xs text-gray-500">Qty: {item.quantity}</span>
+                                      </div>
+                                      <div className="text-right font-bold text-gray-800">
+                                        ${((item.price * item.quantity) / 100).toFixed(2)}
+                                      </div>
+                                    </li>
+                                  ))}
+                                </ul>
+                              ) : (
+                                <p className="text-sm text-red-500 italic flex items-center gap-2">
+                                  ⚠️ <span>No items found.</span>
+                                </p>
+                              )}
+                            </div>
+
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

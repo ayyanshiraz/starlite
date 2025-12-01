@@ -1,65 +1,94 @@
-import { NextResponse } from 'next/server';
-import Stripe from 'stripe';
+import { NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client";
+import Stripe from "stripe";
 
-// 1. Correct Import: We import 'productSkus' instead of 'products'
-import { productSkus } from '@/lib/sku-data'; 
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  typescript: true,
+});
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
+const prisma = new PrismaClient();
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { cartItems } = body; 
+    const { items, customerInfo } = body;
 
-    const lineItems = cartItems.map((cartItem: any) => {
-      // 2. Correct Lookup: Direct access using the ID (no .find needed)
-      const product = productSkus[cartItem.id];
+    if (!items || items.length === 0) {
+      return NextResponse.json({ error: "No items in cart" }, { status: 400 });
+    }
 
-      // Check if product exists in your database
-      if (!product) {
-        throw new Error(`Product with ID ${cartItem.id} not found`);
+    const amountTotal = items.reduce((acc: number, item: any) => {
+       const price = typeof item.price === 'number' ? item.price : 0; 
+       return acc + (price * item.quantity);
+    }, 0);
+
+    // 1. Create Order in DB (Save Customer Info)
+    const tempId = `temp_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+
+    const newOrder = await prisma.order.create({
+      data: {
+        customerName: `${customerInfo.firstName} ${customerInfo.lastName}`,
+        customerEmail: customerInfo.email,
+        customerPhone: customerInfo.phone ? customerInfo.phone : null,
+        addressLine1: customerInfo.address,
+        addressLine2: customerInfo.address2 || null, 
+        city: customerInfo.city,
+        postalCode: customerInfo.postalCode, // Renamed from zip to match schema if needed
+        country: customerInfo.country,
+        state: customerInfo.state || null,
+        amountTotal: Math.round(amountTotal * 100),
+        currency: 'usd',
+        status: 'pending',
+        stripeSessionId: tempId,
+        items: {
+          create: items.map((item: any) => ({
+            name: item.name,
+            quantity: item.quantity,
+            price: Math.round((typeof item.price === 'number' ? item.price : 0) * 100),
+            sku: item.sku || null 
+          }))
+        }
       }
-
-      // 3. Price Check: 
-      // If price is a string (like "Get a Quote"), we CANNOT checkout.
-      if (typeof product.price === 'string') {
-        throw new Error(`Product "${cartItem.id}" requires a quote and cannot be bought online.`);
-      }
-
-      // If we are here, product.price is a number (e.g., 200)
-      return {
-        price_data: {
-          currency: 'usd', 
-          product_data: {
-            name: cartItem.id, // Or add a name field to your SkuData interface if you want pretty names
-          },
-          // Stripe needs cents (200 * 100 = 20000 cents)
-          unit_amount: Math.round(product.price * 100), 
-        },
-        quantity: cartItem.quantity,
-      };
     });
 
+    // 2. Create Stripe Session
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      line_items: lineItems,
-      mode: 'payment',
-      // 👇 ADD THESE LINES 👇
-      phone_number_collection: {
-        enabled: true,
+      payment_method_types: ["card"],
+      line_items: items.map((item: any) => {
+        // 🟢 FIX: Ensure we only send valid URLs to Stripe
+        const images = item.image && item.image.startsWith('http') ? [item.image] : [];
+        
+        return {
+          price_data: {
+            currency: "usd",
+            product_data: {
+              name: item.name,
+              images: images, // Send empty array if local image
+            },
+            unit_amount: Math.round((typeof item.price === 'number' ? item.price : 0) * 100),
+          },
+          quantity: item.quantity,
+        };
+      }),
+      mode: "payment",
+      success_url: `${process.env.NEXT_PUBLIC_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.NEXT_PUBLIC_URL}/checkout`,
+      metadata: {
+        orderId: newOrder.id,
       },
-      shipping_address_collection: {
-        allowed_countries: ['US', 'GB', 'CA'], // Add countries you ship to
-      },
-      // 👆 END ADDITION 👆
-      success_url: `${request.headers.get('origin')}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${request.headers.get('origin')}/checkout`,
     });
 
+    // 3. Update Order with Real Session ID
+    await prisma.order.update({
+      where: { id: newOrder.id },
+      data: { stripeSessionId: session.id }
+    });
+
+    // 🟢 Return the URL for redirection (New Way)
     return NextResponse.json({ url: session.url });
 
   } catch (error: any) {
-    console.error("Stripe Error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("Checkout API Error:", error);
+    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
   }
 }

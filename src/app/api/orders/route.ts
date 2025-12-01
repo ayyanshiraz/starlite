@@ -5,10 +5,12 @@ const prisma = new PrismaClient();
 
 export async function GET() {
   try {
-    // Fetch all orders sorted by newest first
     const orders = await prisma.order.findMany({
       orderBy: { createdAt: 'desc' },
-      include: { items: true } // Include items if you need them
+      // 🟢 CRITICAL FIX: This tells DB to send the items with the order
+      include: {
+        items: true, 
+      }
     });
 
     return NextResponse.json(orders);

@@ -11,13 +11,16 @@ datasource db {
 
 // --- 1. ADMIN USER (For Login) ---
 model AdminUser {
-  id          String   @id @default(cuid())
-  username    String   @unique
-  password    String
-  // Store permissions as a comma-separated string (e.g. "dashboard,orders")
-  permissions String   @default("dashboard,products,orders,users") 
-  isSuperAdmin Boolean @default(false)
-  createdAt   DateTime @default(now())
+  id           String   @id @default(cuid())
+  username     String   @unique
+  password     String
+  permissions  String   @default("dashboard")
+  isSuperAdmin Boolean  @default(false)
+  
+  // 👇 THIS IS THE MISSING LINE
+  isActive     Boolean  @default(true) 
+
+  createdAt    DateTime @default(now())
 }
 
 // --- 2. PRODUCT MANAGEMENT (Dynamic Database) ---

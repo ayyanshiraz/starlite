@@ -1,77 +1,113 @@
 "use client";
 
-import React, { useEffect, Suspense } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useCart } from '@/hooks/useCart';
-import { CheckCircleIcon } from 'lucide-react'; // Or use your SVG component if you prefer
 
-// 🟢 1. Create a Sub-Component for the Logic
 function SuccessContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const { clearCart } = useCart();
-  
-  // Get Stripe/Payment Session ID
   const sessionId = searchParams.get('session_id');
+  
+  const [order, setOrder] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (sessionId) {
-      // If we have a session ID, it means payment worked. Clear the cart.
+      // 1. Clear the shopping cart
       clearCart();
+
+      // 2. Fetch the actual order details
+      fetch(`/api/orders/success?session_id=${sessionId}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (!data.error) {
+            setOrder(data);
+          }
+        })
+        .catch(err => console.error("Failed to fetch order", err))
+        .finally(() => setLoading(false));
     }
   }, [sessionId, clearCart]);
 
   return (
-    <div className="text-center">
+    <div className="text-center max-w-2xl mx-auto p-6">
       <div className="flex justify-center mb-6">
-        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            className="w-10 h-10 text-green-600" 
-            fill="none" 
-            viewBox="0 0 24 24" 
-            stroke="currentColor" 
-            strokeWidth={2}
-          >
+        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center shadow-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
           </svg>
         </div>
       </div>
       
-      <h1 className="text-3xl font-bold text-gray-900 mb-4">
-        Payment Successful!
-      </h1>
-      
-      <p className="text-gray-600 mb-8 max-w-md mx-auto">
-        Thank you for your purchase. Your order has been confirmed and will be shipped shortly.
-        {sessionId && <span className="block text-xs text-gray-400 mt-2">Transaction ID: {sessionId.slice(-8)}</span>}
+      <h1 className="text-3xl font-bold text-gray-900 mb-2">Payment Successful!</h1>
+      <p className="text-gray-600 mb-8">
+        Thank you for your purchase. Your order has been confirmed.
       </p>
 
-      <div className="space-x-4">
-        <Link 
-          href="/shop"
-          className="inline-block bg-gray-100 text-gray-700 font-semibold py-3 px-8 rounded-lg hover:bg-gray-200 transition"
-        >
+      {/* --- ORDER DETAILS BOX --- */}
+      {loading ? (
+        <div className="p-6 bg-gray-50 rounded-lg mb-8 animate-pulse">
+          <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto mb-2"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/3 mx-auto"></div>
+        </div>
+      ) : order ? (
+        <div className="bg-white border border-gray-200 rounded-xl p-6 mb-8 shadow-sm text-left">
+          <div className="flex justify-between border-b pb-4 mb-4">
+            <div>
+              <p className="text-xs text-gray-500 uppercase font-bold">Order Number</p>
+              <p className="text-lg font-mono font-bold text-blue-600">#{order.id.slice(-8).toUpperCase()}</p>
+            </div>
+            <div className="text-right">
+              <p className="text-xs text-gray-500 uppercase font-bold">Total Amount</p>
+              <p className="text-lg font-bold">${(order.amountTotal / 100).toFixed(2)}</p>
+            </div>
+          </div>
+          
+          <div>
+            <p className="text-xs text-gray-500 uppercase font-bold mb-2">Items Ordered</p>
+            <ul className="divide-y divide-gray-100">
+              {order.items.map((item: any, idx: number) => (
+                // 🟢 FIXED: Proper Flex Layout to prevent overlap
+                <li key={idx} className="flex justify-between items-start py-3">
+                  <div className="pr-4">
+                     <p className="text-sm font-semibold text-gray-900">{item.name}</p>
+                     <p className="text-xs text-gray-500 mt-0.5">Qty: {item.quantity}</p>
+                  </div>
+                  <div className="text-sm font-bold text-gray-900 whitespace-nowrap">
+                     ${(item.price / 100).toFixed(2)}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+          
+          <div className="mt-6 pt-4 border-t text-sm text-gray-500">
+             <p>Shipping to: <span className="font-medium text-gray-900">{order.addressLine1}, {order.city}</span></p>
+          </div>
+        </div>
+      ) : (
+        <p className="text-red-500 mb-6">Could not retrieve order details. Please check your email.</p>
+      )}
+
+      {/* 🟢 UPDATED BUTTONS: Continue Shopping + Track Order */}
+      <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        <Link href="/shop" className="bg-gray-100 text-gray-800 font-bold py-3 px-8 rounded-lg hover:bg-gray-200 transition text-center">
           Continue Shopping
         </Link>
-        <Link 
-          href="/track-your-order"
-          className="inline-block bg-blue-600 text-white font-semibold py-3 px-8 rounded-lg hover:bg-blue-700 transition"
-        >
-          Track Order
+        <Link href="/track-your-order" className="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 transition text-center shadow-md">
+          Track Your Order
         </Link>
       </div>
     </div>
   );
 }
 
-// 🟢 2. Main Page Component (Wraps Content in Suspense)
 export default function SuccessPage() {
   return (
     <main className="bg-white min-h-screen flex flex-col items-center justify-center px-4">
-      {/* Suspense is required for build when using useSearchParams */}
-      <Suspense fallback={<p>Loading order details...</p>}>
+      <Suspense fallback={<p>Loading...</p>}>
         <SuccessContent />
       </Suspense>
     </main>
