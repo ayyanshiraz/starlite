@@ -1,14 +1,21 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // 1. Ignore TypeScript Errors (Valid)
+  // 🟢 1. Increase Upload Limit (Fixes the 1MB Error)
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '10mb', // Increase to 10MB (or more if needed)
+    },
+  },
+
+  // 2. Ignore TypeScript/ESLint Errors (Keep this for Vercel deployment)
   typescript: {
     ignoreBuildErrors: true,
   },
-  
-  // 🔴 REMOVED 'eslint' block from here. 
-  // We use "next build --no-lint" in package.json instead.
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 
-  // 2. Allow External Images
+  // 3. Allow External Images
   images: {
     remotePatterns: [
       {

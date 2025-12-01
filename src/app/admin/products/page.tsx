@@ -1,8 +1,13 @@
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation'; // 🟢 FIXED IMPORT
+import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
+
+// Client Components
+import AdminSearch from '@/components/admin/AdminSearch';
+import AdminProductForm from '@/components/admin/AdminProductForm';
+import ProductTable from '@/components/admin/ProductTable';
+import CsvImporter from '@/components/admin/CsvImporter';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,25 +16,48 @@ const ITEMS_PER_PAGE = 10;
 export default async function AdminProductsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ edit?: string; page?: string }>;
+  searchParams: Promise<{ edit?: string; page?: string; search?: string }>;
 }) {
   const params = await searchParams;
   const editingId = params.edit;
   const currentPage = Number(params.page) || 1;
+  const query = params.search || '';
 
-  // 1. Fetch Paginated Products
+  // ------------------------------------------------------------------
+  // 1. BUILD DATABASE FILTER (SEARCH)
+  // ------------------------------------------------------------------
+  const whereCondition: any = {};
+  
+  if (query) {
+    const isNumber = !isNaN(Number(query));
+    whereCondition.OR = [
+      { name: { contains: query, mode: 'insensitive' } },
+      { sku: { contains: query, mode: 'insensitive' } },
+      { slug: { contains: query, mode: 'insensitive' } },
+      { category: { contains: query, mode: 'insensitive' } },
+    ];
+    // If query looks like a price (number), search exact price match
+    if (isNumber) {
+      whereCondition.OR.push({ price: { equals: Math.round(Number(query) * 100) } });
+    }
+  }
+
+  // ------------------------------------------------------------------
+  // 2. FETCH DATA (Products + Total Count)
+  // ------------------------------------------------------------------
   const [products, totalCount] = await Promise.all([
     prisma.product.findMany({
+      where: whereCondition,
       orderBy: { createdAt: 'desc' },
       skip: (currentPage - 1) * ITEMS_PER_PAGE,
       take: ITEMS_PER_PAGE,
     }),
-    prisma.product.count(),
+    prisma.product.count({ where: whereCondition }),
   ]);
 
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
-  // 2. Fetch Product to Edit
+  // Fetch specific product if editing
   let productToEdit = null;
   if (editingId) {
     productToEdit = await prisma.product.findUnique({
@@ -37,18 +65,9 @@ export default async function AdminProductsPage({
     });
   }
 
-  // Helper: Convert Description (JSON or String) to text for the input box
-  const getDescriptionString = (desc: any) => {
-    if (!desc) return '';
-    if (typeof desc === 'string') return desc;
-    return JSON.stringify(desc, null, 2); // Makes JSON readable in the box
-  };
-
-  const editDescriptionValue = getDescriptionString(productToEdit?.description);
-
-  // =========================================================
-  // SERVER ACTIONS
-  // =========================================================
+  // ==================================================================
+  // SERVER ACTIONS (Backend Logic)
+  // ==================================================================
 
   async function saveProduct(formData: FormData) {
     "use server";
@@ -58,14 +77,19 @@ export default async function AdminProductsPage({
     const slugInput = formData.get('slug') as string;
     const category = formData.get('category') as string;
     const priceInput = formData.get('price') as string;
-    const image = formData.get('image') as string || '/placeholder.png';
     const sku = formData.get('sku') as string;
     const stock = parseInt(formData.get('stock') as string) || 0;
     const description = formData.get('description') as string;
     const availability = formData.get('availability') as string;
+    
+    // Image handling: Priority to Base64 (Upload), then URL input, then Placeholder
+    const imageBase64 = formData.get('imageBase64') as string;
+    const imageURLInput = formData.get('imageURL') as string;
+    const finalImage = imageBase64 || imageURLInput || '/placeholder.png';
 
     const priceCents = priceInput ? Math.round(parseFloat(priceInput) * 100) : null;
 
+    // Auto-generate slug if empty
     let finalSlug = slugInput;
     if (!finalSlug) {
       const slugRaw = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, ''); 
@@ -77,258 +101,127 @@ export default async function AdminProductsPage({
       slug: finalSlug,
       category,
       price: priceCents,
-      image,
+      image: finalImage,
       sku,
       stock,
-      description, // Save as text/string now
+      description, 
       availability
     };
 
-    if (id) {
-      await prisma.product.update({ where: { id }, data });
-    } else {
-      await prisma.product.create({ data });
-    }
-    
-    revalidatePath('/admin/products');
-  }
-
-  async function deleteProduct(formData: FormData) {
-    "use server";
-    const id = formData.get('id') as string;
     try {
-      await prisma.product.delete({ where: { id } });
+      if (id) {
+        await prisma.product.update({ where: { id }, data });
+      } else {
+        await prisma.product.create({ data });
+      }
       revalidatePath('/admin/products');
     } catch (error) {
-      console.error("Failed to delete product");
+      console.error("Save Product Error:", error);
+      // Optional: throw error to be caught by UI
     }
   }
 
   async function goToPage(formData: FormData) {
     "use server";
     const page = formData.get('page');
-    redirect(`/admin/products?page=${page}`);
+    redirect(`/admin/products?page=${page}&search=${query}`);
   }
 
-  // 🟢 STYLE CONSTANTS (Visible Borders & Colors)
-  const inputStyle = "w-full border-2 border-gray-300 p-3 rounded-lg text-gray-900 bg-white focus:border-blue-600 outline-none shadow-sm font-medium";
-  const labelStyle = "block text-xs font-bold text-gray-600 uppercase mb-1 ml-1";
-
-  // =========================================================
-  // UI
-  // =========================================================
+  // ==================================================================
+  // UI RENDER
+  // ==================================================================
   return (
     <div className="max-w-7xl mx-auto min-h-screen pb-20 p-6 bg-gray-50">
       
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-extrabold text-gray-900">Product Manager</h1>
-        {editingId && (
-          <Link 
-            href={`/admin/products?page=${currentPage}`}
-            className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg text-sm font-bold shadow transition"
-          >
-            Cancel Editing
-          </Link>
-        )}
-      </div>
-
-      {/* --- EDIT/ADD FORM --- */}
-      <div className={`p-8 rounded-2xl shadow-md border mb-12 transition-all duration-300 ${
-        productToEdit ? 'bg-blue-50 border-blue-200 ring-2 ring-blue-100' : 'bg-white border-gray-200'
-      }`}>
-        <h2 className={`text-xl font-bold mb-6 border-b pb-4 ${productToEdit ? 'text-blue-800 border-blue-200' : 'text-gray-800 border-gray-100'}`}>
-          {productToEdit ? `✏️ Editing: ${productToEdit.name}` : '✨ Add New Product'}
-        </h2>
+      {/* --- HEADER & TOOLS --- */}
+      <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-8 gap-6">
+        <div>
+          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Product Manager</h1>
+          <p className="text-sm text-gray-500 mt-1">Manage inventory, prices, and import data.</p>
+        </div>
         
-        <form action={saveProduct} className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          {productToEdit && <input type="hidden" name="id" value={productToEdit.id} />}
-
-          {/* 1. Name */}
-          <div className="md:col-span-2">
-            <label className={labelStyle}>Product Name *</label>
-            <input name="name" required defaultValue={productToEdit?.name || ''} className={inputStyle} placeholder="e.g. Dell Latitude 5540" />
+        <div className="flex flex-col md:flex-row gap-4 w-full xl:w-auto">
+          {/* Search Bar */}
+          <div className="flex-grow md:w-80">
+            <AdminSearch />
+          </div>
+          
+          {/* CSV Import Button */}
+          <div className="flex-shrink-0">
+            <CsvImporter />
           </div>
 
-          {/* 2. Slug */}
-          <div className="md:col-span-2">
-            <label className={labelStyle}>Slug (URL)</label>
-            <input name="slug" defaultValue={productToEdit?.slug || ''} className={inputStyle} placeholder="Auto-generated if empty" />
-          </div>
-
-          {/* 3. Category */}
-          <div>
-            <label className={labelStyle}>Category</label>
-            <input name="category" defaultValue={productToEdit?.category || ''} className={inputStyle} placeholder="Laptops" />
-          </div>
-
-          {/* 4. SKU */}
-          <div>
-            <label className={labelStyle}>SKU</label>
-            <input name="sku" defaultValue={productToEdit?.sku || ''} className={inputStyle} placeholder="ABC-123" />
-          </div>
-
-          {/* 5. Stock */}
-          <div>
-            <label className={labelStyle}>Stock Qty</label>
-            <input name="stock" type="number" defaultValue={productToEdit?.stock || 100} className={inputStyle} />
-          </div>
-
-          {/* 6. Availability */}
-          <div>
-            <label className={labelStyle}>Availability</label>
-            <select name="availability" defaultValue={productToEdit?.availability || 'In Stock'} className={inputStyle}>
-              <option value="In Stock">In Stock</option>
-              <option value="Out of Stock">Out of Stock</option>
-              <option value="Pre Order">Pre Order</option>
-            </select>
-          </div>
-
-          {/* 7. Price */}
-          <div className="md:col-span-2">
-            <label className={labelStyle}>Price ($)</label>
-            <input name="price" type="number" step="0.01" defaultValue={productToEdit?.price ? (productToEdit.price / 100).toFixed(2) : ''} className={inputStyle} placeholder="0.00 (Leave empty for Quote)" />
-          </div>
-
-          {/* 8. Image */}
-          <div className="md:col-span-2">
-            <label className={labelStyle}>Image URL</label>
-            <input name="image" defaultValue={productToEdit?.image || ''} className={inputStyle} placeholder="/images/product.jpg" />
-          </div>
-
-          {/* 9. Description */}
-          <div className="md:col-span-4">
-            <label className={labelStyle}>Description</label>
-            <textarea 
-              name="description" 
-              rows={6} 
-              defaultValue={editDescriptionValue} 
-              className={`${inputStyle} font-mono text-sm`} // Monospace for JSON editing
-              placeholder="Enter details..." 
-            />
-          </div>
-
-          {/* Submit Button */}
-          <div className="md:col-span-4 mt-4 flex justify-end">
-            <button className={`text-white py-3 px-8 rounded-lg font-bold text-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 ${
-              productToEdit ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-700 hover:bg-blue-800'
-            }`}>
-              {productToEdit ? 'Update Product' : '+ Create Product'}
-            </button>
-          </div>
-        </form>
+          {/* Cancel Edit Button (Visible only when editing) */}
+          {editingId && (
+            <Link 
+              href={`/admin/products?page=${currentPage}`} 
+              className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg text-sm font-bold shadow transition flex items-center justify-center"
+            >
+              Cancel Editing
+            </Link>
+          )}
+        </div>
       </div>
 
-      {/* --- PRODUCT TABLE --- */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-8">
-        <table className="w-full text-left border-collapse">
-          <thead className="bg-gray-100 text-gray-600 text-xs uppercase font-bold tracking-wider border-b border-gray-200">
-            <tr>
-              <th className="p-5">Image</th>
-              <th className="p-5">Info</th>
-              <th className="p-5">Stock/SKU</th>
-              <th className="p-5">Price</th>
-              <th className="p-5 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {products.map((p) => (
-              <tr key={p.id} className={`group transition-colors duration-200 ${editingId === p.id ? 'bg-blue-50' : 'hover:bg-gray-50'}`}>
-                <td className="p-5 w-24">
-                  <div className="w-16 h-16 relative bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden p-1">
-                    {p.image && <Image src={p.image} alt={p.name} fill className="object-contain" />}
-                  </div>
-                </td>
-                <td className="p-5">
-                  <div className="font-bold text-gray-900 group-hover:text-blue-700 transition-colors text-sm">{p.name}</div>
-                  <div className="text-xs text-gray-500 mt-1 font-mono bg-gray-100 inline-block px-2 py-0.5 rounded">{p.slug.slice(0, 30)}...</div>
-                  <div className="text-xs text-gray-400 mt-1">{p.category || 'Uncategorized'}</div>
-                </td>
-                <td className="p-5 text-sm">
-                  <div className={`font-bold ${p.stock > 0 ? "text-green-600" : "text-red-500"}`}>
-                    {p.stock > 0 ? `${p.stock} Units` : 'Out of Stock'}
-                  </div>
-                  <div className="text-xs text-gray-400 mt-1">SKU: {p.sku || '--'}</div>
-                </td>
-                <td className="p-5 font-bold text-gray-800">
-                  {p.price ? `$${(p.price / 100).toFixed(2)}` : <span className="text-blue-600 text-xs uppercase font-bold">Quote</span>}
-                </td>
-                <td className="p-5 text-right space-x-4">
-                  <Link 
-                    href={`/admin/products?page=${currentPage}&edit=${p.id}`} 
-                    scroll={true} 
-                    className="text-blue-600 font-bold hover:underline bg-blue-50 px-3 py-1.5 rounded text-xs"
-                  >
-                    Edit
-                  </Link>
-                  <form action={deleteProduct} className="inline-block">
-                    <input type="hidden" name="id" value={p.id} />
-                    <button className="text-red-500 font-bold hover:underline bg-red-50 px-3 py-1.5 rounded text-xs">Delete</button>
-                  </form>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {/* --- EDIT / CREATE FORM --- */}
+      <AdminProductForm productToEdit={productToEdit} saveProductAction={saveProduct} />
 
-      {/* 🟢 FIXED PAGINATION BAR (First | Prev | Next | Last) */}
-      <div className="flex flex-col md:flex-row justify-between items-center bg-white p-5 rounded-xl border shadow-sm gap-4">
+      {/* --- PRODUCT TABLE (With Bulk Actions) --- */}
+      {products.length === 0 ? (
+         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+            </div>
+            <h3 className="text-lg font-medium text-gray-900">No products found</h3>
+            <p className="text-gray-500 mt-1">Try adjusting your search or add a new product.</p>
+         </div>
+      ) : (
+        // 🟢 This component handles the Table, Checkboxes, and Bulk Delete/Update
+        <ProductTable products={products} />
+      )}
+
+      {/* --- PAGINATION --- */}
+      <div className="flex flex-col md:flex-row justify-between items-center bg-white p-4 rounded-xl border border-gray-200 shadow-sm mt-6 gap-4">
         
+        {/* Navigation Links */}
         <div className="flex items-center gap-2">
-          {/* First */}
-          <Link 
-            href={`/admin/products?page=1`} 
-            className={`px-4 py-2 border rounded-lg text-sm font-bold shadow-sm transition-all ${currentPage === 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-900 hover:bg-black hover:text-white border-gray-300'}`}
-          >
+          <Link href={`/admin/products?page=1&search=${query}`} className={`px-3 py-1.5 border rounded text-sm font-medium transition ${currentPage === 1 ? 'bg-gray-100 text-gray-400 pointer-events-none' : 'hover:bg-gray-50 text-gray-700'}`}>
             « First
           </Link>
-          
-          {/* Previous */}
-          <Link 
-            href={`/admin/products?page=${currentPage > 1 ? currentPage - 1 : 1}`} 
-            className={`px-4 py-2 border rounded-lg text-sm font-bold shadow-sm transition-all ${currentPage === 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-900 hover:bg-black hover:text-white border-gray-300'}`}
-          >
+          <Link href={`/admin/products?page=${currentPage > 1 ? currentPage - 1 : 1}&search=${query}`} className={`px-3 py-1.5 border rounded text-sm font-medium transition ${currentPage === 1 ? 'bg-gray-100 text-gray-400 pointer-events-none' : 'hover:bg-gray-50 text-gray-700'}`}>
             ‹ Prev
           </Link>
-
-          <span className="mx-2 text-sm font-bold text-gray-800 bg-gray-100 px-4 py-2 rounded border border-gray-200">
-            Page {currentPage} <span className="text-gray-500 font-normal">of</span> {totalPages || 1}
+          
+          <span className="px-4 text-sm font-bold text-gray-800">
+            Page {currentPage} <span className="text-gray-400 font-normal">of</span> {totalPages || 1}
           </span>
 
-          {/* Next */}
-          <Link 
-            href={`/admin/products?page=${currentPage < totalPages ? currentPage + 1 : totalPages}`} 
-            className={`px-4 py-2 border rounded-lg text-sm font-bold shadow-sm transition-all ${currentPage === totalPages ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-900 hover:bg-black hover:text-white border-gray-300'}`}
-          >
+          <Link href={`/admin/products?page=${currentPage < totalPages ? currentPage + 1 : totalPages}&search=${query}`} className={`px-3 py-1.5 border rounded text-sm font-medium transition ${currentPage === totalPages ? 'bg-gray-100 text-gray-400 pointer-events-none' : 'hover:bg-gray-50 text-gray-700'}`}>
             Next ›
           </Link>
-
-          {/* Last */}
-          <Link 
-            href={`/admin/products?page=${totalPages}`} 
-            className={`px-4 py-2 border rounded-lg text-sm font-bold shadow-sm transition-all ${currentPage === totalPages ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-900 hover:bg-black hover:text-white border-gray-300'}`}
-          >
+          <Link href={`/admin/products?page=${totalPages}&search=${query}`} className={`px-3 py-1.5 border rounded text-sm font-medium transition ${currentPage === totalPages ? 'bg-gray-100 text-gray-400 pointer-events-none' : 'hover:bg-gray-50 text-gray-700'}`}>
             Last »
           </Link>
         </div>
 
-        {/* Go To Page */}
-        <form action={goToPage} className="flex items-center gap-2 bg-gray-50 p-2 rounded-lg border border-gray-200">
-          <span className="text-sm font-bold text-gray-700 pl-2">Go to:</span>
+        {/* Go To Page Input */}
+        <form action={goToPage} className="flex gap-2 items-center bg-gray-50 p-1.5 rounded-lg border border-gray-200">
+          <span className="text-xs font-bold text-gray-500 uppercase pl-2">Go to</span>
+          <input type="hidden" name="term" value={query} />
           <input 
             type="number" 
             name="page" 
             min="1" 
             max={totalPages} 
-            placeholder="#" 
-            className="border-gray-300 border-2 rounded p-1 w-16 text-center text-sm font-bold text-black focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+            className="w-12 p-1 text-center text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none"
+            placeholder="#"
           />
-          <button className="bg-gray-900 text-white px-4 py-1 rounded text-sm font-bold hover:bg-black transition shadow-md">
+          <button className="bg-gray-900 text-white px-3 py-1 rounded text-sm font-bold hover:bg-black transition">
             Go
           </button>
         </form>
-
       </div>
+
     </div>
   );
 }

@@ -172,10 +172,28 @@ const SpecItem = ({ label, children }: { label: string, children: React.ReactNod
 );
 
 // --- DESCRIPTION TAB ---
+// ... imports remain the same ...
+
+// 🟢 NEW HELPER: Parses "**Text**" into <strong>Text</strong>
+const renderFormattedText = (text: string) => {
+  if (!text) return "";
+  const parts = text.split("**");
+  return parts.map((part, index) =>
+    // Every odd index (1, 3, 5) was inside double stars
+    index % 2 === 1 ? <strong key={index} className="font-bold text-gray-900">{part}</strong> : part
+  );
+};
+
+// --- DESCRIPTION TAB ---
 const DescriptionTab = ({ description }: { description: StandardProductDescription | KeyFeatureProductDescription | string }) => {
   // 1. Handle Simple String Description (from Admin plain text)
   if (typeof description === 'string') {
-    return <div className="text-gray-800 whitespace-pre-line">{description}</div>;
+    return (
+      <div className="text-gray-800 whitespace-pre-line leading-relaxed">
+        {/* 🟢 Use the helper here */}
+        {renderFormattedText(description)}
+      </div>
+    );
   }
 
   // 2. Handle Key Features (Legacy/Screenshot format)
@@ -187,63 +205,68 @@ const DescriptionTab = ({ description }: { description: StandardProductDescripti
             <div key={index} className="mb-4">
               <p className="font-semibold text-gray-900">{section.title}:</p>
               <ul className="list-disc list-inside ml-4 mt-1 space-y-1 text-gray-700">
-                {section.items.map((item, itemIndex) => <li key={itemIndex}>{item}</li>)}
+                {section.items.map((item, itemIndex) => (
+                   <li key={itemIndex}>{renderFormattedText(item)}</li>
+                ))}
               </ul>
             </div>
           ))}
         </SpecSection>
         <SpecSection title="Benefits">
           <ul className="list-disc list-inside ml-4 space-y-1 text-gray-700">
-            {description.benefits.map((benefit, index) => <li key={index}>{benefit}</li>)}
+            {description.benefits.map((benefit, index) => (
+               <li key={index}>{renderFormattedText(benefit)}</li>
+            ))}
           </ul>
         </SpecSection>
-        <p className="text-gray-700 pt-4">{description.summary}</p>
+        <p className="text-gray-700 pt-4">{renderFormattedText(description.summary)}</p>
       </div>
     );
   } 
   
   // 3. Handle Standard Object Description (Admin Panel JSON)
-  // We use optional chaining (?.) to be safe if fields are missing
   else {
     return (
       <div className="text-gray-800">
-        <h3 className="text-2xl font-bold text-gray-900 mb-6">{description.overview}</h3>
+        <h3 className="text-2xl font-bold text-gray-900 mb-6">
+            {renderFormattedText(description.overview)}
+        </h3>
         {description.design && (
            <SpecSection title={description.design.title || "Design"}>
-             <p className="text-gray-700">{description.design.formFactor}</p>
+             <p className="text-gray-700">{renderFormattedText(description.design.formFactor)}</p>
            </SpecSection>
         )}
         {description.performance && (
             <SpecSection title={description.performance.title || "Performance"} bgColorClass="bg-gray-50">
-            <SpecItem label="Processor">{description.performance.processor}</SpecItem>
-            <SpecItem label="Memory">{description.performance.memory}</SpecItem>
-            <SpecItem label="Storage">{description.performance.storage}</SpecItem>
+            <SpecItem label="Processor">{renderFormattedText(description.performance.processor)}</SpecItem>
+            <SpecItem label="Memory">{renderFormattedText(description.performance.memory)}</SpecItem>
+            <SpecItem label="Storage">{renderFormattedText(description.performance.storage)}</SpecItem>
             </SpecSection>
         )}
         {description.display && (
             <SpecSection title={description.display.title || "Display"} bgColorClass="bg-gray-50">
-            <SpecItem label="Screen">{description.display.screen}</SpecItem>
-            <SpecItem label="Graphics">{description.display.graphics}</SpecItem>
+            <SpecItem label="Screen">{renderFormattedText(description.display.screen)}</SpecItem>
+            <SpecItem label="Graphics">{renderFormattedText(description.display.graphics)}</SpecItem>
             </SpecSection>
         )}
         {description.connectivity && (
             <SpecSection title={description.connectivity.title || "Connectivity"} bgColorClass="bg-gray-50">
             <SpecItem label="Ports">
                 <ul className="list-disc pl-5 space-y-1">
-                {description.connectivity.ports?.map((port, i) => <li key={i}>{port}</li>)}
+                {description.connectivity.ports?.map((port, i) => <li key={i}>{renderFormattedText(port)}</li>)}
                 </ul>
             </SpecItem>
             <SpecItem label="Wireless">
                 <ul className="list-disc pl-5 space-y-1">
-                {description.connectivity.wireless?.map((item, i) => <li key={i}>{item}</li>)}
+                {description.connectivity.wireless?.map((item, i) => <li key={i}>{renderFormattedText(item)}</li>)}
                 </ul>
             </SpecItem>
             </SpecSection>
         )}
         {description.functionality && (
             <SpecSection title={description.functionality.title || "Functionality"} bgColorClass="bg-gray-50">
-            <SpecItem label="Versatility">{description.functionality.versatility}</SpecItem>
-            <SpecItem label="Connectivity Options">{description.functionality.connectivityOptions}</SpecItem>
+            <SpecItem label="Versatility">{renderFormattedText(description.functionality.versatility)}</SpecItem>
+            <SpecItem label="Connectivity Options">{renderFormattedText(description.functionality.connectivityOptions)}</SpecItem>
             </SpecSection>
         )}
       </div>
@@ -251,6 +274,7 @@ const DescriptionTab = ({ description }: { description: StandardProductDescripti
   }
 };
 
+// ... rest of the file remains unchanged ...
 // --- REVIEW FORM (Mock) ---
 const ReviewForm = ({ productName }: { productName: string }) => {
   const [rating, setRating] = useState(0);
