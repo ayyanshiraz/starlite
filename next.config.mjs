@@ -1,16 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // 1. Ignore TypeScript Errors during build
+  // 1. Ignore TypeScript Errors (Valid)
   typescript: {
     ignoreBuildErrors: true,
   },
   
-  // 2. Ignore ESLint Errors during build
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+  // 🔴 REMOVED 'eslint' block from here. 
+  // We use "next build --no-lint" in package.json instead.
 
-  // 3. Allow External Images (for your product images)
+  // 2. Allow External Images
   images: {
     remotePatterns: [
       {
