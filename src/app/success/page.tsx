@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, Suspense } from 'react';
+import React, { useEffect, useState, Suspense, useRef } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useCart } from '@/hooks/useCart';
@@ -12,9 +12,14 @@ function SuccessContent() {
   
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  
+  // 🟢 Prevent double-firing in React 18 Strict Mode
+  const processedRef = useRef(false);
 
   useEffect(() => {
-    if (sessionId) {
+    if (sessionId && !processedRef.current) {
+      processedRef.current = true; // Mark as processed immediately
+
       // 1. Clear the shopping cart
       clearCart();
 
@@ -29,12 +34,18 @@ function SuccessContent() {
         .catch(err => console.error("Failed to fetch order", err))
         .finally(() => setLoading(false));
     }
-  }, [sessionId, clearCart]);
+    // 🟢 FIX: Removed 'clearCart' from dependencies to prevent Infinite Loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionId]); 
 
   return (
     <div className="text-center max-w-2xl mx-auto p-6">
       <div className="flex justify-center mb-6">
         <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center shadow-sm">
+          {/* 
+
+[Image of checkmark icon]
+ - Using SVG directly */}
           <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
           </svg>
@@ -69,7 +80,6 @@ function SuccessContent() {
             <p className="text-xs text-gray-500 uppercase font-bold mb-2">Items Ordered</p>
             <ul className="divide-y divide-gray-100">
               {order.items.map((item: any, idx: number) => (
-                // 🟢 FIXED: Proper Flex Layout to prevent overlap
                 <li key={idx} className="flex justify-between items-start py-3">
                   <div className="pr-4">
                      <p className="text-sm font-semibold text-gray-900">{item.name}</p>
@@ -91,7 +101,6 @@ function SuccessContent() {
         <p className="text-red-500 mb-6">Could not retrieve order details. Please check your email.</p>
       )}
 
-      {/* 🟢 UPDATED BUTTONS: Continue Shopping + Track Order */}
       <div className="flex flex-col sm:flex-row gap-4 justify-center">
         <Link href="/shop" className="bg-gray-100 text-gray-800 font-bold py-3 px-8 rounded-lg hover:bg-gray-200 transition text-center">
           Continue Shopping
