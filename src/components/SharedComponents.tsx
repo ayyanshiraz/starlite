@@ -1,16 +1,11 @@
-// src/app/components/SharedComponents.tsx
 "use client";
 
 import React from 'react';
 
-// --- CHAT BUTTON ---
-export function ChatButton() {
-  return (
-    <button className="fixed bottom-4 right-4 bg-black text-white py-3 px-6 rounded-full font-bold shadow-lg hover:bg-gray-800 z-50">
-      Click to open chat!
-    </button>
-  );
-}
+// 🟢 FIX: We make this return NULL so the old button disappears everywhere
+export const ChatButton = () => {
+  return null; 
+};
 
 // --- Custom Scrollbar Styles ---
 export const CustomScrollbarStyles = () => (
