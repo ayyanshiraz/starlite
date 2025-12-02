@@ -1,18 +1,17 @@
 import { prisma } from '@/lib/prisma';
-import { revalidatePath } from 'next/cache'; // revalidatePath stays here
-
-// 🟢 THIS IS THE FIX: Import redirect from navigation
+import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation'; 
-
 import Link from 'next/link';
 import Image from 'next/image';
+
+// Client Components
 import AdminSearch from '@/components/admin/AdminSearch';
 import AdminProductForm from '@/components/admin/AdminProductForm';
 import ProductTable from '@/components/admin/ProductTable';
 import CsvImporter from '@/components/admin/CsvImporter';
+import AdminGuard from '@/components/admin/AdminGuard';
 
 export const dynamic = 'force-dynamic';
-
 const ITEMS_PER_PAGE = 10;
 
 export default async function AdminProductsPage({
@@ -25,11 +24,8 @@ export default async function AdminProductsPage({
   const currentPage = Number(params.page) || 1;
   const query = params.search || '';
 
-  // ------------------------------------------------------------------
-  // 1. BUILD DATABASE FILTER (SEARCH)
-  // ------------------------------------------------------------------
+  // 1. BUILD DATABASE FILTER
   const whereCondition: any = {};
-  
   if (query) {
     const isNumber = !isNaN(Number(query));
     whereCondition.OR = [
@@ -38,15 +34,12 @@ export default async function AdminProductsPage({
       { slug: { contains: query, mode: 'insensitive' } },
       { category: { contains: query, mode: 'insensitive' } },
     ];
-    // If query looks like a price (number), search exact price match
     if (isNumber) {
       whereCondition.OR.push({ price: { equals: Math.round(Number(query) * 100) } });
     }
   }
 
-  // ------------------------------------------------------------------
-  // 2. FETCH DATA (Products + Total Count)
-  // ------------------------------------------------------------------
+  // 2. FETCH DATA
   const [products, totalCount] = await Promise.all([
     prisma.product.findMany({
       where: whereCondition,
@@ -59,21 +52,15 @@ export default async function AdminProductsPage({
 
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
-  // Fetch specific product if editing
   let productToEdit = null;
   if (editingId) {
-    productToEdit = await prisma.product.findUnique({
-      where: { id: editingId },
-    });
+    productToEdit = await prisma.product.findUnique({ where: { id: editingId } });
   }
 
-  // ==================================================================
-  // SERVER ACTIONS (Backend Logic)
-  // ==================================================================
+  // --- SERVER ACTIONS ---
 
   async function saveProduct(formData: FormData) {
     "use server";
-    
     const id = formData.get('id') as string;
     const name = formData.get('name') as string;
     const slugInput = formData.get('slug') as string;
@@ -84,14 +71,12 @@ export default async function AdminProductsPage({
     const description = formData.get('description') as string;
     const availability = formData.get('availability') as string;
     
-    // Image handling: Priority to Base64 (Upload), then URL input, then Placeholder
     const imageBase64 = formData.get('imageBase64') as string;
     const imageURLInput = formData.get('imageURL') as string;
     const finalImage = imageBase64 || imageURLInput || '/placeholder.png';
 
     const priceCents = priceInput ? Math.round(parseFloat(priceInput) * 100) : null;
 
-    // Auto-generate slug if empty
     let finalSlug = slugInput;
     if (!finalSlug) {
       const slugRaw = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, ''); 
@@ -99,28 +84,14 @@ export default async function AdminProductsPage({
     }
 
     const data = {
-      name,
-      slug: finalSlug,
-      category,
-      price: priceCents,
-      image: finalImage,
-      sku,
-      stock,
-      description, 
-      availability
+      name, slug: finalSlug, category, price: priceCents, image: finalImage, sku, stock, description, availability
     };
 
     try {
-      if (id) {
-        await prisma.product.update({ where: { id }, data });
-      } else {
-        await prisma.product.create({ data });
-      }
+      if (id) await prisma.product.update({ where: { id }, data });
+      else await prisma.product.create({ data });
       revalidatePath('/admin/products');
-    } catch (error) {
-      console.error("Save Product Error:", error);
-      // Optional: throw error to be caught by UI
-    }
+    } catch (error) { console.error("Save Error:", error); }
   }
 
   async function goToPage(formData: FormData) {
@@ -129,101 +100,54 @@ export default async function AdminProductsPage({
     redirect(`/admin/products?page=${page}&search=${query}`);
   }
 
-  // ==================================================================
-  // UI RENDER
-  // ==================================================================
   return (
-    <div className="max-w-7xl mx-auto min-h-screen pb-20 p-6 bg-gray-50">
-      
-      {/* --- HEADER & TOOLS --- */}
-      <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-8 gap-6">
-        <div>
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Product Manager</h1>
-          <p className="text-sm text-gray-500 mt-1">Manage inventory, prices, and import data.</p>
-        </div>
+    <AdminGuard requiredPermission="products">
+      <div className="max-w-7xl mx-auto min-h-screen pb-20 p-6 bg-gray-50">
         
-        <div className="flex flex-col md:flex-row gap-4 w-full xl:w-auto">
-          {/* Search Bar */}
-          <div className="flex-grow md:w-80">
-            <AdminSearch />
+        <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-8 gap-6">
+          <div>
+            <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Product Manager</h1>
+            <p className="text-sm text-gray-500 mt-1">Manage inventory, prices, and import data.</p>
           </div>
           
-          {/* CSV Import Button */}
-          <div className="flex-shrink-0">
-            <CsvImporter />
+          <div className="flex flex-col md:flex-row gap-4 w-full xl:w-auto">
+            <div className="flex-grow md:w-80"><AdminSearch /></div>
+            <div className="flex-shrink-0"><CsvImporter /></div>
+            {editingId && (
+              <Link href={`/admin/products?page=${currentPage}`} className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg text-sm font-bold shadow transition flex items-center justify-center">
+                Cancel Editing
+              </Link>
+            )}
           </div>
-
-          {/* Cancel Edit Button (Visible only when editing) */}
-          {editingId && (
-            <Link 
-              href={`/admin/products?page=${currentPage}`} 
-              className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg text-sm font-bold shadow transition flex items-center justify-center"
-            >
-              Cancel Editing
-            </Link>
-          )}
-        </div>
-      </div>
-
-      {/* --- EDIT / CREATE FORM --- */}
-      <AdminProductForm productToEdit={productToEdit} saveProductAction={saveProduct} />
-
-      {/* --- PRODUCT TABLE (With Bulk Actions) --- */}
-      {products.length === 0 ? (
-         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
-              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
-            </div>
-            <h3 className="text-lg font-medium text-gray-900">No products found</h3>
-            <p className="text-gray-500 mt-1">Try adjusting your search or add a new product.</p>
-         </div>
-      ) : (
-        // 🟢 This component handles the Table, Checkboxes, and Bulk Delete/Update
-        <ProductTable products={products} />
-      )}
-
-      {/* --- PAGINATION --- */}
-      <div className="flex flex-col md:flex-row justify-between items-center bg-white p-4 rounded-xl border border-gray-200 shadow-sm mt-6 gap-4">
-        
-        {/* Navigation Links */}
-        <div className="flex items-center gap-2">
-          <Link href={`/admin/products?page=1&search=${query}`} className={`px-3 py-1.5 border rounded text-sm font-medium transition ${currentPage === 1 ? 'bg-gray-100 text-gray-400 pointer-events-none' : 'hover:bg-gray-50 text-gray-700'}`}>
-            « First
-          </Link>
-          <Link href={`/admin/products?page=${currentPage > 1 ? currentPage - 1 : 1}&search=${query}`} className={`px-3 py-1.5 border rounded text-sm font-medium transition ${currentPage === 1 ? 'bg-gray-100 text-gray-400 pointer-events-none' : 'hover:bg-gray-50 text-gray-700'}`}>
-            ‹ Prev
-          </Link>
-          
-          <span className="px-4 text-sm font-bold text-gray-800">
-            Page {currentPage} <span className="text-gray-400 font-normal">of</span> {totalPages || 1}
-          </span>
-
-          <Link href={`/admin/products?page=${currentPage < totalPages ? currentPage + 1 : totalPages}&search=${query}`} className={`px-3 py-1.5 border rounded text-sm font-medium transition ${currentPage === totalPages ? 'bg-gray-100 text-gray-400 pointer-events-none' : 'hover:bg-gray-50 text-gray-700'}`}>
-            Next ›
-          </Link>
-          <Link href={`/admin/products?page=${totalPages}&search=${query}`} className={`px-3 py-1.5 border rounded text-sm font-medium transition ${currentPage === totalPages ? 'bg-gray-100 text-gray-400 pointer-events-none' : 'hover:bg-gray-50 text-gray-700'}`}>
-            Last »
-          </Link>
         </div>
 
-        {/* Go To Page Input */}
-        <form action={goToPage} className="flex gap-2 items-center bg-gray-50 p-1.5 rounded-lg border border-gray-200">
-          <span className="text-xs font-bold text-gray-500 uppercase pl-2">Go to</span>
-          <input type="hidden" name="term" value={query} />
-          <input 
-            type="number" 
-            name="page" 
-            min="1" 
-            max={totalPages} 
-            className="w-12 p-1 text-center text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none"
-            placeholder="#"
-          />
-          <button className="bg-gray-900 text-white px-3 py-1 rounded text-sm font-bold hover:bg-black transition">
-            Go
-          </button>
-        </form>
-      </div>
+        <AdminProductForm productToEdit={productToEdit} saveProductAction={saveProduct} />
 
-    </div>
+        {products.length === 0 ? (
+           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+              <h3 className="text-lg font-medium text-gray-900">No products found</h3>
+              <p className="text-gray-500 mt-1">Try adjusting your search or add a new product.</p>
+           </div>
+        ) : (
+          <ProductTable products={products} />
+        )}
+
+        <div className="flex flex-col md:flex-row justify-between items-center bg-white p-4 rounded-xl border border-gray-200 shadow-sm mt-6 gap-4">
+          <div className="flex items-center gap-2">
+            <Link href={`/admin/products?page=1&search=${query}`} className={`px-3 py-1.5 border rounded text-sm font-medium transition ${currentPage === 1 ? 'bg-gray-100 text-gray-400 pointer-events-none' : 'hover:bg-gray-50 text-gray-700'}`}>« First</Link>
+            <Link href={`/admin/products?page=${currentPage > 1 ? currentPage - 1 : 1}&search=${query}`} className={`px-3 py-1.5 border rounded text-sm font-medium transition ${currentPage === 1 ? 'bg-gray-100 text-gray-400 pointer-events-none' : 'hover:bg-gray-50 text-gray-700'}`}>‹ Prev</Link>
+            <span className="px-4 text-sm font-bold text-gray-800">Page {currentPage} <span className="text-gray-400 font-normal">of</span> {totalPages || 1}</span>
+            <Link href={`/admin/products?page=${currentPage < totalPages ? currentPage + 1 : totalPages}&search=${query}`} className={`px-3 py-1.5 border rounded text-sm font-medium transition ${currentPage === totalPages ? 'bg-gray-100 text-gray-400 pointer-events-none' : 'hover:bg-gray-50 text-gray-700'}`}>Next ›</Link>
+            <Link href={`/admin/products?page=${totalPages}&search=${query}`} className={`px-3 py-1.5 border rounded text-sm font-medium transition ${currentPage === totalPages ? 'bg-gray-100 text-gray-400 pointer-events-none' : 'hover:bg-gray-50 text-gray-700'}`}>Last »</Link>
+          </div>
+          <form action={goToPage} className="flex gap-2 items-center bg-gray-50 p-1.5 rounded-lg border border-gray-200">
+            <span className="text-xs font-bold text-gray-500 uppercase pl-2">Go to</span>
+            <input type="hidden" name="term" value={query} />
+            <input type="number" name="page" min="1" max={totalPages} className="w-12 p-1 text-center text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none" placeholder="#" />
+            <button className="bg-gray-900 text-white px-3 py-1 rounded text-sm font-bold hover:bg-black transition">Go</button>
+          </form>
+        </div>
+      </div>
+    </AdminGuard>
   );
 }

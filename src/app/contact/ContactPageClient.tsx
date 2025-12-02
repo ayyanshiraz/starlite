@@ -206,7 +206,7 @@ export default function ContactPageClient() {
                 title="WhatsApp" 
                 text="(+44) 746 574 6637"
                 delay={0.65}
-                href="https://wa.me/447465746637" 
+                 
               />
             </div>
 

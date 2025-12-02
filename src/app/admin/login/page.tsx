@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image'; // Optional: If you want to add your logo
+import Image from 'next/image'; 
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
@@ -26,11 +26,26 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (res.ok && data.user) {
-        // 1. Save basic info to localStorage (helps UI load faster before API check)
+        // 1. Save basic info to localStorage
         localStorage.setItem('adminUser', JSON.stringify(data.user));
         
-        // 2. Redirect and Refresh (Vital for Middleware to see new cookies)
-        router.push('/admin/dashboard');
+        // 2. 🟢 SMART REDIRECT LOGIC
+        // Check permissions to send them to the right page immediately
+        const perms = data.user.permissions ? data.user.permissions.split(',') : [];
+        
+        if (data.user.isSuperAdmin || perms.includes('dashboard')) {
+            router.push('/admin/dashboard');
+        } else if (perms.includes('products')) {
+            router.push('/admin/products');
+        } else if (perms.includes('orders')) {
+            router.push('/admin/orders');
+        } else if (perms.includes('users')) {
+            router.push('/admin/users');
+        } else {
+            // Fallback if they have weird permissions
+            router.push('/admin/dashboard');
+        }
+        
         router.refresh(); 
       } else {
         setError(data.error || 'Invalid credentials');
