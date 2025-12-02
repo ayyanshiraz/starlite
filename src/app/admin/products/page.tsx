@@ -1,9 +1,11 @@
 import { prisma } from '@/lib/prisma';
-import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
-import Link from 'next/link';
+import { revalidatePath } from 'next/cache'; // revalidatePath stays here
 
-// Client Components
+// 🟢 THIS IS THE FIX: Import redirect from navigation
+import { redirect } from 'next/navigation'; 
+
+import Link from 'next/link';
+import Image from 'next/image';
 import AdminSearch from '@/components/admin/AdminSearch';
 import AdminProductForm from '@/components/admin/AdminProductForm';
 import ProductTable from '@/components/admin/ProductTable';

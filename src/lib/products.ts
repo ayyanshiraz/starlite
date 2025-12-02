@@ -31,30 +31,35 @@ export type Product = {
 
 // --- 2. HELPER: TRANSFORM DB PRODUCT TO FRONTEND PRODUCT ---
 function transformPrismaProduct(p: any): Product {
+  // Price Logic: Convert cents to dollars, or return "Get a Quote"
   let formattedPrice: string | number = "Get a Quote";
   if (p.price !== null && p.price > 0) {
     formattedPrice = p.price / 100; 
   }
 
+  // Category Slug Logic
   const catSlug = p.category 
     ? p.category.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')
     : 'uncategorized';
 
-  // Handle description safely
+  // Description Logic
   let desc: any = p.description;
-  
-  // If it's a string (from our new admin text area), keep it as string.
-  // If it's null, provide a fallback.
   if (!desc) {
     desc = "No description available.";
   } 
-  // If it's a JSON object (from old data), it stays an object.
+
+  // 🟢 SMART IMAGE LOGIC (The Update)
+  // Default to your GIF. Only use DB image if it's real and not the old placeholder.
+  let finalImage = '/logogif.gif'; 
+  if (p.image && p.image !== '/placeholder.png' && p.image.trim() !== '') {
+    finalImage = p.image;
+  }
 
   return {
     id: p.id,
     name: p.name,
     price: formattedPrice,
-    image: p.image || '/placeholder.png',
+    image: finalImage, // Uses GIF if image is missing
     category: p.category || 'Uncategorized',
     categorySlug: catSlug,
     slug: p.slug,
@@ -83,7 +88,7 @@ export async function getLatestProducts(limit: number = 3): Promise<Product[]> {
   return products.map(transformPrismaProduct);
 }
 
-// C. Get Single Product by Slug (THIS IS THE MISSING FUNCTION CAUSING YOUR ERROR)
+// C. Get Single Product by Slug
 export async function getProductBySlug(slug: string): Promise<Product | null> {
   const product = await prisma.product.findUnique({
     where: { slug: slug },

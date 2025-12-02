@@ -109,7 +109,7 @@ export default function PrivacyPolicyPageClient() {
 
           <PolicySection title="Who are we?">
             <p>
-              Starlight Linkers LLC  is a registered company (Company Registration # SC818387) and VAT # GB 476913747 with our registered office address at 1110 Summit AVE STE 7 Plano, TX 75074.
+              Starlight Linkers LLC  is a registered company with our registered office address at 1110 Summit AVE STE 7 Plano, TX 75074.
             </p>
           </PolicySection>
 
