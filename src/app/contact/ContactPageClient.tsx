@@ -204,7 +204,7 @@ export default function ContactPageClient() {
               <ContactInfoBox 
                 Icon={WhatsAppIcon} 
                 title="Call Us" 
-                text="(+1) 972 431 0606"
+                text="972 431 0606"
                 delay={0.65}
                  
               />
