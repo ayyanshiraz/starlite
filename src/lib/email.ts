@@ -7,12 +7,15 @@ const port = Number(process.env.SMTP_PORT) || 465;
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: port,
-  // 🟢 SMART SECURE: True for 465, False for other ports (like 587)
-  secure: port === 465, 
+  secure: port === 465, // True for 465, False for other ports
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
+  // 🟢 FIX: Trust the shared hosting certificate
+  tls: {
+    rejectUnauthorized: false
+  }
 });
 
 // 3. Send Order Notification (For Paid Orders)
@@ -22,7 +25,10 @@ export async function sendOrderEmail(order: any) {
     const total = (order.amountTotal / 100).toFixed(2);
     const date = new Date(order.createdAt).toLocaleString();
 
-    const itemsHtml = order.items.map((item: any) => `
+    // Safe check for items array
+    const items = Array.isArray(order.items) ? order.items : [];
+    
+    const itemsHtml = items.map((item: any) => `
       <tr>
         <td style="padding: 8px; border-bottom: 1px solid #ddd;">${item.name}</td>
         <td style="padding: 8px; border-bottom: 1px solid #ddd;">${item.sku || '-'}</td>
@@ -38,9 +44,17 @@ export async function sendOrderEmail(order: any) {
         <p><strong>Status:</strong> <span style="color: green; font-weight: bold;">PAID (Processing)</span></p>
         <hr />
         <h3>👤 Customer</h3>
-        <p>${order.customerName}<br/>${order.customerEmail}<br/>${order.customerPhone || 'N/A'}</p>
+        <p>
+          ${order.customerName}<br/>
+          ${order.customerEmail}<br/>
+          ${order.customerPhone || 'N/A'}
+        </p>
         <h3>📍 Address</h3>
-        <p>${order.addressLine1}<br/>${order.city}, ${order.postalCode}<br/>${order.country}</p>
+        <p>
+          ${order.addressLine1}<br/>
+          ${order.city}, ${order.postalCode}<br/>
+          ${order.country}
+        </p>
         <h3>🛒 Items</h3>
         <table style="width: 100%; border-collapse: collapse;">
           <tbody>${itemsHtml}</tbody>
@@ -51,7 +65,7 @@ export async function sendOrderEmail(order: any) {
 
     await transporter.sendMail({
       from: `"Starlight System" <${process.env.SMTP_USER}>`,
-      to: 'billing@starlightlinkers.com', // 🟢 Send to yourself
+      to: 'billing@starlightlinkers.com', // Send to yourself
       subject: `💰 New Order #${shortId} - $${total}`,
       html: htmlContent,
     });
@@ -80,8 +94,9 @@ export async function sendAdminOTP(email: string, code: string) {
       html: htmlContent,
     });
     console.log(`📧 OTP sent to ${email}`);
-  } catch (error) {
-    console.error("❌ OTP Email Failed:", error);
-    // We DO NOT throw the error here so the login can continue with the console code fallback
+  } catch (error: any) {
+    console.error("❌ OTP Email Failed:", error.message);
+    // We THROW the error so the UI knows it failed
+    throw error;
   }
 }
