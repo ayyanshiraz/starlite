@@ -1,9 +1,9 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 
-// --- Icon Components (Unchanged) ---
+// --- Icon Components ---
 const iconProps = {
   xmlns: "http://www.w3.org/2000/svg",
   width: "28",
@@ -48,12 +48,11 @@ interface ContactInfoBoxProps {
   title: string;
   text: React.ReactNode;
   delay: number;
-  href?: string; // Added optional href prop
+  href?: string;
 }
 
 const ContactInfoBox: React.FC<ContactInfoBoxProps> = ({ Icon, title, text, delay, href }) => {
-  
-  const boxClasses = "bg-[#00001E] text-white p-4 rounded-lg flex flex-col items-center text-center shadow-lg cursor-pointer w-full h-full";
+  const boxClasses = "bg-[#00001E] text-white p-4 rounded-lg flex flex-col items-center text-center shadow-lg cursor-pointer w-full h-full hover:bg-blue-900 transition-colors";
   
   const animationProps = {
     initial: { opacity: 0, y: 20 },
@@ -66,12 +65,10 @@ const ContactInfoBox: React.FC<ContactInfoBoxProps> = ({ Icon, title, text, dela
     }
   };
 
-  // If href exists, render as a link (motion.a)
   if (href) {
     return (
       <motion.a 
         href={href}
-        // Open in new tab if it is not a telephone link
         target={href.startsWith('tel:') ? undefined : "_blank"}
         rel={href.startsWith('tel:') ? undefined : "noopener noreferrer"}
         className={boxClasses}
@@ -84,7 +81,6 @@ const ContactInfoBox: React.FC<ContactInfoBoxProps> = ({ Icon, title, text, dela
     );
   }
 
-  // Default behavior (div)
   return (
     <motion.div className={boxClasses} {...animationProps}>
       <Icon className="w-8 h-8 mb-3" />
@@ -94,10 +90,50 @@ const ContactInfoBox: React.FC<ContactInfoBoxProps> = ({ Icon, title, text, dela
   );
 };
 
-
 // --- Main Contact Page Component ---
 export default function ContactPageClient() {
   
+  // 🟢 1. Form State
+  const [formData, setFormData] = useState({
+    fullName: '', 
+    email: '', 
+    subject: '', 
+    message: ''
+  });
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // 🟢 2. Submit Logic
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus('loading');
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            name: formData.fullName,
+            email: formData.email,
+            subject: formData.subject,
+            message: formData.message
+        }),
+      });
+
+      if (res.ok) {
+        setStatus('success');
+        setFormData({ fullName: '', email: '', subject: '', message: '' }); // Reset form
+      } else {
+        setStatus('error');
+      }
+    } catch (err) {
+      setStatus('error');
+    }
+  };
+
   const formFieldVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
@@ -118,7 +154,7 @@ export default function ContactPageClient() {
           alt="Contact center agent" 
           className="absolute inset-0 w-full h-full object-cover opacity-30" 
         />
-        <div className="absolute inset-0  bg-opacity-40"></div>
+        <div className="absolute inset-0 bg-black bg-opacity-40"></div>
         
         <div className="relative z-10 h-full flex flex-col justify-center items-center text-center text-white p-4">
           <motion.h1
@@ -127,7 +163,7 @@ export default function ContactPageClient() {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-4xl md:text-5xl font-bold mb-4"
           >
-            We&apos;re Here To Help
+            We're Here To Help
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: -20 }}
@@ -135,7 +171,7 @@ export default function ContactPageClient() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="max-w-2xl text-lg md:text-xl text-gray-200 text-center"
           >
-            For inquiries or assistance, contact us anytime. Your satisfaction is our priority, and we are here to help with any questions or needs.
+            For inquiries or assistance, contact us anytime. Your satisfaction is our priority.
           </motion.p>
         </div>
       </motion.section>
@@ -167,31 +203,20 @@ export default function ContactPageClient() {
 
           {/* --- Left Column: Info + Map --- */}
           <div className="space-y-8">
-            {/* Info Boxes Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              
-              {/* Address (Not Clickable) */}
               <ContactInfoBox 
                 Icon={MapPinIcon} 
                 title="Our Address" 
                 text={"1110 Summit AVE STE 7 Plano, TX 75074"}
                 delay={0.5} 
               />
-              
-              {/* Call Us (Clickable) */}
               <ContactInfoBox 
                 Icon={PhoneIcon} 
                 title="Call Us" 
-                text={
-                  <>
-                    <span className="block">(972) 431 0905</span>
-                  </>
-                }
+                text={<span className="block">(972) 431 0905</span>}
                 delay={0.55}
-                href="tel:+441916733012" 
+                href="tel:+19724310905" 
               />
-
-              {/* Email (Clickable mailto - Optional, but recommended) */}
               <ContactInfoBox 
                 Icon={MailIcon} 
                 title="Email Us" 
@@ -199,18 +224,15 @@ export default function ContactPageClient() {
                 delay={0.6}
                 href="mailto:sales@starlightlinkers.com"
               />
-
-              {/* WhatsApp (Clickable) */}
               <ContactInfoBox 
                 Icon={WhatsAppIcon} 
-                title="Call Us" 
+                title="WhatsApp" 
                 text="972 431 0606"
                 delay={0.65}
-                 
               />
             </div>
 
-            {/* Google Map Embed */}
+            {/* Google Map */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -218,7 +240,7 @@ export default function ContactPageClient() {
             >
               <div className="rounded-lg overflow-hidden shadow-lg border border-gray-200">
                 <iframe
-                  src="https://maps.google.com/maps?q=1110%20Summit%20AVE%20STE%207%20Plano,%20TX%2075074&t=m&z=14&ie=UTF8&iwloc=B&output=embed"
+                  src="https://maps.google.com/maps?q=1110%20Summit%20AVE%20STE%207%20Plano%2C%20TX%2075074&t=&z=13&ie=UTF8&iwloc=&output=embed"
                   width="100%"
                   height="400"
                   style={{ border: 0 }}
@@ -237,89 +259,90 @@ export default function ContactPageClient() {
             transition={{ duration: 0.6, delay: 0.7 }}
             className="bg-gray-50 p-8 rounded-lg shadow-lg border border-gray-200 h-full flex flex-col"
           >
-            <h3 className="text-2xl font-bold text-gray-900 mb-6">
-              Send us a message
-            </h3>
+            <h3 className="text-2xl font-bold text-gray-900 mb-6">Send us a message</h3>
             
+            {/* 🟢 SUCCESS / ERROR MESSAGES */}
+            {status === 'success' && (
+                <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4 animate-in fade-in">
+                    <strong className="font-bold">Message Sent!</strong>
+                    <span className="block sm:inline"> We will get back to you soon.</span>
+                </div>
+            )}
+            {status === 'error' && (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4 animate-in fade-in">
+                    <strong className="font-bold">Error!</strong>
+                    <span className="block sm:inline"> Failed to send message. Please try again later.</span>
+                </div>
+            )}
+
             <motion.form 
-              action="#" 
-              method="POST" 
+              onSubmit={handleSubmit}
               className="space-y-6 flex flex-col h-full"
               initial="hidden"
               animate="visible"
-              variants={{
-                visible: {
-                  transition: {
-                    staggerChildren: 0.1,
-                  },
-                },
-              }}
+              variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
             >
-              {/* Full Name */}
               <motion.div variants={formFieldVariants}>
-                <label htmlFor="full-name" className="block text-sm font-medium text-gray-700 mb-1">
-                  Full Name
-                </label>
+                <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
                 <input
                   type="text"
-                  name="full-name"
-                  id="full-name"
-                  autoComplete="name"
-                  className="block w-full rounded-md border-gray-300 shadow-sm p-3 focus:ring-[#00001E] focus:border-gray-400"
+                  name="fullName"
+                  id="fullName"
+                  required
+                  value={formData.fullName}
+                  onChange={handleChange}
+                  className="block w-full rounded-md border-gray-300 shadow-sm p-3 focus:ring-[#00001E] focus:border-gray-400 text-gray-900"
                   placeholder="Your Name"
                 />
               </motion.div>
 
-              {/* Email Address */}
               <motion.div variants={formFieldVariants}>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                  Email Address
-                </label>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
                 <input
                   type="email"
                   name="email"
                   id="email"
-                  autoComplete="email"
-                  className="block w-full rounded-md border-gray-300 shadow-sm p-3 focus:ring-[#00001E] focus:border-gray-400"
+                  required
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="block w-full rounded-md border-gray-300 shadow-sm p-3 focus:ring-[#00001E] focus:border-gray-400 text-gray-900"
                   placeholder="you@example.com"
                 />
               </motion.div>
 
-              {/* Subject */}
               <motion.div variants={formFieldVariants}>
-                <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
-                  Subject
-                </label>
+                <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">Subject</label>
                 <input
                   type="text"
                   name="subject"
                   id="subject"
-                  className="block w-full rounded-md border-gray-300 shadow-sm p-3 focus:ring-[#00001E] focus:border-gray-400"
+                  value={formData.subject}
+                  onChange={handleChange}
+                  className="block w-full rounded-md border-gray-300 shadow-sm p-3 focus:ring-[#00001E] focus:border-gray-400 text-gray-900"
                   placeholder="Inquiry about..."
                 />
               </motion.div>
 
-              {/* Message */}
               <motion.div variants={formFieldVariants} className="flex-grow flex flex-col">
-                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
-                  Message
-                </label>
+                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">Message</label>
                 <textarea
                   id="message"
                   name="message"
-                  className="block w-full rounded-md border-gray-300 shadow-sm p-3 focus:ring-[#00001E] focus:border-gray-400 h-full"
+                  required
+                  value={formData.message}
+                  onChange={handleChange}
+                  className="block w-full rounded-md border-gray-300 shadow-sm p-3 focus:ring-[#00001E] focus:border-gray-400 h-32 resize-none text-gray-900"
                   placeholder="Your message here..."
-                  defaultValue={""}
                 />
               </motion.div>
 
-              {/* Submit Button */}
               <motion.div variants={formFieldVariants}>
                 <button
                   type="submit"
-                  className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-bold text-white bg-[#00001E] hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00001E]"
+                  disabled={status === 'loading'}
+                  className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-bold text-white bg-[#00001E] hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00001E] transition-all ${status === 'loading' ? 'opacity-70 cursor-not-allowed' : ''}`}
                 >
-                  Send Message
+                  {status === 'loading' ? 'Sending...' : 'Send Message'}
                 </button>
               </motion.div>
             </motion.form>
