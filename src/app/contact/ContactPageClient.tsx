@@ -227,7 +227,7 @@ export default function ContactPageClient() {
               <ContactInfoBox 
                 Icon={WhatsAppIcon} 
                 title="WhatsApp" 
-                text="972 431 0606"
+                text="(972) 431 0606"
                 delay={0.65}
               />
             </div>
