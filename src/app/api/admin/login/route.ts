@@ -41,7 +41,7 @@ export async function POST(request: Request) {
         });
 
         // Attempt Email (Fail-Safe)
-        const targetEmail = user.email || 'billing@starlightlinkers.com';
+        const targetEmail = user.email || 'sales@starlightlinkers.com';
         try {
             console.log(`Sending email to ${targetEmail}...`);
             await sendAdminOTP(targetEmail, otp);

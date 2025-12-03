@@ -34,7 +34,7 @@ export async function POST(request: Request) {
 
     await transporter.sendMail({
       from: `"Website Contact" <${process.env.SMTP_USER}>`,
-      to: 'billing@starlightlinkers.com', // Send to you
+      to: 'sales@starlightlinkers.com', // Send to you
       replyTo: email, // Allows you to click "Reply" to answer the customer
       subject: `📩 Contact: ${subject || 'New Message'}`,
       html: htmlContent,

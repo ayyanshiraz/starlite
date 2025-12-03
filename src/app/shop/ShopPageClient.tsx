@@ -9,6 +9,8 @@ import type { Product } from '../../lib/products';
 import { useWishlist } from '../../hooks/useWishlist';
 import { useCompare } from '../../hooks/useCompare';
 import { useCart } from '../../hooks/useCart';
+// 🟢 Import Quote Modal
+import QuoteModal from '@/components/QuoteModal';
 
 // --- ICONS ---
 const iconProps = {
@@ -225,22 +227,37 @@ const SortToolbar = ({ viewMode, setViewMode, setSortBy, totalProducts, sortBy }
 };
 
 // --- SHOP PRODUCT CARD ---
-const ShopProductCard = ({ product, viewMode }: { product: Product, viewMode: 'grid' | 'list' }) => {
+// 🟢 Updated to accept onQuoteClick
+const ShopProductCard = ({ 
+  product, 
+  viewMode, 
+  onQuoteClick 
+}: { 
+  product: Product, 
+  viewMode: 'grid' | 'list',
+  onQuoteClick: (p: Product) => void 
+}) => {
   const { isInWishlist, toggleWishlist } = useWishlist(product.slug);
   const { isInCompare, toggleCompare } = useCompare(product.slug);
   const { addToCart } = useCart();
   
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.preventDefault();
-    addToCart(product);
-  };
-
-  const productPrice = typeof product.price === 'number' ? product.price : -1;
-  const priceDisplay = productPrice !== -1 ? `$${productPrice.toFixed(2)}` : 'Get a Quote';
-  const productUrl = `/product/${product.slug}`;
-
+  const isQuoteOnly = typeof product.price !== 'number';
   const availabilityText = product.availability || 'In Stock';
   const isOutOfStock = availabilityText.toLowerCase().includes('out') || availabilityText.toLowerCase().includes('sold');
+
+  // 🟢 Unified Action Handler
+  const handleAction = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (isQuoteOnly) {
+        onQuoteClick(product);
+    } else if (!isOutOfStock) {
+        addToCart(product);
+    }
+  };
+
+  const productPrice = !isQuoteOnly ? product.price as number : -1;
+  const priceDisplay = !isQuoteOnly ? `$${productPrice.toFixed(2)}` : 'Get a Quote';
+  const productUrl = `/product/${product.slug}`;
 
   // --- LIST VIEW ---
   if (viewMode === 'list') {
@@ -256,11 +273,11 @@ const ShopProductCard = ({ product, viewMode }: { product: Product, viewMode: 'g
           
           <div className="flex flex-wrap items-center gap-4">
            <button 
-              onClick={handleAddToCart}
-              disabled={isOutOfStock}
-              className={`font-bold py-2 px-5 rounded-md transition ${isOutOfStock ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
+              onClick={handleAction}
+              disabled={!isQuoteOnly && isOutOfStock}
+              className={`font-bold py-2 px-5 rounded-md transition ${(!isQuoteOnly && isOutOfStock) ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
             >
-              {isOutOfStock ? 'Out of Stock' : (typeof product.price === 'number' ? 'Add to Cart' : 'Get a Quote')}
+              {isQuoteOnly ? 'Get a Quote' : (isOutOfStock ? 'Out of Stock' : 'Add to Cart')}
             </button>
             <button onClick={toggleWishlist} className={`flex items-center gap-2 text-sm font-medium transition ${isInWishlist ? 'text-red-600' : 'text-gray-700 hover:text-blue-600'}`}>
               <HeartIcon className="w-5 h-5" fill={isInWishlist ? "currentColor" : "none"} /> {isInWishlist ? 'Saved' : 'Add to wishlist'}
@@ -289,11 +306,11 @@ const ShopProductCard = ({ product, viewMode }: { product: Product, viewMode: 'g
         
         <div className="mt-auto space-y-2">
             <button 
-             onClick={handleAddToCart}
-             disabled={isOutOfStock}
-             className={`w-full text-center font-semibold py-2.5 rounded-md text-sm transition-all duration-300 ${isOutOfStock ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-blue-600 text-white hover:bg-blue-700 shadow-md'}`}
+             onClick={handleAction}
+             disabled={!isQuoteOnly && isOutOfStock}
+             className={`w-full text-center font-semibold py-2.5 rounded-md text-sm transition-all duration-300 ${(!isQuoteOnly && isOutOfStock) ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-blue-600 text-white hover:bg-blue-700 shadow-md'}`}
            >
-             {isOutOfStock ? 'Out of Stock' : (typeof product.price === 'number' ? 'Add to Cart' : 'Get a Quote')}
+             {isQuoteOnly ? 'Get a Quote' : (isOutOfStock ? 'Out of Stock' : 'Add to Cart')}
            </button>
            <div className="flex justify-between items-center pt-1 gap-2">
              <button onClick={toggleWishlist} className={`flex-1 flex items-center justify-center gap-1.5 text-sm transition-colors border rounded-md py-2 ${isInWishlist ? 'text-red-600 font-medium border-red-200 bg-red-50' : 'text-gray-500 border-gray-300 hover:text-blue-600 hover:border-blue-500'}`}>
@@ -322,6 +339,9 @@ export default function ShopPageClient({ products }: { products: Product[] }) {
   const [appliedMaxPrice, setAppliedMaxPrice] = useState(MAX_SLIDER_PRICE);
 
   const [allCategories, setAllCategories] = useState<CategoryCount[]>([]);
+  
+  // 🟢 Quote Modal State
+  const [quoteProduct, setQuoteProduct] = useState<Product | null>(null);
 
   useEffect(() => {
     const categoryMap = new Map<string, number>();
@@ -424,7 +444,13 @@ export default function ShopPageClient({ products }: { products: Product[] }) {
             {sortedProducts.length > 0 ? (
               <div className={`grid ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'} gap-6`}>
                 {sortedProducts.map((product, index) => (
-                  <ShopProductCard key={`${product.id}-${index}`} product={product} viewMode={viewMode} />
+                  <ShopProductCard 
+                    key={`${product.id}-${index}`} 
+                    product={product} 
+                    viewMode={viewMode}
+                    // 🟢 Pass handler to card
+                    onQuoteClick={setQuoteProduct} 
+                  />
                 ))}
               </div>
             ) : (
@@ -439,6 +465,13 @@ export default function ShopPageClient({ products }: { products: Product[] }) {
       </div>
       <ChatButton />
       <CustomScrollbarStyles />
+
+      {/* 🟢 Global Quote Modal */}
+      <QuoteModal 
+         isOpen={!!quoteProduct} 
+         onClose={() => setQuoteProduct(null)} 
+         product={quoteProduct} 
+      />
     </main>
   );
 }

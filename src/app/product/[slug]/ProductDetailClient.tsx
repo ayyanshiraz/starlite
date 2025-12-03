@@ -12,6 +12,8 @@ import type { Product, StandardProductDescription, KeyFeatureProductDescription 
 import { useWishlist } from '@/hooks/useWishlist';
 import { useCompare } from '@/hooks/useCompare';
 import { useCart } from '@/hooks/useCart';
+// 🟢 Import the Quote Modal
+import QuoteModal from '@/components/QuoteModal';
 
 // --- ICONS ---
 const iconProps = { xmlns: "http://www.w3.org/2000/svg", width: "24", height: "24", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round" } as const;
@@ -23,7 +25,7 @@ const StarIcon = ({ className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg
 const CheckCircleIcon = ({ className = "" }) => (<svg {...iconProps} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>);
 const XCircleIcon = ({ className = "" }) => (<svg {...iconProps} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>);
 
-// --- SIDEBAR COMPONENTS (Fixed to not rely on allProducts) ---
+// --- SIDEBAR COMPONENTS ---
 const CategoriesSidebar = ({ currentCategorySlug }: { currentCategorySlug?: string }) => {
   return (
     <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden mb-8">
@@ -40,7 +42,7 @@ const CategoriesSidebar = ({ currentCategorySlug }: { currentCategorySlug?: stri
           return (
             <Link
               key={category.slug}
-              href={`/shop?category=${category.name}`} // Updated to point to shop filter
+              href={`/shop?category=${category.name}`} 
               className={`group relative flex items-center justify-between px-5 py-2.5 text-sm transition-all border-t border-gray-50 ${isActive ? 'text-blue-700 font-semibold bg-blue-50/50 border-l-4 border-blue-600' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 border-l-4 border-transparent'}`}
             >
               <span className="truncate pr-2">{category.name}</span>
@@ -52,7 +54,6 @@ const CategoriesSidebar = ({ currentCategorySlug }: { currentCategorySlug?: stri
   );
 };
 
-// Simplified sidebar (Since we don't have global data here anymore)
 const LatestProductsSidebar = () => (
   <div className="border border-gray-200 rounded-lg p-6 bg-white shadow-sm">
     <h3 className="text-xl font-bold text-gray-900 mb-6">Shop More</h3>
@@ -97,19 +98,25 @@ const ProductGallery = ({ product }: { product: Product }) => {
   );
 };
 
-// --- PRODUCT INFO ---
+// --- PRODUCT INFO (Updated for Quote Modal) ---
 const ProductInfo = ({ product }: { product: Product }) => {
   const { isInWishlist, toggleWishlist } = useWishlist(product.slug);
   const { isInCompare, toggleCompare } = useCompare(product.slug);
   const { addToCart } = useCart();
   
+  // 🟢 Modal State
+  const [isQuoteOpen, setIsQuoteOpen] = useState(false);
+
   const isQuoteOnly = typeof product.price !== 'number';
   const availabilityText = product.availability || 'In Stock';
   const isOutOfStock = availabilityText.toLowerCase().includes('out') || availabilityText.toLowerCase().includes('sold');
 
   const handleAction = (e: React.MouseEvent) => {
-    if (!isQuoteOnly && !isOutOfStock) {
-      e.preventDefault();
+    e.preventDefault();
+    // 🟢 Open Modal if Quote Only, otherwise Add to Cart
+    if (isQuoteOnly) {
+      setIsQuoteOpen(true);
+    } else if (!isOutOfStock) {
       addToCart(product);
     }
   };
@@ -142,16 +149,21 @@ const ProductInfo = ({ product }: { product: Product }) => {
       </div>
       
       <div className="flex items-center gap-3">
-        {!isQuoteOnly ? (
-          <button onClick={handleAction} disabled={isOutOfStock} className={`px-8 py-3 font-bold rounded-md transition w-full md:w-auto text-center shadow-md flex justify-center items-center ${isOutOfStock ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-[#1447E6] text-white hover:bg-blue-700'}`}>
-            {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
-          </button>
-        ) : (
-          <a href="tel:9724310905" className="px-8 py-3 bg-[#1447E6] text-white font-bold rounded-md hover:bg-blue-700 transition w-full md:w-auto text-center shadow-md block">
-            Get a Quote
-          </a>
-        )}
+        <button 
+          onClick={handleAction} 
+          disabled={!isQuoteOnly && isOutOfStock} 
+          className={`px-8 py-3 font-bold rounded-md transition w-full md:w-auto text-center shadow-md flex justify-center items-center ${(!isQuoteOnly && isOutOfStock) ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-[#1447E6] text-white hover:bg-blue-700'}`}
+        >
+          {isQuoteOnly ? 'Get a Quote' : (isOutOfStock ? 'Out of Stock' : 'Add to Cart')}
+        </button>
       </div>
+
+      {/* 🟢 Quote Modal Logic */}
+      <QuoteModal 
+        isOpen={isQuoteOpen} 
+        onClose={() => setIsQuoteOpen(false)} 
+        product={product} 
+      />
     </div>
   );
 };
@@ -170,9 +182,6 @@ const SpecItem = ({ label, children }: { label: string, children: React.ReactNod
     <dd className="md:col-span-2 text-gray-700">{children}</dd>
   </div>
 );
-
-// --- DESCRIPTION TAB ---
-// ... imports remain the same ...
 
 // 🟢 NEW HELPER: Parses "**Text**" into <strong>Text</strong>
 const renderFormattedText = (text: string) => {
@@ -274,7 +283,6 @@ const DescriptionTab = ({ description }: { description: StandardProductDescripti
   }
 };
 
-// ... rest of the file remains unchanged ...
 // --- REVIEW FORM (Mock) ---
 const ReviewForm = ({ productName }: { productName: string }) => {
   const [rating, setRating] = useState(0);
@@ -286,7 +294,6 @@ const ReviewForm = ({ productName }: { productName: string }) => {
          <span className="text-sm font-bold mr-2">Your Rating:</span>
          {[1, 2, 3, 4, 5].map(s => <button key={s} onClick={()=>setRating(s)} type="button" className={rating >= s ? "text-yellow-400" : "text-gray-300"}><StarIcon/></button>)}
       </div>
-      {/* Simplified form for visual purposes */}
       <textarea className="w-full border p-2 rounded mb-4" rows={4} placeholder="Your Review"></textarea>
       <button className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">Submit Review</button>
     </div>

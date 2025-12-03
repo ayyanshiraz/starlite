@@ -65,7 +65,7 @@ export async function sendOrderEmail(order: any) {
 
     await transporter.sendMail({
       from: `"Starlight System" <${process.env.SMTP_USER}>`,
-      to: 'billing@starlightlinkers.com', // Send to yourself
+      to: 'sales@starlightlinkers.com', // Send to yourself
       subject: `💰 New Order #${shortId} - $${total}`,
       html: htmlContent,
     });

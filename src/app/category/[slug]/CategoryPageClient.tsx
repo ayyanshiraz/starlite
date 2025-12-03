@@ -6,10 +6,12 @@ import Link from 'next/link';
 import { HeaderSection } from '@/components/Header'; 
 import { ChatButton, CustomScrollbarStyles } from '@/components/SharedComponents'; 
 import { categoriesData } from '@/lib/data';
-import type { Product } from '@/lib/products'; 
+import type { Product } from '@/lib/products';
 import { useWishlist } from '@/hooks/useWishlist';
 import { useCompare } from '@/hooks/useCompare';
 import { useCart } from '@/hooks/useCart';
+// 🟢 Import Quote Modal
+import QuoteModal from '@/components/QuoteModal';
 
 // --- ICONS ---
 const iconProps = { xmlns: "http://www.w3.org/2000/svg", width: "24", height: "24", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round" } as const;
@@ -21,7 +23,6 @@ const ChevronLeftIcon = ({ className = "" }) => (<svg {...iconProps} className={
 const ChevronRightIcon = ({ className = "" }) => (<svg {...iconProps} className={className}><path d="m9 18 6-6-6-6"></path></svg>);
 const CompareIcon = ({ className = "" }) => (<svg {...iconProps} className={className}><path d="M8 3L4 7l4 4"/><path d="M4 7h16"/><path d="M16 21l4-4-4-4"/><path d="M20 17H4"/></svg>);
 
-// --- HELPER: CATEGORY NORMALIZER ---
 const normalizeCategoryName = (rawCategory: string, currentBrandName: string): string => {
   if (!rawCategory) return "Other";
   const parts = rawCategory.split(',');
@@ -41,7 +42,6 @@ const normalizeCategoryName = (rawCategory: string, currentBrandName: string): s
   return cleanName || "Accessories";
 };
 
-// --- SUB-COMPONENTS ---
 const Breadcrumbs = ({ categoryName }: { categoryName: string }) => (
   <nav className="mb-6 text-sm text-gray-600" aria-label="Breadcrumb">
     <ol className="list-none p-0 inline-flex">
@@ -135,16 +135,32 @@ const DynamicCategoriesSidebar = ({ currentCategoryName, products, onSubCategory
   );
 };
 
-const ProductCard = ({ product, viewMode }: { product: Product, viewMode: 'grid' | 'list' }) => {
+// 🟢 Updated Product Card to use Quote Handler
+const ProductCard = ({ 
+    product, 
+    viewMode,
+    onQuoteClick // 🟢 New Prop
+}: { 
+    product: Product, 
+    viewMode: 'grid' | 'list',
+    onQuoteClick: (p: Product) => void 
+}) => {
   const { isInWishlist, toggleWishlist } = useWishlist(product.slug);
   const { isInCompare, toggleCompare } = useCompare(product.slug);
   const { addToCart } = useCart();
-  const handleAddToCart = (e: React.MouseEvent) => { e.preventDefault(); addToCart(product); };
-  const [isHovered, setIsHovered] = useState(false);
   
   const isQuoteOnly = typeof product.price !== 'number';
   const priceDisplay = !isQuoteOnly ? `$${Number(product.price).toFixed(2)}` : 'Get a Quote';
   const productUrl = `/product/${product.slug}`; 
+
+  const handleAction = (e: React.MouseEvent) => { 
+      e.preventDefault(); 
+      if (isQuoteOnly) {
+          onQuoteClick(product); // 🟢 Open Modal
+      } else {
+          addToCart(product); 
+      }
+  };
 
   if (viewMode === 'list') {
     return (
@@ -157,7 +173,9 @@ const ProductCard = ({ product, viewMode }: { product: Product, viewMode: 'grid'
           <Link href={productUrl}><h3 className="text-lg font-bold hover:text-blue-600 transition mt-1">{product.name}</h3></Link>
           <p className="text-xl font-bold my-3">{priceDisplay}</p>
           <div className="flex items-center gap-4">
-            <button onClick={handleAddToCart} className="bg-blue-600 text-white font-bold py-2 px-5 rounded-md hover:bg-blue-700 transition">{!isQuoteOnly ? 'Add to Cart' : 'Get a Quote'}</button>
+            <button onClick={handleAction} className="bg-blue-600 text-white font-bold py-2 px-5 rounded-md hover:bg-blue-700 transition">
+                {!isQuoteOnly ? 'Add to Cart' : 'Get a Quote'}
+            </button>
             <button onClick={toggleWishlist} className={`flex items-center gap-2 text-sm font-medium transition ${isInWishlist ? 'text-red-600' : 'text-gray-600 hover:text-blue-600'}`}><HeartIcon className="w-5 h-5" fill={isInWishlist ? "currentColor" : "none"} /> {isInWishlist ? 'Saved' : 'Add to wishlist'}</button>
             <button onClick={toggleCompare} className={`flex items-center gap-2 text-sm font-medium transition ${isInCompare ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600'}`}><CompareIcon className="w-5 h-5"/> {isInCompare ? 'Added' : 'Compare'}</button>
           </div>
@@ -166,20 +184,22 @@ const ProductCard = ({ product, viewMode }: { product: Product, viewMode: 'grid'
     );
   }
   return (
-    <div className="relative w-full border border-gray-200 rounded-lg group transition-all bg-white text-gray-900 shadow-sm hover:shadow-lg" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
+    <div className="relative w-full border border-gray-200 rounded-lg group transition-all bg-white text-gray-900 shadow-sm hover:shadow-lg">
       <button onClick={toggleWishlist} className={`absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-full transition ${isInWishlist ? 'bg-red-100 text-red-600 hover:bg-red-200' : 'bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white'}`}><HeartIcon className="w-4 h-4" fill={isInWishlist ? "currentColor" : "none"} /></button>
       <Link href={productUrl} className="block w-full h-48 bg-white p-3 rounded-t-lg">
         <Image src={product.image} alt={product.name} width={300} height={300} className="w-full h-full object-contain rounded-md group-hover:scale-105 transition-transform"/>
       </Link>
       <div className="p-3 text-center h-[120px] flex flex-col justify-center">
-        {!isHovered ? (
           <div><span className="text-xs text-gray-500">{product.category.split(',')[0]}</span><Link href={productUrl}><h3 className="text-sm font-semibold hover:text-blue-600 transition mt-1 h-10 overflow-hidden line-clamp-2">{product.name}</h3></Link><p className="text-lg font-bold my-3">{priceDisplay}</p></div>
-        ) : (
-          <div className="animate-fadeIn flex flex-col gap-2">
-            <button onClick={handleAddToCart} className="bg-blue-600 text-white w-full py-2 rounded-md font-bold text-sm hover:bg-blue-700 transition">{!isQuoteOnly ? 'Add to Cart' : 'Get a Quote'}</button>
-            <div className="flex flex-col"><button onClick={toggleWishlist} className={`flex items-center justify-center gap-2 w-full py-1 rounded-md font-bold text-sm transition ${isInWishlist ? 'text-red-600' : 'text-gray-600 hover:text-blue-600'}`}><HeartIcon className="w-4 h-4" fill={isInWishlist ? "currentColor" : "none"}/> {isInWishlist ? 'Saved' : 'Add to wishlist'}</button><button onClick={toggleCompare} className={`flex items-center justify-center gap-2 w-full py-1 rounded-md font-bold text-sm transition ${isInCompare ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600'}`}><CompareIcon className="w-4 h-4"/> {isInCompare ? 'Added' : 'Compare'}</button></div>
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute bottom-4 left-4 right-4 flex flex-col gap-2 bg-white p-2 rounded shadow-lg">
+            <button onClick={handleAction} className="bg-blue-600 text-white w-full py-2 rounded-md font-bold text-sm hover:bg-blue-700 transition">
+                {!isQuoteOnly ? 'Add to Cart' : 'Get a Quote'}
+            </button>
+            <div className="flex justify-between">
+                <button onClick={toggleWishlist} className="text-gray-600 text-xs hover:text-blue-600">Save</button>
+                <button onClick={toggleCompare} className="text-gray-600 text-xs hover:text-blue-600">Compare</button>
+            </div>
           </div>
-        )}
       </div>
     </div>
   );
@@ -214,6 +234,9 @@ export default function CategoryPageClient({ products, slug }: { products: Produ
   const [appliedMinPrice, setAppliedMinPrice] = useState(0);
   const [appliedMaxPrice, setAppliedMaxPrice] = useState(MAX_SLIDER_PRICE);
   const [selectedSubCategory, setSelectedSubCategory] = useState<string | null>(null);
+  
+  // 🟢 Quote Modal State
+  const [quoteProduct, setQuoteProduct] = useState<Product | null>(null);
 
   const handleFilterClick = () => {
     setAppliedMinPrice(minPrice);
@@ -221,10 +244,9 @@ export default function CategoryPageClient({ products, slug }: { products: Produ
     setCurrentPage(1); 
   };
 
-  // 🟢 Filter logic using passed props
   const categoryProducts = useMemo(() => {
     if (!products) return [];
-    return products; // The server has already filtered by slug!
+    return products; 
   }, [products]);
 
   const filteredProducts = useMemo(() => {
@@ -284,7 +306,13 @@ export default function CategoryPageClient({ products, slug }: { products: Produ
             />
             <div className={`grid ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5' : 'grid-cols-1'} gap-4`}>
               {productsToShow.map((product) => (
-                <ProductCard key={product.id} product={product} viewMode={viewMode} />
+                <ProductCard 
+                    key={product.id} 
+                    product={product} 
+                    viewMode={viewMode} 
+                    // 🟢 Pass Handler
+                    onQuoteClick={setQuoteProduct}
+                />
               ))}
             </div>
             {productsToShow.length === 0 && (
@@ -303,6 +331,13 @@ export default function CategoryPageClient({ products, slug }: { products: Produ
       </div>
       <ChatButton />
       <CustomScrollbarStyles />
+
+      {/* 🟢 Global Quote Modal */}
+      <QuoteModal 
+         isOpen={!!quoteProduct} 
+         onClose={() => setQuoteProduct(null)} 
+         product={quoteProduct} 
+      />
     </main>
   );
 }

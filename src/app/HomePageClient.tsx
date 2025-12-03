@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
@@ -8,13 +8,15 @@ import type { Product } from '../lib/products';
 import { useWishlist } from '../hooks/useWishlist';
 import { useCompare } from '../hooks/useCompare';
 import { useCart } from '../hooks/useCart';
+// 🟢 Import Quote Modal
+import QuoteModal from '@/components/QuoteModal';
 
 // --- IMPORTS ---
 import { HeaderSection } from '../components/Header';
 import { ChatButton, CustomScrollbarStyles } from '../components/SharedComponents';
 import { GlobalProductHighlights } from '../components/GlobalProductHighlights';
 
-// --- HELPER: Filter Products by Exact Names ---
+// --- HELPER: Robust Filter Products by Exact Names ---
 const getProductsByNames = (allProducts: Product[], names: string[]) => {
   if (!allProducts) return [];
   return names.map(targetName => {
@@ -37,12 +39,6 @@ const sliderData = [
   { id: 'routers', preTitle: 'Networking', title: 'Next-Gen Routers', description: 'Future-proof your network with advanced next-generation router technology.', img: '/images/hero-router.png', href: '/category/routers' },
   { id: 'switches', preTitle: 'Networking', title: 'Network Boost & High Performance', description: 'Experience unmatched performance with Ciscos high-speed switch technology.', img: '/images/hero-switch.png', href: '/category/switches' }
 ];
-
-const slideVariants = {
-  initial: { opacity: 0 },
-  animate: { opacity: 1, transition: { duration: 0.8, ease: "easeIn" } },
-  exit: { opacity: 0, transition: { duration: 0.8, ease: "easeOut" } }
-};
 
 const textChildVariants = {
   hidden: { opacity: 0, y: 30 },
@@ -140,13 +136,27 @@ const TabButton = ({ title, isActive, onClick }: { title: string, isActive: bool
 );
 
 // --- HELPER: Product Card ---
-function ProductCard({ product }: { product: any }) {
+function ProductCard({ 
+  product, 
+  onQuoteClick 
+}: { 
+  product: any; 
+  onQuoteClick: (p: any) => void;
+}) {
   const { isInWishlist, toggleWishlist } = useWishlist(product.slug);
   const { isInCompare, toggleCompare } = useCompare(product.slug);
   const { addToCart } = useCart();
   
-  const handleAddToCart = (e: React.MouseEvent) => { e.preventDefault(); addToCart(product); };
-  const showAddToCart = product.price && product.price !== 'Get a Quote';
+  const isQuoteOnly = typeof product.price !== 'number';
+
+  const handleAction = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (isQuoteOnly) {
+        onQuoteClick(product);
+    } else {
+        addToCart(product);
+    }
+  };
 
   return (
     <motion.div className="group relative border border-gray-200 bg-white rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg flex flex-col z-0" whileHover={{ y: -8, scale: 1.03, zIndex: 40, transition: { duration: 0.1, ease: "easeOut" } }}>
@@ -159,11 +169,11 @@ function ProductCard({ product }: { product: any }) {
           <h3 className="text-sm font-semibold text-gray-900 mb-3 h-10 line-clamp-2 group-hover:text-blue-600 transition-colors">{product.name}</h3>
         </Link>
         <p className="text-md font-bold text-gray-900 mb-3">
-          {typeof product.price === 'number' ? `$${product.price.toFixed(2)}` : product.price}
+          {typeof product.price === 'number' ? `$${product.price.toFixed(2)}` : 'Get a Quote'}
         </p>
         <div className="mt-auto pt-4 border-t border-gray-200">
-          <button onClick={handleAddToCart} className="block w-full text-center bg-blue-600 text-white font-semibold py-2.5 rounded-md text-sm transition-all duration-300 hover:bg-blue-700 hover:shadow-md">
-            {showAddToCart ? 'Add to Cart' : 'Get a Quote'}
+          <button onClick={handleAction} className="block w-full text-center bg-blue-600 text-white font-semibold py-2.5 rounded-md text-sm transition-all duration-300 hover:bg-blue-700 hover:shadow-md">
+            {isQuoteOnly ? 'Get a Quote' : 'Add to Cart'}
           </button>
           <div className="flex justify-between items-center pt-3">
             <button onClick={toggleWishlist} className={`flex items-center gap-1.5 text-sm transition-colors ${isInWishlist ? 'text-red-600 font-medium' : 'text-gray-500 hover:text-blue-600'}`}>
@@ -180,7 +190,13 @@ function ProductCard({ product }: { product: any }) {
 }
 
 // --- FEATURED PRODUCTS SECTION ---
-function FeaturedProductsSection({ products }: { products: Product[] }) {
+function FeaturedProductsSection({ 
+    products, 
+    onQuoteClick 
+}: { 
+    products: Product[]; 
+    onQuoteClick: (p: Product) => void;
+}) {
   const [activeTab, setActiveTab] = useState('featured');
   const [isMobile, setIsMobile] = useState(false);
 
@@ -193,7 +209,6 @@ function FeaturedProductsSection({ products }: { products: Product[] }) {
 
   const safeProducts = products || [];
 
-  // 🟢 FEATURED TAB (Exact Items)
   const featuredNames = [
     'D-Link DWA-X1850 AX1800 Wi-Fi 6 USB Adapter',
     'D-Link DAP-X2850 Nuclias Connect AX3600 Wi-Fi 6 PoE Access Point',
@@ -206,7 +221,6 @@ function FeaturedProductsSection({ products }: { products: Product[] }) {
   ];
   const featuredList = getProductsByNames(safeProducts, featuredNames);
 
-  // 🟢 TOP RATED TAB (Exact Items)
   const topRatedNames = [
     'Switch smart managed Layer2 5 Port',
     'Ubiquiti UniFi Dream Machine Pro Managed Gigabit (UDM-Pro)',
@@ -243,7 +257,9 @@ function FeaturedProductsSection({ products }: { products: Product[] }) {
             <Image src="/sidebanner.gif" alt={specialOffer.name || 'Offer'} layout="fill" objectFit="cover" className="transition-transform duration-300 group-hover:scale-105" />
           </Link>
           <div className="lg:col-span-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-             {displayedProducts.map((product) => <ProductCard key={product.id} product={product} />)}
+             {displayedProducts.map((product) => (
+               <ProductCard key={product.id} product={product} onQuoteClick={onQuoteClick} />
+             ))}
           </div>
         </div>
       </div>
@@ -273,11 +289,24 @@ function EverythingBannerSection() {
 }
 
 // --- BEST DEALS ITEM ---
-const BestDealItem = ({ product }: { product: any }) => {
+const BestDealItem = ({ 
+    product, 
+    onQuoteClick 
+}: { 
+    product: any; 
+    onQuoteClick: (p: any) => void; 
+}) => {
   const { addToCart } = useCart();
-  const { isInWishlist, toggleWishlist } = useWishlist(product.slug);
-  const { isInCompare, toggleCompare } = useCompare(product.slug);
   const showAddToCart = product.price && product.price !== 'Get a Quote';
+  
+  const handleAction = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!showAddToCart) {
+        onQuoteClick(product);
+    } else {
+        addToCart(product);
+    }
+  };
 
   return (
     <div className="group bg-white rounded-lg border border-gray-200 hover:border-blue-600 transition-all duration-300 overflow-hidden flex flex-col shadow-sm hover:shadow-xl">
@@ -290,21 +319,23 @@ const BestDealItem = ({ product }: { product: any }) => {
           <h3 className="text-sm font-semibold text-gray-900 mb-3 h-10 line-clamp-2 group-hover:text-blue-600 transition-colors">{product.name}</h3>
         </Link>
         <div className="mt-auto pt-4 border-t border-gray-200">
-          <button onClick={(e) => { e.preventDefault(); addToCart(product); }} className="block w-full text-center bg-blue-600 text-white font-semibold py-2.5 rounded-md text-sm transition-all duration-300 hover:bg-blue-700 hover:shadow-md">
+          <button onClick={handleAction} className="block w-full text-center bg-blue-600 text-white font-semibold py-2.5 rounded-md text-sm transition-all duration-300 hover:bg-blue-700 hover:shadow-md">
             {showAddToCart ? 'Add to Cart' : 'Get a Quote'}
           </button>
-          <div className="flex justify-between items-center pt-3">
-            <button onClick={toggleWishlist} className={`flex items-center gap-1 text-sm font-medium ${isInWishlist ? 'text-red-600' : 'text-gray-600 hover:text-blue-600'}`}><HeartIcon className="w-4 h-4" fill={isInWishlist ? "currentColor" : "none"} /> Save</button>
-            <button onClick={toggleCompare} className={`flex items-center gap-1 text-sm font-medium ${isInCompare ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600'}`}><CompareIcon className="w-4 h-4" /> Compare</button>
-          </div>
         </div>
       </div>
     </div>
   );
 };
 
-// --- BEST DEALS SECTION (Auto-Switching) ---
-function BestDealsSection({ products }: { products: Product[] }) {
+// --- BEST DEALS SECTION ---
+function BestDealsSection({ 
+    products, 
+    onQuoteClick 
+}: { 
+    products: Product[]; 
+    onQuoteClick: (p: Product) => void; 
+}) {
   const [activeCategory, setActiveCategory] = useState('all');
   const [isPaused, setIsPaused] = useState(false);
   const safeProducts = products || [];
@@ -338,7 +369,6 @@ function BestDealsSection({ products }: { products: Product[] }) {
     'HP 225 Keyboard & Mouse – USB Cable Keyboard – USB Cable Mouse –'
   ];
 
-  // 🟢 NEW: HP Displays Tab
   const hpDisplayNames = [
     'HP 322pv 21.4″ Full HD LED Monitor',
     'HP 324pf 23.8″ FHD IPS Monitor ? 100Hz, 5ms, HDMI/DP/VGA ? Slim LED Backlight for Work & Gaming',
@@ -347,7 +377,6 @@ function BestDealsSection({ products }: { products: Product[] }) {
     'HP 7 Pro 24″ WUXGA IPS Monitor – 8X534AA#ABU'
   ];
 
-  // 🟢 NEW: Transceiver Tab
   const transceiverNames = [
     'Alcatel-Lucent network transceiver module – SFP-10G-LR',
     'Avaya 1 PORT 10GBase-SR XFP Transceiver',
@@ -362,7 +391,6 @@ function BestDealsSection({ products }: { products: Product[] }) {
       { id: 'transceiver', title: 'Transceiver' }
   ];
 
-  // 🟢 AUTO-SWITCH LOGIC
   useEffect(() => {
     if (isPaused) return;
     const interval = setInterval(() => {
@@ -397,7 +425,7 @@ function BestDealsSection({ products }: { products: Product[] }) {
             <AnimatePresence mode="wait">
                 {productsToShow.map(product => (
                     <motion.div key={product.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
-                        <BestDealItem product={product} />
+                        <BestDealItem product={product} onQuoteClick={onQuoteClick} />
                     </motion.div>
                 ))}
             </AnimatePresence>
@@ -408,15 +436,19 @@ function BestDealsSection({ products }: { products: Product[] }) {
 }
 
 // --- BEST SELLERS SECTION (Carousel 3-per-line + Shuffle) ---
-function BestSellersSection({ products }: { products: Product[] }) {
+function BestSellersSection({ 
+    products, 
+    onQuoteClick 
+}: { 
+    products: Product[]; 
+    onQuoteClick: (p: Product) => void; 
+}) {
     const [activeTab, setActiveTab] = useState('best-sellers');
     const [page, setPage] = useState(0);
     const safeProducts = products || [];
 
-    // 🟢 Shuffle All Products for "Best Sellers" tab
     const allShuffled = useMemo(() => [...safeProducts].sort(() => 0.5 - Math.random()), [safeProducts]);
 
-    // 🟢 Filter for other tabs
     const displayedProducts = useMemo(() => {
         if (activeTab === 'best-sellers') return allShuffled;
         if (activeTab === 'workstations') return safeProducts.filter(p => p.category.toLowerCase().includes('workstation') || p.name.toLowerCase().includes('workstation'));
@@ -425,7 +457,6 @@ function BestSellersSection({ products }: { products: Product[] }) {
         return [];
     }, [activeTab, safeProducts, allShuffled]);
 
-    // 🟢 Carousel Logic (3 per page)
     const itemsPerPage = 3;
     const totalPages = Math.ceil(displayedProducts.length / itemsPerPage);
     const productsToRender = displayedProducts.slice(page * itemsPerPage, (page + 1) * itemsPerPage);
@@ -433,7 +464,6 @@ function BestSellersSection({ products }: { products: Product[] }) {
     const nextPage = () => setPage((prev) => (prev + 1) % totalPages);
     const prevPage = () => setPage((prev) => (prev - 1 + totalPages) % totalPages);
 
-    // Reset page when tab changes
     useEffect(() => setPage(0), [activeTab]);
 
     const tabs = [
@@ -459,12 +489,11 @@ function BestSellersSection({ products }: { products: Product[] }) {
                         <AnimatePresence mode="wait">
                             {productsToRender.map(p => (
                                 <motion.div key={`${p.id}-${page}`} initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -50 }} transition={{ duration: 0.4 }}>
-                                    <BestDealItem product={p} />
+                                    <BestDealItem product={p} onQuoteClick={onQuoteClick} />
                                 </motion.div>
                             ))}
                         </AnimatePresence>
                     </div>
-                    {/* Arrows */}
                     {displayedProducts.length > itemsPerPage && (
                         <>
                             <button onClick={prevPage} className="absolute top-1/2 -left-12 -translate-y-1/2 p-2 bg-gray-200 rounded-full hover:bg-blue-600 hover:text-white transition"><ChevronLeftIcon className="w-6 h-6"/></button>
@@ -478,7 +507,13 @@ function BestSellersSection({ products }: { products: Product[] }) {
 }
 
 // --- RECENTLY ADDED SECTION ---
-function RecentlyAddedSection({ products }: { products: Product[] }) {
+function RecentlyAddedSection({ 
+    products, 
+    onQuoteClick 
+}: { 
+    products: Product[]; 
+    onQuoteClick: (p: Product) => void; 
+}) {
     const safeProducts = products || [];
     const recent = safeProducts.slice(0, 8); 
 
@@ -495,6 +530,10 @@ function RecentlyAddedSection({ products }: { products: Product[] }) {
                              <Link href={`/product/${p.slug}`}>
                                 <h3 className="text-md font-semibold text-blue-600 mb-3 h-12 line-clamp-2">{p.name}</h3>
                              </Link>
+                             {/* 🟢 3. Added Button to trigger Quote Modal */}
+                             <button onClick={(e) => { e.preventDefault(); onQuoteClick(p); }} className="w-full bg-blue-600 text-white py-2 rounded text-sm font-bold hover:bg-blue-700 transition">
+                                Get a Quote
+                             </button>
                         </div>
                     ))}
                 </div>
@@ -503,23 +542,53 @@ function RecentlyAddedSection({ products }: { products: Product[] }) {
     );
 }
 
+// --- BIG DEALS BANNER ---
+function BigDealsBannerSection() {
+  return (
+    <section className="py-12 bg-gray-50">
+      <div className="container mx-auto px-8 lg:px-24">
+        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+          <Link href="/shop" className="block relative w-full" style={{ paddingBottom: '15%' }}>
+            <Image src="/banner.webp" alt="Big deals banner" layout="fill" objectFit="cover" className="w-full h-full" priority />
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // --- MAIN PAGE COMPONENT ---
 export default function HomePageClient({ products }: { products: Product[] }) {
   const safeProducts = products || [];
+  
+  // 🟢 4. GLOBAL QUOTE STATE
+  const [quoteProduct, setQuoteProduct] = useState<Product | null>(null);
+
+  const handleQuoteClick = (p: Product) => {
+      setQuoteProduct(p);
+  };
 
   return (
     <>
       <HeaderSection />
       <ModernHeroSection />
       <DealsSection />
-      <FeaturedProductsSection products={safeProducts} />
+      <FeaturedProductsSection products={safeProducts} onQuoteClick={handleQuoteClick} />
       <EverythingBannerSection />
-      <BestDealsSection products={safeProducts} />
-      <BestSellersSection products={safeProducts} />
-      <RecentlyAddedSection products={safeProducts} />
+      <BestDealsSection products={safeProducts} onQuoteClick={handleQuoteClick} />
+      <BestSellersSection products={safeProducts} onQuoteClick={handleQuoteClick} />
+      <BigDealsBannerSection />
+      <RecentlyAddedSection products={safeProducts} onQuoteClick={handleQuoteClick} />
       <GlobalProductHighlights products={safeProducts} />
       <ChatButton />
       <CustomScrollbarStyles />
+
+      {/* 🟢 5. RENDER MODAL */}
+      <QuoteModal 
+        isOpen={!!quoteProduct} 
+        onClose={() => setQuoteProduct(null)} 
+        product={quoteProduct} 
+      />
     </>
   );
 }
