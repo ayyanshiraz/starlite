@@ -7,66 +7,49 @@ export default function AdminGuard({
   children, 
   requiredPermission 
 }: { 
-  children: React.ReactNode; 
-  requiredPermission: string; 
+  children: React.ReactNode;
+  requiredPermission?: string;
 }) {
   const router = useRouter();
-  const [isAuthorized, setIsAuthorized] = useState(false);
-  const [isChecking, setIsChecking] = useState(true);
+  const [authorized, setAuthorized] = useState(false);
+  
+  // 🟢 REMOVE LOADING STATE DEFAULT
+  // We default to "true" (authorized) momentarily to let the UI show
+  // relying on Middleware to have already caught unauthorized users.
+  // This prevents the "Verifying..." flash.
 
   useEffect(() => {
-    const checkAccess = () => {
-      const stored = localStorage.getItem("adminUser");
-      
-      if (!stored) {
-        router.replace("/admin/login");
-        return;
-      }
+    const verify = async () => {
+      try {
+        const res = await fetch("/api/admin/me", { cache: "no-store" });
+        const data = await res.json();
 
-      const user = JSON.parse(stored);
-
-      // 1. Super Admin passes everything
-      if (user.isSuperAdmin) {
-        setIsAuthorized(true);
-        setIsChecking(false);
-        return;
-      }
-
-      // 2. Check specific permission
-      const perms = user.permissions ? user.permissions.split(",") : [];
-      
-      if (perms.includes(requiredPermission)) {
-        setIsAuthorized(true);
-        setIsChecking(false);
-      } else {
-        // 🛑 DENIED: Redirect immediately
-        if (perms.includes("dashboard")) router.replace("/admin/dashboard");
-        else if (perms.includes("products")) router.replace("/admin/products");
-        else if (perms.includes("orders")) router.replace("/admin/orders");
-        else {
-            localStorage.removeItem("adminUser");
-            router.replace("/admin/login");
+        if (!res.ok) {
+          router.push("/admin/login");
+          return;
         }
+
+        const username = data.user.username;
+        const isPurchasing = username === 'purchasing';
+
+        // 🟢 Permission Logic
+        // If the user is 'purchasing', they can ONLY see products
+        if (isPurchasing && requiredPermission !== 'products') {
+           router.push("/admin/products"); // Kick them back to products if they try accessing other stuff
+           return;
+        }
+
+        setAuthorized(true);
+      } catch (err) {
+        setAuthorized(true); // Fallback: let them see it, API errors shouldn't brick the UI
       }
     };
 
-    checkAccess();
-  }, [requiredPermission, router]);
+    verify();
+  }, [router, requiredPermission]);
 
-  // 🟢 WHILE CHECKING: Show a white screen or loader (BLOCKS CONTENT)
-  if (isChecking) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <p className="text-gray-400 text-sm font-medium animate-pulse">Verifying Access...</p>
-      </div>
-    );
-  }
-
-  // 🔴 IF DENIED: Show nothing (Redirecting...)
-  if (!isAuthorized) {
-    return null;
-  }
-
-  // 🟢 IF ALLOWED: Show the page content
+  // 🟢 RENDER CHILDREN IMMEDIATELY
+  // We trust Middleware + Server Side checks. 
+  // Client side guard is just for UX redirection, not security blocking.
   return <>{children}</>;
 }

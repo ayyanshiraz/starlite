@@ -1,41 +1,59 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  // 1. Get the current path
-  const path = request.nextUrl.pathname
+  const path = request.nextUrl.pathname;
+  
+  // 🟢 1. Define Paths
+  const isLoginPage = path === '/admin/login';
+  const isProtectedPath = path.startsWith('/admin') && !isLoginPage;
 
-  // 2. Define public paths (Paths that don't need a password)
-  // We allow '/admin/login' so you can actually log in!
-  const isPublicPath = path === '/admin/login'
-
-  // 3. Get the token from the cookies
-  // ⚠️ CRITICAL: Ensure this matches the name you set in your Login page code!
-  // It might be 'auth_token', 'token', 'session', etc.
-  const token = request.cookies.get('auth_token')?.value || ''
-
-  // 4. LOGIC: Redirect based on scenarios
-
-  // SCENARIO A: User is on a protected page (like /admin/dashboard) but HAS NO TOKEN
-  if (!isPublicPath && !token) {
-    // Kick them back to login
-    return NextResponse.redirect(new URL('/admin/login', request.nextUrl))
+  // 🟢 2. Get the Cookie
+  // Note: We named it 'admin_session' in your Login API
+  const sessionCookie = request.cookies.get('admin_session');
+  
+  // 🟢 3. Parse the Cookie to find the Role
+  let userRole = null;
+  if (sessionCookie) {
+    try {
+      const sessionData = JSON.parse(sessionCookie.value);
+      userRole = sessionData.username === 'purchasing' ? 'purchasing' : sessionData.role; 
+      // (Or strictly check sessionData.username if you prefer)
+    } catch (e) {
+      console.error("Middleware: Failed to parse session cookie");
+    }
   }
 
-  // SCENARIO B: User is on Login page, but ALREADY HAS A TOKEN
-  if (isPublicPath && token) {
-    // Send them straight to dashboard (Better UX)
-    return NextResponse.redirect(new URL('/admin/dashboard', request.nextUrl))
+  // --- SCENARIO A: Not Logged In ---
+  // Trying to access admin pages without a cookie -> Go to Login
+  if (isProtectedPath && !sessionCookie) {
+    return NextResponse.redirect(new URL('/admin/login', request.url));
   }
 
-  // Allow the request to proceed if checks pass
-  return NextResponse.next()
+  // --- SCENARIO B: Already Logged In ---
+  if (sessionCookie) {
+    
+    // 1. If user is on Login Page -> Send them to their "Home"
+    if (isLoginPage) {
+      if (userRole === 'purchasing') {
+        return NextResponse.redirect(new URL('/admin/products', request.url));
+      }
+      return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+    }
+
+    // 2. RESTRICTION: Purchasing User trying to access Dashboard or Orders
+    // If 'purchasing' user tries to go ANYWHERE except /admin/products, force them back.
+    if (userRole === 'purchasing') {
+      // Allow /admin/products and sub-routes like /admin/products/add
+      if (!path.startsWith('/admin/products')) {
+         return NextResponse.redirect(new URL('/admin/products', request.url));
+      }
+    }
+  }
+
+  return NextResponse.next();
 }
 
-// 5. CONFIG: Tell Middleware which paths to protect
 export const config = {
-  // We only run this on routes starting with /admin
-  matcher: [
-    '/admin/:path*'
-  ]
-}
+  matcher: ['/admin/:path*'],
+};

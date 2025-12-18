@@ -1,61 +1,76 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { cookies } from "next/headers"; // 🟢 Use Next.js cookies helper
+import { cookies } from "next/headers";
 
 const prisma = new PrismaClient();
 
 export async function POST(request: Request) {
   try {
-    const { userId, code } = await request.json();
+    const { userId, otpCode } = await request.json();
+
+    console.log(`🔍 VERIFY ATTEMPT for UserID: ${userId}`);
+    console.log(`📥 Received Code: "${otpCode}"`);
 
     // 1. Find User
     const user = await prisma.adminUser.findUnique({ where: { id: userId } });
-    if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-    // 2. Verify Code
-    if (!user.otpCode || user.otpCode !== code) {
-      return NextResponse.json({ error: "Invalid Code" }, { status: 400 });
-    }
-    if (!user.otpExpires || new Date() > user.otpExpires) {
-      return NextResponse.json({ error: "Code Expired" }, { status: 400 });
+    if (!user) {
+      console.log("❌ User not found in DB");
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // 3. Clear OTP from DB
+    console.log(`💾 DB Stored Code: "${user.otpCode}"`);
+    console.log(`🕒 Code Expires At: ${user.otpExpires}`);
+    console.log(`⌚ Current Server Time: ${new Date()}`);
+
+    // 2. Validate OTP
+    // 🟢 Force String comparison to avoid Number vs String issues
+    const inputCode = String(otpCode).trim();
+    const dbCode = String(user.otpCode).trim();
+
+    const isMatch = inputCode === dbCode;
+    const isExpired = !user.otpExpires || new Date() > user.otpExpires;
+
+    if (!isMatch) {
+        console.log("❌ CODE MISMATCH: Input does not match DB.");
+        return NextResponse.json({ error: "Invalid code" }, { status: 400 });
+    }
+
+    if (isExpired) {
+        console.log("❌ CODE EXPIRED.");
+        return NextResponse.json({ error: "Code has expired" }, { status: 400 });
+    }
+
+    // 3. Clear OTP
     await prisma.adminUser.update({
       where: { id: user.id },
       data: { otpCode: null, otpExpires: null }
     });
 
-    // 🟢 4. SET COOKIES (Critical Fix)
-    // We must set the same cookies that the Middleware checks for.
-    const cookieStore = await cookies();
-
-    // Cookie A: Access Token (Middleware checks this!)
-    cookieStore.set('auth_token', 'valid_token', {
-        httpOnly: true, path: '/', maxAge: 86400 
-    });
-
-    // Cookie B: Identity
-    cookieStore.set('auth_user', user.username, {
-        httpOnly: true, path: '/', maxAge: 86400 
-    });
-
-    // Cookie C: Admin Data
-    const userCookieData = JSON.stringify({
+    // 4. Create Session & Set Cookie
+    const sessionData = {
       id: user.id,
       username: user.username,
-      permissions: user.permissions,
-      isSuperAdmin: user.isSuperAdmin
+      role: user.isSuperAdmin ? 'superadmin' : 'admin',
+      isLoggedIn: true
+    };
+
+    const cookieStore = await cookies();
+    
+    cookieStore.set('admin_session', JSON.stringify(sessionData), {
+      httpOnly: true,
+      secure: false, // Keep false for localhost testing
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60 * 24 // 1 Day
     });
 
-    cookieStore.set('admin_data', userCookieData, {
-        httpOnly: false, path: '/', maxAge: 86400
-    });
+    console.log(`✅ SUCCESS! Cookie set for ${user.username}`);
 
-    return NextResponse.json({ success: true, user });
+    return NextResponse.json({ success: true });
 
-  } catch (error) {
-    console.error("Verify 2FA Error:", error);
-    return NextResponse.json({ error: "Verification failed" }, { status: 500 });
+  } catch (error: any) {
+    console.error("OTP VERIFY ERROR:", error);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
