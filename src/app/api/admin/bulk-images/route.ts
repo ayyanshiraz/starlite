@@ -1,69 +1,76 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { writeFile, mkdir } from 'fs/promises';
+import * as ftp from 'basic-ftp';
+import { Readable } from 'stream';
 import path from 'path';
 
 export async function POST(request: Request) {
+  const client = new ftp.Client();
+  // client.ftp.verbose = true; // Uncomment if you need to debug connection issues
+
   try {
     const formData = await request.formData();
     const files = formData.getAll('files') as File[];
 
-    if (!files || files.length === 0) {
-      return NextResponse.json({ success: false, message: "No files received" });
-    }
+    if (!files.length) return NextResponse.json({ success: false, message: "No files received" });
 
-    // 1. Ensure upload directory exists
-    const uploadDir = path.join(process.cwd(), 'public/uploads/products');
-    await mkdir(uploadDir, { recursive: true });
+    // 1. Connect to your Namecheap Server
+    await client.access({
+      host: process.env.FTP_HOST,
+      user: process.env.FTP_USER,
+      password: process.env.FTP_PASSWORD,
+      secure: process.env.FTP_SECURE === 'true',
+      // If secure connection fails, try setting secure: false
+    });
 
-    const report: string[] = [];
+    // 2. Prepare the destination folder
+    // On cPanel, your live site usually lives in 'public_html'
+    const uploadPath = 'public_html/uploads/products';
+    await client.ensureDir(uploadPath);
+
+    const logs: string[] = [];
     let successCount = 0;
 
     for (const file of files) {
-      // 2. Extract SKU from filename (e.g., "DELL-5540.jpg" -> "DELL-5540")
       const filename = file.name;
-      const skuFromFilename = path.parse(filename).name; 
+      // Extract SKU: "DELL-5540.jpg" -> "DELL-5540"
+      const sku = path.parse(filename).name; 
 
       // 3. Find the Product
-      // We use 'findFirst' with insensitive mode to match "dell-5540" with "DELL-5540"
       const product = await prisma.product.findFirst({
-        where: {
-          sku: {
-            equals: skuFromFilename,
-            mode: 'insensitive', 
-          }
-        }
+        where: { sku: { equals: sku, mode: 'insensitive' } }
       });
 
       if (product) {
-        // 4. Save the file ONLY if the product exists
-        const bytes = await file.arrayBuffer();
-        const buffer = Buffer.from(bytes);
-        const savePath = path.join(uploadDir, filename);
-        await writeFile(savePath, buffer);
+        // 4. Upload File via Stream
+        const buffer = Buffer.from(await file.arrayBuffer());
+        const stream = Readable.from(buffer);
 
-        // 5. Update Database
-        const publicUrl = `/uploads/products/${filename}`;
+        await client.uploadFrom(stream, `${uploadPath}/${filename}`);
+
+        // 5. Generate the Public URL
+        // Since you uploaded to public_html/uploads/products, the URL is:
+        const publicUrl = `https://starlightlinkers.com/uploads/products/${filename}`;
+
+        // 6. Save URL to Database
         await prisma.product.update({
           where: { id: product.id },
           data: { image: publicUrl }
         });
 
-        report.push(`✅ Linked: ${filename} -> ${product.name}`);
         successCount++;
+        logs.push(`✅ Uploaded & Linked: ${sku}`);
       } else {
-        report.push(`⚠️ Skipped: ${filename} (No product found with SKU: "${skuFromFilename}")`);
+        logs.push(`⚠️ Skipped: ${filename} (Product SKU not found)`);
       }
     }
 
-    return NextResponse.json({ 
-      success: true, 
-      count: successCount, 
-      logs: report 
-    });
+    client.close();
+    return NextResponse.json({ success: true, count: successCount, logs });
 
   } catch (error: any) {
-    console.error(error);
-    return NextResponse.json({ success: false, error: error.message });
+    client.close();
+    console.error("FTP Error:", error);
+    return NextResponse.json({ success: false, error: "FTP Error: " + error.message });
   }
 }
