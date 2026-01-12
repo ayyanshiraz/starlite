@@ -6,7 +6,7 @@ import path from 'path';
 
 export async function POST(request: Request) {
   const client = new ftp.Client();
-  // client.ftp.verbose = true; // Uncomment if you need to debug connection issues
+  // client.ftp.verbose = true; // Debug mode
 
   try {
     const formData = await request.formData();
@@ -14,54 +14,62 @@ export async function POST(request: Request) {
 
     if (!files.length) return NextResponse.json({ success: false, message: "No files received" });
 
-    // 1. Connect to your Namecheap Server
+    // 1. Connect
     await client.access({
       host: process.env.FTP_HOST,
       user: process.env.FTP_USER,
       password: process.env.FTP_PASSWORD,
       secure: process.env.FTP_SECURE === 'true',
-      // If secure connection fails, try setting secure: false
     });
 
-    // 2. Prepare the destination folder
-    // On cPanel, your live site usually lives in 'public_html'
-    const uploadPath = 'public_html/uploads/products';
-    await client.ensureDir(uploadPath);
+    // 2. SAFE NAVIGATION (Walk into folders one by one)
+    try {
+      // Try to enter public_html. 
+      // If the FTP user is ALREADY inside public_html (common), this might fail, so we catch it.
+      await client.cd("public_html").catch(() => console.log("Already in public_html or root."));
+      
+      // Now enter uploads
+      await client.ensureDir("uploads");
+      await client.cd("uploads");
+
+      // Now enter products
+      await client.ensureDir("products");
+      await client.cd("products");
+      
+    } catch (err) {
+      throw new Error("Could not find 'uploads/products' folder. Please create it manually in cPanel inside public_html.");
+    }
 
     const logs: string[] = [];
     let successCount = 0;
 
     for (const file of files) {
       const filename = file.name;
-      // Extract SKU: "DELL-5540.jpg" -> "DELL-5540"
       const sku = path.parse(filename).name; 
 
-      // 3. Find the Product
       const product = await prisma.product.findFirst({
         where: { sku: { equals: sku, mode: 'insensitive' } }
       });
 
       if (product) {
-        // 4. Upload File via Stream
         const buffer = Buffer.from(await file.arrayBuffer());
         const stream = Readable.from(buffer);
 
-        await client.uploadFrom(stream, `${uploadPath}/${filename}`);
+        // 3. UPLOAD (Since we are already inside the folder, we just use the filename)
+        await client.uploadFrom(stream, filename);
 
-        // 5. Generate the Public URL
-        // Since you uploaded to public_html/uploads/products, the URL is:
+        // 4. Update Database
         const publicUrl = `https://starlightlinkers.com/uploads/products/${filename}`;
-
-        // 6. Save URL to Database
+        
         await prisma.product.update({
           where: { id: product.id },
           data: { image: publicUrl }
         });
 
         successCount++;
-        logs.push(`✅ Uploaded & Linked: ${sku}`);
+        logs.push(`✅ Uploaded: ${sku}`);
       } else {
-        logs.push(`⚠️ Skipped: ${filename} (Product SKU not found)`);
+        logs.push(`⚠️ Skipped: ${filename} (SKU not found)`);
       }
     }
 
@@ -70,7 +78,6 @@ export async function POST(request: Request) {
 
   } catch (error: any) {
     client.close();
-    console.error("FTP Error:", error);
     return NextResponse.json({ success: false, error: "FTP Error: " + error.message });
   }
 }
