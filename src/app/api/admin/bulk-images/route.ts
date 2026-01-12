@@ -22,25 +22,61 @@ export async function POST(request: Request) {
       secure: process.env.FTP_SECURE === 'true',
     });
 
-    // 2. SAFE NAVIGATION (Walk into folders one by one)
-    try {
-      // Try to enter public_html. 
-      // If the FTP user is ALREADY inside public_html (common), this might fail, so we catch it.
-      await client.cd("public_html").catch(() => console.log("Already in public_html or root."));
-      
-      // Now enter uploads
-      await client.ensureDir("uploads");
-      await client.cd("uploads");
+    const logs: string[] = [];
+    logs.push(`🔌 Connected to ${process.env.FTP_HOST}`);
+    
+    // 2. DIAGNOSTIC NAVIGATION (The "Smart Walk")
+    // This part figures out where we are before trying to upload.
+    
+    // Step A: Check where we started
+    let currentDir = await client.pwd();
+    logs.push(`📂 Started at: ${currentDir}`);
 
-      // Now enter products
-      await client.ensureDir("products");
-      await client.cd("products");
-      
-    } catch (err) {
-      throw new Error("Could not find 'uploads/products' folder. Please create it manually in cPanel inside public_html.");
+    // Step B: Look for public_html
+    // Get list of folders in current directory
+    const rootList = await client.list();
+    const hasPublicHtml = rootList.some(f => f.name === "public_html");
+
+    if (hasPublicHtml) {
+      logs.push("⬇️ Found 'public_html'. Entering...");
+      await client.cd("public_html");
+    } else {
+      logs.push("ℹ️ 'public_html' not found here. Assuming we are already inside it (or in a subfolder).");
     }
 
-    const logs: string[] = [];
+    // Step C: Look for uploads
+    const currentList = await client.list();
+    const hasUploads = currentList.some(f => f.name === "uploads");
+
+    if (hasUploads) {
+      logs.push("⬇️ Found 'uploads'. Entering...");
+      await client.cd("uploads");
+      
+      // Step D: Look for products
+      const uploadsList = await client.list();
+      const hasProducts = uploadsList.some(f => f.name === "products");
+      
+      if (hasProducts) {
+        logs.push("⬇️ Found 'products'. Entering...");
+        await client.cd("products");
+      } else {
+        logs.push("✨ 'products' folder missing. Creating it...");
+        await client.ensureDir("products");
+        await client.cd("products");
+      }
+
+    } else {
+      // If we can't find 'uploads', we might be lost. Try creating it.
+      logs.push("✨ 'uploads' folder missing. Creating full path...");
+      await client.ensureDir("uploads/products");
+      await client.cd("uploads/products");
+    }
+
+    // Double check where we ended up
+    const finalDir = await client.pwd();
+    logs.push(`📍 Final Upload Destination: ${finalDir}`);
+
+    // 3. START UPLOAD
     let successCount = 0;
 
     for (const file of files) {
@@ -55,21 +91,24 @@ export async function POST(request: Request) {
         const buffer = Buffer.from(await file.arrayBuffer());
         const stream = Readable.from(buffer);
 
-        // 3. UPLOAD (Since we are already inside the folder, we just use the filename)
-        await client.uploadFrom(stream, filename);
+        try {
+            // Upload explicitly to the current folder
+            await client.uploadFrom(stream, filename);
 
-        // 4. Update Database
-        const publicUrl = `https://starlightlinkers.com/uploads/products/${filename}`;
-        
-        await prisma.product.update({
-          where: { id: product.id },
-          data: { image: publicUrl }
-        });
+            const publicUrl = `https://starlightlinkers.com/uploads/products/${filename}`;
+            
+            await prisma.product.update({
+                where: { id: product.id },
+                data: { image: publicUrl }
+            });
 
-        successCount++;
-        logs.push(`✅ Uploaded: ${sku}`);
+            successCount++;
+            logs.push(`✅ Uploaded: ${sku}`);
+        } catch (uploadErr: any) {
+            logs.push(`❌ Upload Failed for ${sku}: ${uploadErr.message}`);
+        }
       } else {
-        logs.push(`⚠️ Skipped: ${filename} (SKU not found)`);
+        logs.push(`⚠️ Skipped: ${filename} (SKU not found in DB)`);
       }
     }
 
@@ -78,6 +117,7 @@ export async function POST(request: Request) {
 
   } catch (error: any) {
     client.close();
-    return NextResponse.json({ success: false, error: "FTP Error: " + error.message });
+    // Return the REAL error message this time
+    return NextResponse.json({ success: false, error: "FTP Critical Error: " + error.message });
   }
 }
