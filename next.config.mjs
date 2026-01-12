@@ -1,13 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // 🟢 1. Increase Upload Limit (Fixes the 1MB Error)
+  // 1. Increase Upload Limit
   experimental: {
     serverActions: {
-      bodySizeLimit: '10mb', // Increase to 10MB (or more if needed)
+      bodySizeLimit: '10mb', 
     },
   },
 
-  // 2. Ignore TypeScript/ESLint Errors (Keep this for Vercel deployment)
+  // 2. Ignore Errors
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -15,12 +15,16 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
 
-  // 3. Allow External Images
+  // 3. Allow External Images (Fixed)
   images: {
     remotePatterns: [
       {
         protocol: 'https',
         hostname: '**',
+      },
+      {
+        protocol: 'http',  // 👈 Added this
+        hostname: '**',    // 👈 Allows HTTP from anywhere
       },
     ],
   },
