@@ -6,7 +6,7 @@ const getRowValue = (row: any, keys: string[]) => {
   const rowKeys = Object.keys(row);
   for (const k of keys) {
     // We clean the key (remove spaces, lowercase) to match loosely
-    // Example: "Short description" becomes "shortdescription"
+    // Example: "Manufacturer Part No" becomes "manufacturerpartno"
     const cleanTarget = k.toLowerCase().replace(/[^a-z0-9]/g, '');
     
     const foundKey = rowKeys.find(rk => 
@@ -45,34 +45,33 @@ export async function POST(request: Request) {
       try {
         // 🟢 1. INTELLIGENT MAPPING
         
-        // NAME: In your CSV, the 'Description' column is the Product Name.
+        // SKU: Added 'Manufacturer Part No' to the list
+        let sku = getRowValue(row, ['Manufacturer Part No', 'SKU', 'Product No', 'Part Number']);
+        if (sku) sku = String(sku).trim(); 
+
+        // NAME: 'Description' column is your Product Name
         const name = getRowValue(row, ['Description', 'Name', 'Title', 'Product Name']);
         
-        // SKU: Look for SKU or Product No
-        let sku = getRowValue(row, ['SKU', 'Product No', 'Part Number']);
-        if (sku) sku = String(sku).trim(); // Clean spaces from SKU
-
-        // CATEGORY: Fix for "Uncategorized"
-        // We look for 'Category', 'Product Group', or 'Cat'
+        // CATEGORY
         const categoryRaw = getRowValue(row, ['Category', 'Product Group', 'Cat']);
         const category = categoryRaw || "Uncategorized";
         
         // BRAND
         const brand = getRowValue(row, ['Brand', 'Manufacturer']);
 
-        // SHORT DESCRIPTION
-        const shortDesc = getRowValue(row, ['Short description', 'Overview', 'Summary']) || "";
+        // SHORT DESCRIPTION: Added 'short Description' explicitly
+        const shortDesc = getRowValue(row, ['short Description', 'Short description', 'Overview', 'Summary']) || "";
 
-        // LONG DESCRIPTION (Handling your specific typo 'descrption')
+        // LONG DESCRIPTION (Optional if you have it later)
         const longDesc = getRowValue(row, ['descrption', 'Long description', 'Details', 'Full Description']) || "";
 
         // PRICE & STOCK
         const rawPrice = getRowValue(row, ['Price', 'RRP', 'Cost']);
-        const rawStock = getRowValue(row, ['Availibility', 'Availability', 'Stock', 'Qty']);
+        const rawStock = getRowValue(row, ['Availability', 'Availibility', 'Stock', 'Qty']);
 
         // SKIP INVALID ROWS
         if (!name || !sku) {
-          console.log(`⚠️ Skipping row: Missing Name or SKU`);
+          console.log(`⚠️ Skipping row: Missing Name (${name}) or SKU (${sku})`);
           results.errors++;
           continue;
         }
@@ -86,14 +85,14 @@ export async function POST(request: Request) {
             if (slug.length > 150) slug = slug.substring(0, 150);
         }
 
-        // Price (Convert "12.50" to 1250 cents)
+        // Price (Handles commas like "1,371.57" -> 137157 cents)
         let priceCents = null;
         if (rawPrice !== undefined && rawPrice !== "") {
            const cleanPrice = String(rawPrice).replace(/[^0-9.]/g, '');
            priceCents = Math.round(parseFloat(cleanPrice) * 100);
         }
 
-        // Stock (Handle "Instock" text)
+        // Stock (Handle "InStock" text or integers)
         let stock = 0;
         if (rawStock !== undefined && rawStock !== "") {
             const cleanStock = String(rawStock).toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -102,20 +101,19 @@ export async function POST(request: Request) {
             if (!isNaN(parsed)) {
                 stock = parsed;
             } else if (cleanStock.includes('instock') || cleanStock.includes('yes')) {
-                stock = 10; // Default stock if CSV says "Instock"
+                stock = 10; // Default stock if CSV says "InStock"
             }
         }
 
         const availability = stock > 0 ? "In Stock" : "Out of Stock";
-        // Combine Brand + Category for a better structure (e.g., "Ubiquiti, Routers")
+        // Combine Brand + Category (e.g., "CYBERPOWER SYSTEMS, UPS - Mini Tower")
         const finalCategory = brand ? `${brand}, ${category}` : category;
 
         // 🟢 3. SAVE TO DATABASE
-        // We store descriptions in a structured JSON format
         const descriptionData = {
             short: shortDesc,
             long: longDesc, 
-            overview: shortDesc // Fallback for older parts of your site
+            overview: shortDesc // Using short description as primary overview
         };
 
         const existingProduct = await prisma.product.findFirst({
@@ -132,8 +130,8 @@ export async function POST(request: Request) {
                 price: priceCents,
                 stock: stock,
                 availability: availability,
-                description: descriptionData, // Saves both Short & Long
-                category: finalCategory       // Saves the fixed Category
+                description: descriptionData,
+                category: finalCategory
              }
            });
            results.updated++;
