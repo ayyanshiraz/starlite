@@ -5,8 +5,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCart } from '../hooks/useCart';
-import type { Product } from '../lib/products'; // 🟢 Import Type only
-import { getSearchSuggestions } from '../app/actions/header-actions'; // 🟢 Import Server Action
+import type { Product } from '../lib/products';
+import { getSearchSuggestions } from '../app/actions/header-actions';
 
 // --- SVG ICON COMPONENTS ---
 const iconProps = {
@@ -32,7 +32,7 @@ const ShoppingBagIcon = ({ className = "" }) => (<svg {...iconProps} className={
 export function HeaderSection() {
   // Search State
   const [searchQuery, setSearchQuery] = useState("");
-  const [suggestions, setSuggestions] = useState<Product[]>([]); // 🟢 Fixed Type
+  const [suggestions, setSuggestions] = useState<Product[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   
   // Badge Counts
@@ -71,7 +71,7 @@ export function HeaderSection() {
     return () => window.removeEventListener('compare-updated', updateCompareCount);
   }, []);
 
-  // --- 🟢 UPDATED Search Logic (Async with Debounce) ---
+  // --- Search Logic ---
   useEffect(() => {
     const fetchSuggestions = async () => {
       if (searchQuery.trim().length > 1) {
@@ -88,12 +88,10 @@ export function HeaderSection() {
       }
     };
 
-    // Debounce: Wait 300ms after user stops typing before asking DB
     const timer = setTimeout(fetchSuggestions, 300);
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // Close search on click outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent | TouchEvent) {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -111,8 +109,9 @@ export function HeaderSection() {
       document.activeElement.blur();
     }
     if (searchQuery.trim()) {
-      // 🟢 Point to Shop page filter
-      router.push(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
+      // 🟢 FIX: Route to '/search' instead of '/shop'
+      // Use 'q' as the parameter to match your Search Page code
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
     }
   };
 
@@ -134,8 +133,6 @@ export function HeaderSection() {
 
           {/* --- Icon Group --- */}
           <div className="flex items-center gap-3 sm:gap-4 flex-shrink-0 md:order-3">
-            
-            {/* --- COMPARE ICON --- */}
             <Link href="/compare" className="text-gray-700 hover:text-black relative">
               <RepeatIcon className="w-6 h-6" />
               {compareCount > 0 && (
@@ -145,7 +142,6 @@ export function HeaderSection() {
               )}
             </Link>
 
-            {/* --- WISHLIST ICON --- */}
             <Link href="/wishlist" className="text-gray-700 hover:text-black relative">
               <HeartIcon className="w-6 h-6" />
               {wishlistCount > 0 && (
@@ -155,16 +151,13 @@ export function HeaderSection() {
               )}
             </Link>
             
-            {/* --- USER ICON --- */}
             <Link href="/my-account" className="text-gray-700 hover:text-black">
               <UserIcon className="w-6 h-6" />
             </Link>
             
-            {/* --- CART ICON --- */}
             <Link href="/cart" className="flex items-center gap-2 cursor-pointer group">
               <div className="relative">
                 <ShoppingBagIcon className="w-7 h-7 text-gray-800 group-hover:text-blue-600 transition-colors" />
-                
                 {cartCount > 0 && (
                   <span className="absolute -top-2 -right-2 w-5 h-5 bg-blue-600 text-white text-xs font-bold rounded-full flex items-center justify-center border-2 border-white">
                     {cartCount}
