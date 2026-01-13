@@ -143,7 +143,7 @@ export default function TermsAndConditionsPageClient() {
 
           <PolicySection title="Claims">
             <p>
-              If a Customer makes any claims against Starlight Linkers LLC , the Customer agrees that the venue for such claims will be London, UK.
+              If a Customer makes any claims against Starlight Linkers LLC , the Customer agrees that the venue for such claims will be TX, USA.
             </p>
           </PolicySection>
 
