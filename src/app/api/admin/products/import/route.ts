@@ -6,7 +6,6 @@ const getRowValue = (row: any, keys: string[]) => {
   const rowKeys = Object.keys(row);
   for (const k of keys) {
     // We clean the key (remove spaces, lowercase) to match loosely
-    // Example: "Manufacturer Part No" becomes "manufacturerpartno"
     const cleanTarget = k.toLowerCase().replace(/[^a-z0-9]/g, '');
     
     const foundKey = rowKeys.find(rk => 
@@ -43,14 +42,19 @@ export async function POST(request: Request) {
 
     for (const row of products) {
       try {
-        // 🟢 1. INTELLIGENT MAPPING
+        // 🟢 1. INTELLIGENT MAPPING (SWAPPED)
         
-        // SKU: Added 'Manufacturer Part No' to the list
+        // SKU: (Unchanged)
         let sku = getRowValue(row, ['Manufacturer Part No', 'SKU', 'Product No', 'Part Number']);
         if (sku) sku = String(sku).trim(); 
 
-        // NAME: 'Description' column is your Product Name
-        const name = getRowValue(row, ['Description', 'Name', 'Title', 'Product Name']);
+        // NAME <- 'short Description'
+        // We now look for 'short Description' FIRST to use as the Product Name
+        const name = getRowValue(row, ['short Description', 'Short description', 'Name', 'Title']);
+        
+        // PRIMARY DESCRIPTION <- 'Description'
+        // We now look for 'Description' to use as the Main Text Body
+        const primaryDesc = getRowValue(row, ['Description', 'Long description', 'Details', 'Full Description']) || "";
         
         // CATEGORY
         const categoryRaw = getRowValue(row, ['Category', 'Product Group', 'Cat']);
@@ -58,12 +62,6 @@ export async function POST(request: Request) {
         
         // BRAND
         const brand = getRowValue(row, ['Brand', 'Manufacturer']);
-
-        // SHORT DESCRIPTION: Added 'short Description' explicitly
-        const shortDesc = getRowValue(row, ['short Description', 'Short description', 'Overview', 'Summary']) || "";
-
-        // LONG DESCRIPTION (Optional if you have it later)
-        const longDesc = getRowValue(row, ['descrption', 'Long description', 'Details', 'Full Description']) || "";
 
         // PRICE & STOCK
         const rawPrice = getRowValue(row, ['Price', 'RRP', 'Cost']);
@@ -85,14 +83,14 @@ export async function POST(request: Request) {
             if (slug.length > 150) slug = slug.substring(0, 150);
         }
 
-        // Price (Handles commas like "1,371.57" -> 137157 cents)
+        // Price
         let priceCents = null;
         if (rawPrice !== undefined && rawPrice !== "") {
            const cleanPrice = String(rawPrice).replace(/[^0-9.]/g, '');
            priceCents = Math.round(parseFloat(cleanPrice) * 100);
         }
 
-        // Stock (Handle "InStock" text or integers)
+        // Stock
         let stock = 0;
         if (rawStock !== undefined && rawStock !== "") {
             const cleanStock = String(rawStock).toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -101,19 +99,19 @@ export async function POST(request: Request) {
             if (!isNaN(parsed)) {
                 stock = parsed;
             } else if (cleanStock.includes('instock') || cleanStock.includes('yes')) {
-                stock = 10; // Default stock if CSV says "InStock"
+                stock = 10;
             }
         }
 
         const availability = stock > 0 ? "In Stock" : "Out of Stock";
-        // Combine Brand + Category (e.g., "CYBERPOWER SYSTEMS, UPS - Mini Tower")
         const finalCategory = brand ? `${brand}, ${category}` : category;
 
         // 🟢 3. SAVE TO DATABASE
+        // We map the 'primaryDesc' (from your CSV 'Description' column) to the overview
         const descriptionData = {
-            short: shortDesc,
-            long: longDesc, 
-            overview: shortDesc // Using short description as primary overview
+            short: primaryDesc, 
+            long: primaryDesc, 
+            overview: primaryDesc 
         };
 
         const existingProduct = await prisma.product.findFirst({
