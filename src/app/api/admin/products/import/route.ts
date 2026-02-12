@@ -42,18 +42,16 @@ export async function POST(request: Request) {
 
     for (const row of products) {
       try {
-        // 🟢 1. INTELLIGENT MAPPING (SWAPPED)
+        // 🟢 1. INTELLIGENT MAPPING
         
-        // SKU: (Unchanged)
+        // SKU:
         let sku = getRowValue(row, ['Manufacturer Part No', 'SKU', 'Product No', 'Part Number']);
         if (sku) sku = String(sku).trim(); 
 
         // NAME <- 'short Description'
-        // We now look for 'short Description' FIRST to use as the Product Name
         const name = getRowValue(row, ['short Description', 'Short description', 'Name', 'Title']);
         
         // PRIMARY DESCRIPTION <- 'Description'
-        // We now look for 'Description' to use as the Main Text Body
         const primaryDesc = getRowValue(row, ['Description', 'Long description', 'Details', 'Full Description']) || "";
         
         // CATEGORY
@@ -90,24 +88,30 @@ export async function POST(request: Request) {
            priceCents = Math.round(parseFloat(cleanPrice) * 100);
         }
 
-        // Stock
+        // 🟢 STOCK LOGIC UPDATE
         let stock = 0;
         if (rawStock !== undefined && rawStock !== "") {
-            const cleanStock = String(rawStock).toLowerCase().replace(/[^a-z0-9]/g, '');
-            const parsed = parseInt(rawStock);
+            // Remove commas (e.g., "1,000") and parse as integer
+            const cleanStock = String(rawStock).replace(/,/g, '');
+            const parsed = parseInt(cleanStock);
             
             if (!isNaN(parsed)) {
                 stock = parsed;
-            } else if (cleanStock.includes('instock') || cleanStock.includes('yes')) {
-                stock = 10;
+            } else {
+                // Legacy fallback: Check for "Instock" text if parsing fails
+                const textStock = String(rawStock).toLowerCase().replace(/[^a-z0-9]/g, '');
+                if (textStock.includes('instock') || textStock.includes('yes')) {
+                    stock = 10; // Default qty if text says "In Stock"
+                }
             }
         }
 
+        // Determine Availability: 0 = "Out of Stock", >0 = "In Stock"
         const availability = stock > 0 ? "In Stock" : "Out of Stock";
+        
         const finalCategory = brand ? `${brand}, ${category}` : category;
 
         // 🟢 3. SAVE TO DATABASE
-        // We map the 'primaryDesc' (from your CSV 'Description' column) to the overview
         const descriptionData = {
             short: primaryDesc, 
             long: primaryDesc, 
